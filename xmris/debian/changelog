@@ -1,0 +1,11 @@
+xmris (4.0.5-1) unstable; urgency=low
+
+  * Initial release (closes: #546486).
+    The changes are made as follows
+    + The garden data are stored under /var/lib/xmris/gardens/,
+      instead of /etc/X11/app-defaults/xmris.
+    + The score data are stored under /var/lib/xmris ,
+      instead of /var/lib/games/xmris.
+    + The 'USELOCKFILE' feature is disable.
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Sat, 17 Sep 2011 22:49:01 +0900

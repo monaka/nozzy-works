@@ -1,0 +1,16 @@
+Source: xmris
+Section: games
+Priority: optional
+Maintainer: Takahide Nojima <nozzy123nozzy@gmail.com>
+Build-Depends: debhelper (>= 7.0.50), xutils-dev, libx11-dev, libxaw7-dev, quilt
+Standards-Version: 3.9.2
+Homepage: http://sourceforge.net/projects/xmris/
+
+Package: xmris
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, menu
+Description: Clone of arcade game Mr.Do -- written for X
+ "Mr-Is" is a version of the Mr Do video arcade game for the 
+ X Window System. Mr-Ed is an editor with which you can create your 
+ own gardens.
+

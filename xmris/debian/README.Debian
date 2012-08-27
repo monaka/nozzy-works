@@ -1,0 +1,29 @@
+xmris for Debian
+----------------
+
+ The changes are made as follows,
+
+  1. The garden data are stored under /var/lib/xmris/gardens/ ,instead of /etc/X11/app-defaults/xmris.
+
+  2. The score data are stored under /var/lib/xmris ,instead of /var/lib/games/xmris.
+
+  3. The 'USELOCKFILE' feature is disable.
+
+Change Key bindings
+-------------------
+
+ To use the cursor keys for moving,
+
+  Step1. Put following lines to 'xmris.ad' file,
+         
+         Xmris*Up: Up
+         Xmris*Down: Down
+         Xmris*Left: Left
+         Xmris*Right: Right
+
+   Step 2. Register xmris.ad to X resource,
+       
+         xrdb -marge ./xmris.ad
+
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Sat, 19 Sep 2011 22:43:00 +0900

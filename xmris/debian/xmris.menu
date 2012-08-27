@@ -1,0 +1,10 @@
+?package(xmris):needs="X11" \
+  section="Games/Action" \
+  longtitle="A version of the Mr Do video arcade game for X"\
+  title="Xmris"\
+  command="xmris"
+?package(xmris):needs="X11" \
+  section="Games/Action" \
+  longtitle="Stage editor of Xmris"\
+  title="Xmred"\
+  command="xmred"

@@ -1,0 +1,24 @@
+[Desktop Entry]
+
+Name=Xmris
+GenericName=Xmris
+Comment=A version of the Mr Do video arcade game for X
+
+Type=Application
+Exec=xmris
+Icon=xmris
+Terminal=false
+Categories=Game;ArcadeGame;
+
+[Desktop Entry]
+
+Name=Xred
+GenericName=Xred
+Comment=Stage editor of Xmris
+
+Type=Application
+Exec=xmred
+Icon=xmred
+Terminal=false
+Categories=Game;ArcadeGame;
+

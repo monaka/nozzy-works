@@ -1,0 +1,3 @@
+version=3
+http://sf.net/xmris/xmris\.([\d\.]+)\.tar\.gz
+
