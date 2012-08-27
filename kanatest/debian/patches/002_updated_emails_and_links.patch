@@ -1,0 +1,88 @@
+From: Tomasz Maka <pasp@users.sourceforge.net>
+Subject: Updated emails and links
+Origin: upstream, http://svn.gna.org/viewcvs/kanatest?view=rev&revision=51
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/kanatest/+bug/462599
+
+Index: AUTHORS
+===================================================================
+--- kanatest/AUTHORS	(revision 50)
++++ kanatest/AUTHORS	(revision 51)
+@@ -4,8 +4,8 @@
+ 
+ Tomasz Maka <pasp@users.sourceforge.net>
+ 
+-Maja Kocon  <ironya@ll.pl>
+-Piotr Maka  <sill@ll.pl>
++Maja Kocon  <ironya@pinky-babble.org>
++Piotr Maka  <silloz@users.sourceforge.net>
+ 
+ 
+ Contributors
+Index: src/about.c
+===================================================================
+--- kanatest/src/about.c	(revision 50)
++++ kanatest/src/about.c	(revision 51)
+@@ -148,7 +148,7 @@
+     "fr",   "Adrian Courrèges",     "a.courreges@gmail.com",
+     "hu",   "Szigetvári Csaba",     "csaba.szigetvari@informedia.hu",
+     "it",   "Jacopo Farina",        "jacopo.farina@email.it",
+-    "pl",   "Piotr Mąka",           "sill@ll.pl",
++    "pl",   "Piotr Mąka",           "silloz@users.sourceforge.net",
+     "pt",   "Bruno Ramos",          "ladrilho@gmail.com",
+     "ru",   "Taci Taclipoka",       "taclipoka@gmail.com"
+ };
+@@ -235,7 +235,7 @@
+ 
+     gtk_text_buffer_insert (entry_buffer, &iter, "\n", -1);
+     gui_url_insert_link(&appGUI->about_links_list, &appGUI->about_link_index, appGUI->about_textview,
+-						&iter, NULL, 0, "http://clay.ll.pl/kanatest", TRUE, appGUI);
++						&iter, NULL, 0, "http://clayo.org/kanatest", TRUE, appGUI);
+     gtk_text_buffer_insert (entry_buffer, &iter, "\n", -1);
+     g_snprintf (buffer, BUFFER_SIZE, "\n(%s %s, %s)\n\n", _("compiled on"), __DATE__, __TIME__);
+     gtk_text_buffer_insert_with_tags_by_name (entry_buffer, &iter, buffer, -1, "center", "italic", NULL);
+@@ -244,18 +244,18 @@
+     gtk_text_buffer_insert_with_tags_by_name (entry_buffer, &iter, buffer, -1, "bold", NULL);
+     gtk_text_buffer_insert (entry_buffer, &iter, "     Tomasz Mąka <", -1);
+     gui_url_insert_link (&appGUI->about_links_list, &appGUI->about_link_index, appGUI->about_textview,
+-						 &iter, NULL, 0, "pasp@ll.pl", TRUE, appGUI);
++						 &iter, NULL, 0, "pasp@users.sourceforge.net", TRUE, appGUI);
+     gtk_text_buffer_insert (entry_buffer, &iter, ">\n", -1);
+ 
+     g_snprintf (buffer, BUFFER_SIZE, "\n%s:\n", _("Graphics"));
+     gtk_text_buffer_insert_with_tags_by_name (entry_buffer, &iter, buffer, -1, "bold", NULL);
+     gtk_text_buffer_insert (entry_buffer, &iter, "     Maja Kocoń (", -1);
+     gui_url_insert_link (&appGUI->about_links_list, &appGUI->about_link_index, appGUI->about_textview,
+-						 &iter, NULL, 0, "http://ironya.ll.pl", TRUE, appGUI);
++						 &iter, NULL, 0, "http://pinky-babble.org", TRUE, appGUI);
+     gtk_text_buffer_insert (entry_buffer, &iter, ")\n", -1);
+     gtk_text_buffer_insert (entry_buffer, &iter, "     Piotr Mąka <", -1);
+     gui_url_insert_link (&appGUI->about_links_list, &appGUI->about_link_index, appGUI->about_textview,
+-						 &iter, NULL, 0, "sill@ll.pl", TRUE, appGUI);
++						 &iter, NULL, 0, "silloz@users.sourceforge.net", TRUE, appGUI);
+     gtk_text_buffer_insert (entry_buffer, &iter, ">\n", -1);
+ 
+     g_snprintf (buffer, BUFFER_SIZE, "\n%s:\n", _("Translators"));
+Index: README
+===================================================================
+--- kanatest/README	(revision 50)
++++ kanatest/README	(revision 51)
+@@ -61,7 +61,7 @@
+ 
+ -----> WHERE ?
+ 
+-Homepage: http://clay.ll.pl/kanatest
++Homepage: http://clayo.org/kanatest
+ 
+ 
+ -----> WHO ?
+@@ -70,8 +70,8 @@
+      Tomasz Maka <pasp@users.sourceforge.net>
+ 
+ Graphics:
+-     Maja Kocon (http://ironya.ll.pl) - current logo, icons
+-     Piotr Maka <sill@ll.pl> - logo used in previous versions
++     Maja Kocon (http://pinky-babble.org) - current logo, icons
++     Piotr Maka <silloz@users.sourceforge.net> - logo used in previous versions
+ 
+ Any suggestions, patches, criticism are kindly welcome.
+ 

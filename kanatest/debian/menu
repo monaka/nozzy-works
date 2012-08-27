@@ -1,0 +1,4 @@
+?package(kanatest):command="/usr/bin/kanatest" needs="X11" \
+    section="Applications/Education" title="Kana test" \
+    icon="/usr/share/pixmaps/kanatest.xpm" \
+    longtitle="Drill game to learn Japanese kana characters"

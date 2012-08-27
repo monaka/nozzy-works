@@ -1,0 +1,3 @@
+version=3
+
+http://clayo.org/kanatest/ kanatest-([\d.]+)\.tar\.gz

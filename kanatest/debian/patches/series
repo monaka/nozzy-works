@@ -1,0 +1,6 @@
+001_PATH_MAX_fix.diff
+002_updated_emails_and_links.patch
+003_gtk_ftbfs_fix.patch
+004_io-warning-on-fist-startup.patch
+005_implicit_declarration_gtk_combo_box_new_text.patch
+006_fix_errors_for_hardening.patch

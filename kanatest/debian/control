@@ -1,0 +1,25 @@
+Source: kanatest
+Section: text
+Priority: optional
+Maintainer: Debian Games Team <pkg-games-devel@lists.alioth.debian.org>
+Uploaders: Sam Hocevar <sho@debian.org>, Barry deFreese <bdefreese@debian.org>,
+ Evgeni Golov <evgeni@debian.org>
+Build-Depends: debhelper (>= 5.0), quilt, libgtk2.0-dev (>= 2.0), libxml2-dev, gettext, autotools-dev
+Standards-Version: 3.9.3
+Homepage: http://clayo.org/kanatest/
+Vcs-Svn: svn://svn.debian.org/svn/pkg-games/packages/trunk/kanatest/
+Vcs-Browser: http://svn.debian.org/wsvn/pkg-games/packages/trunk/kanatest/?op=log
+
+Package: kanatest
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: fonts-ipafont-mincho | fonts-japanese-mincho
+Suggests: fonts-mikachan
+Description: beginner's drill game to learn Japanese kana characters
+ Kanatest is a simple hiragana and katakana drill game. It checks your
+ knowledge of Japanese kana characters.
+ .
+ There are three drill modes: hiragana mode (hiragana charset only), katakana
+ mode (katakana charset only) and mixed mode (both charsets). The tester shows
+ random kana characters and waits until you enter the romaji equivalent in an
+ entry field. At the end, statistics are provided.

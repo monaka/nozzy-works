@@ -1,0 +1,18 @@
+Description: Fix up  for  i/o warning on first startup.
+Forwarded: https://mail.gna.org/public/kanatest-friends/2012-03/msg00003.html
+Bug-Debian: http://bugs.debian.org/512627
+Author: Takahide Nojima <nozzy123nozzy@gmail.com>
+
+--- a/src/main.c
++++ b/src/main.c
+@@ -69,7 +69,9 @@
+     if (g_file_test(buffer, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR) != TRUE) {
+         prefs_read_config (CONFIG_FILENAME_OLD, CONFIG_DIRNAME_OLD);
+         prefs_write_config (CONFIG_FILENAME, CONFIG_DIRNAME);
+-        stats_read_list (STATS_FILENAME_OLD, CONFIG_DIRNAME_OLD, appGUI);
++	if (g_file_test(prefs_get_config_filename (STATS_FILENAME_OLD, CONFIG_DIRNAME_OLD), G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR) == TRUE) {
++	  stats_read_list (STATS_FILENAME_OLD, CONFIG_DIRNAME_OLD, appGUI);
++	}
+         stats_write_list (STATS_FILENAME, CONFIG_DIRNAME, appGUI);
+     }
+ 

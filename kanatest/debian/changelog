@@ -1,0 +1,250 @@
+kanatest (0.4.8-3) unstable; urgency=low
+
+  * debian/control:
+    + replace recommends and suggests for more apropriate
+      japanese fonts.
+    LP: #642941
+  * Add 004_io-warning-on-first-startup.patch to fix up
+       some warning on starting up.
+    LP: #512627
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Wed, 01 Aug 2012 22:02:00 +0900
+
+kanatest (0.4.8-2) unstable; urgency=low
+
+  * debian/control:
+    + Update my email address.
+    + Update the homepage link.
+    + Standards-Version: 3.9.1
+  * debian/watch:
+    + Upstream homepage has moved, update watchfile.
+  * Add 002_updated_emails_and_links.patch to fix old links and emails.
+    LP: #462599
+  * Add 003_gtk_ftbfs_fix.patch to fix FTBFS with GTK+ >= 2.22.
+  * Set 1.0 in debian/source/format.
+
+ -- Evgeni Golov <evgeni@debian.org>  Mon, 28 Mar 2011 13:35:04 +0200
+
+kanatest (0.4.8-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/patches/004_ru_po.diff:
+    + Drop the patch, upstream has updated the translation.
+  * debian/copyright:
+    + Update copyright years.
+  * debian/control:
+    + Bump Standards-Version to 3.8.1, no changes.
+
+ -- Evgeni Golov <sargentd@die-welt.net>  Fri, 17 Apr 2009 08:52:58 +0200
+
+kanatest (0.4.6-2) unstable; urgency=low
+
+  [ Barry deFreese ]
+  * Update my e-mail address.
+
+  [ Evgeni Golov ]
+  * Upload to unstable again.
+  * debian/patches/004_ru_po.diff:
+    + Update russian translation.
+  * debian/patches/{003_de_po,002_kfreebsd_fix}.diff:
+    + Really drop patches, not only not apply them.
+
+ -- Evgeni Golov <sargentd@die-welt.net>  Mon, 16 Feb 2009 21:16:37 +0100
+
+kanatest (0.4.6-1) experimental; urgency=low
+
+  * New upstream release, upload to experimental.
+  * debian/patches/003_de_po.diff:
+    + Applied upstream, thus droped.
+  * debian/patches/002_kfreebsd_fix.diff
+    + upstream has cleaned up the includes, patch droped.
+  * debian/kanatest.6:
+    + Set section to 1, not 6
+    + Rename to kanatest.1
+  * debian/rules:
+    + Install binary to /usr/bin, data to /usr/share.
+    + Set LDFLAGS="-Wl,-z,defs -Wl,--as-needed" to tighten deps.
+    + dh_installchangelogs only takes one argument, install the README
+      correctly with dh_installdocs and not install AUTHORS at all.
+    + Remove the comment header.
+    + Only pass --host= to configure when cross-building.
+    + Clean up the clean target.
+  * debian/copyright:
+    + Use the machine-readable format.
+  * debian/control:
+    + Add ${misc:Depends} to Depends.
+  * debian/patches/001_PATH_MAX_fix.diff:
+    + Hurd does not have PATH_MAX, fix FTBFS by defining it.
+
+ -- Evgeni Golov <sargentd@die-welt.net>  Thu, 18 Dec 2008 22:32:47 +0100
+
+kanatest (0.4.4-2) unstable; urgency=low
+
+  [ Barry deFreese ]
+  * Bump Standars Version to 3.7.3 (No changes needed)
+
+  [ Ansgar Burchardt ]
+  * debian/menu:
+    + Change section to Applications/Education instead of Games
+  * debian/kanatest.desktop:
+    + Change categories to Education, Languages instead of Game
+  * debian/control:
+    + Change section to text instead of games
+
+  [ Evgeni Golov ]
+  * debian/rules:
+    + let config.stamp depend on $(QUILT_STAMPFN) instead of patch
+      so configure isn't run twice
+    + wrap the configure options for better reading
+    + don't set CFLAGS, let dpkg handle them
+  * debian/patches/003_de_po.diff:
+    + Add German translation, thanks Mathias Brodala <info@noctus.net>!
+      Closes: #500064
+  * debian/control:
+    + Bump Standars-Version to 3.8.0
+    + Add myself to Uploaders
+  * debian/README.source:
+    + Add README.source with information about quilt-usage, as
+      recommended by Policy
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu, 25 Sep 2008 11:58:15 +0000
+
+kanatest (0.4.4-1) unstable; urgency=low
+
+  [ Eddy Petrișor ]
+  * Gtk should be written as GTK in the desktop file
+  * added a Romanian translation of the comment in the desktop file
+
+  [ Cyril Brulebois ]
+  * Adjusted XS-Vcs-Svn and XS-Vcs-Browser fields in the control file.
+
+  [ Barry deFreese ]
+  * New upstream release (Closes: #451414)
+  * Add watch file (Closes: #451416)
+  * Add Homepage field in control
+  * Make distclean not ignore errors
+  * Remove XS- from VCS fields in control
+  * Fix up clean target
+  * Revert 000_config_sub_guess.diff - Improved upstream build system
+  * 002_kfreebsd_fix.diff (Closes: #416873)
+    + Conditionally include limits.h on linux - Fixes FTBFS on kfreebsd
+    + Thanks to Cyril Brulebois for the patch
+  * Add myself to uploaders
+  * Remove deprecated Encoding field from desktop and fix categories
+  * Include quilt.make and fix rules to patch/unpatch
+
+  [ Mike O'Connor ]
+  * make sure docs/*.pmo are built (Closes: #441711)
+  * add missing build-depends on gettext
+
+  [ Paul Wise ]
+  * Move non-free ttf-mikachan from Recommends to Suggests
+  * Add a descriptive longtitle to the menu file
+  * Support noopt and nostrip properly
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Mon, 19 Nov 2007 14:12:32 +0930
+
+kanatest (0.4.2-2) unstable; urgency=low
+
+  * debian/control:
+    + Build-depend against libxml2-dev.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat, 07 Apr 2007 14:21:36 +0200
+
+kanatest (0.4.2-1) unstable; urgency=low
+
+  [ Gonéri Le Bouder ]
+  * add French comment in desktop file
+  * remove the Applications category from the desktop file since
+    it's not an official category
+    http://standards.freedesktop.org/menu-spec/latest/apa.html
+  * call dh_desktop to run update-desktop-database
+
+  [ Sam Hocevar ]
+  * New upstream release (Closes: #416493).
+  * debian/control:
+    + Added Vcs fields.
+    + Recommend ttf-kochi-mincho | ttf-mikachan | ttf-kochi-gothic because
+      the software now uses the system fonts to display kanas.
+  * debian/compat:
+    + Set level to 5.
+  * debian/kanatest.6:
+    + Upstream's manpage disappeared. Readded mine.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 30 Mar 2007 12:39:45 +0200
+
+kanatest (0.3.6-3) unstable; urgency=low
+
+  * Moved packaging to the Debian Games Team.
+  * Use quilt for patch management.
+  * debian/control:
+    + Set policy to 3.7.2.
+    + Build-depend on quilt.
+  * debian/copyright:
+    + Fixed the FSF address.
+  * debian/kanatest.6:
+    + Removed this file, upstream's manpage is all right.
+
+  * debian/patches/000_config_sub_guess.diff:
+    + New patch from old diff.gz -- update config.sub and config.guess files.
+
+  * debian/patches/020_data_path.diff:
+    + New patch from old diff.gz -- disable data path overriding.
+
+  * debian/patches/030_de_po.diff:
+    + New patch by Jens Seidel: fix the de.po file's charset (Closes: #314023).
+
+  * debian/patches/030_manpage.diff:
+    + New patch -- substitute ${prefix} (Closes: #282528) and fix the
+      project's webpage.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 17 May 2006 03:28:01 +0200
+
+kanatest (0.3.6-2) unstable; urgency=low
+
+  * debian/copyright:
+    + Converted this file to UTF-8.
+  * debian/control:
+    + Set policy to 3.6.1.1.
+  * debian/menu debian/kanatest.desktop:
+    + Added a GNOME menu entry and pixmap thanks to Dan Korostelev.
+    + Added a pixmap for the Debian menu entry thanks to Dan Korostelev.
+      (Closes: #257433).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 10 Aug 2004 12:01:34 +0200
+
+kanatest (0.3.6-1) unstable; urgency=low
+
+  * New upstream release (Closes: #245780).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sun, 25 Apr 2004 20:35:59 +0200
+
+kanatest (0.3.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Mon, 15 Sep 2003 12:58:49 +0200
+
+kanatest (0.3.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    + Set policy to 3.6.1.0.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat, 30 Aug 2003 22:53:41 +0200
+
+kanatest (0.3.1-2) unstable; urgency=low
+
+  * Fixed a bug on fresh installs that prevented kanatest to load its
+    graphic files (Closes: #198835).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu, 26 Jun 2003 10:39:13 +0200
+
+kanatest (0.3.1-1) unstable; urgency=low
+
+  * Initial Release (Closes: #197466).
+  * Wrote a manpage for kanatest(6).
+  * Disabled the data path overriding in src/prefs.c.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Mon, 16 Jun 2003 02:38:18 +0200
+
