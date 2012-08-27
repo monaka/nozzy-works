@@ -1,0 +1,104 @@
+compatability level →互換性レベル　
+See. http://www.debian.org/doc/manuals/maint-guide/dother.ja.html#compat
+default --> 特に指定なき場合は
+multi-arch/multiarch -> multiarch
+See. http://lists.debian.or.jp/debian-doc/201111/msg00005.html
+support --> サポート
+See. debian policyマニュアルでもサポートで統一
+build dependency --> ビルド依存
+See. debian-maintener-guide 1.2章 pbuilderの注釈中
+architecture independent package→アーキテクチャ非依存パッケージ
+architecture dependent package→アーキテクチャ依存パッケージ
+See. debian-maintener-guide 2.9章 [21]注釈
+target--> (makefileの場合) ターゲット
+See. debian-maintener-guide 4.4.1章
+automatic --> 機械的に
+※そうしないと意味通らん。
+build system ---> ビルドシステム
+See. debian-maintener-guide 2.4/2.5章
+build tree ---> ビルドツリー
+See. debian-maintener-guide 4.4.1章
+tarball --> tar玉
+See. debian-maintener-guide 2.1章
+note that --> (できれば訳さない)
+upstream XXXX ---> アップストリームXXXX
+See. debian-maintener-guide 2.1章
+build directory ---> ビルドディレクトリ
+See. debian-maintener-guide 5.11章
+update/updating ----> 更新
+See. debian-maintener-guide 9章
+upgrade ---> アップグレード
+See. debian-maintener-guide 2.6章
+addon ---> アドオン
+See. developers-reference A.3.1
+http://www.debian.org/doc/manuals/developers-reference/tools.html#debhelper
+sequence --> 一連の処理
+参考： debian-maintener-guide 4.4.2章にこちらのsequenceと同様と
+思われる語句があるが、誤訳している為参考にしないこととする。
+各コマンドの見出し ---> (ですます調で統一する)
+理由：man debhelper.ja.7がここの見出しを抜いて一覧にするため。句調が異なると見づらい為。
+BUILD SYSTEM OPTIONS ---> ビルドシステム用オプション
+DESCRIPTION ---> 説明
+理由：これらはリンクとしても利用されるため、日本語へ直す。
+
+以下の訳のうち、/script,/packageはファイルとしてインストールされる文意だが、
+実際の動作は違い、ディレクトリとしてあつかって突っ込む仕様。日本語はそちらに
+あわせた。--->BTS行きか？
+msgid ""
+"This is the script to be run by the bug reporting program for generating a "
+"bug report template. This file is installed as F<usr/share/bug/package> in "
+"the package build directory if no other types of bug reporting customization "
+"files are going to be installed for the package in question. Otherwise, this "
+"file is installed as F<usr/share/bug/package/script>. Finally, the installed "
+"script is given execute permissions."
+msgstr ""
+"このファイルは、バグレポートの雛形を生成するバグ報告プログラムによって"
+"実行されるスクリプトファイルとなります。処理対象のパッケージについて、"
+"他にバグレポート変更用ファイルがインストールされない場合、このスクリプ"
+"トファイルがF<usr/share/bug/package>以下にパッケージ構築ディレクトリ配"
+"下にインストールされます。インストールされるべきバグレポート変更用ファ"
+"イルが他にある場合、このスクリプトファイルは"
+"F<usr/share/bug/package/script>以下にインストールされます。最後に、イン"
+"ストールされたファイルには実行権限が付与されます。"
+
+そのくせ
+
+msgid ""
+"It is the bug control file containing some directions for the bug reporting "
+"tool. This file is installed as F<usr/share/bug/package/control> in the "
+"package build directory."
+msgstr ""
+"バグレポート用ツールのディレクトリ群の名前が記載されるバグ制御用のファイルと"
+"なります。このファイルは、パッケージ構築ディレクトリへF<usr/share/bug/"
+"package/control> としてインストールされます。"
+
+は英文が実際の動作にあっている...
+
+the bug control file ---> バグコントロールファイル
+
+dh_clean中
+clean ---> パッケージビルドディレクトリと併用されると消去の意味が濃厚。
+See. dh_cleanコマンドの構造
+
+dh_installdeb
+conffile --> conffileで統一
+See. debian policy manual 3章
+
+dh_installdoc
+documentation directory(directories) --> 文章ディレクトリ
+cf. 既存には該当訳文なし。
+
+dh_installemacsen
+priority level ---> 優先順位
+
+dh_installifupdown 
+hook -->フック
+hook script -->フックスクリプト
+See. maint-guide 6.4章
+
+dh_installman
+fails for some reason ...> 理由の部分については訳さない（不自然なので）
+
+dh_installmenu
+Debian menu method ---> Debianメニューメソッド　（こうしないとmenu-methodファイルという名前と統一がとれない）
+
