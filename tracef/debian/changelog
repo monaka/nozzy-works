@@ -1,0 +1,5 @@
+tracef (0.16-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Mon, 20 Jun 2011 01:15:38 +0900

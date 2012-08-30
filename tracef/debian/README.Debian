@@ -1,0 +1,19 @@
+tracef for Debian
+-----------------
+
+1. What for tracef?
+
+  'tracef' commands can make call tree graph of binary executable.
+
+2. How to use?
+
+   Usage of 'tracef' is very simple. If you would like to check
+the call tree of executable binary of 'foo', you just simply type
+like this,
+
+   tracef /where/to/install/foo
+
+  Then you can get call tree like below,
+
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Mon, 20 Jun 2011 01:15:38 +0900

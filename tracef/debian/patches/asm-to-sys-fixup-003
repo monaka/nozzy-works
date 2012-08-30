@@ -1,0 +1,26 @@
+Index: tracef-0.16/src/printer.cpp
+===================================================================
+--- tracef-0.16.orig/src/printer.cpp	2011-06-21 02:46:27.000000000 +0900
++++ tracef-0.16/src/printer.cpp	2011-06-21 02:46:58.000000000 +0900
+@@ -14,7 +14,7 @@
+ #include <cstring>
+ #include <sys/time.h>
+ #include <sys/ptrace.h>
+-#include <asm/user.h>
++#include <sys/user.h>
+ 
+ #include "process.h"
+ #include "printer.h"
+Index: tracef-0.16/src/trace.cpp
+===================================================================
+--- tracef-0.16.orig/src/trace.cpp	2011-06-21 02:46:20.000000000 +0900
++++ tracef-0.16/src/trace.cpp	2011-06-21 02:46:46.000000000 +0900
+@@ -4,7 +4,7 @@
+ 
+ #include <string>
+ #include "trace.h"
+-#include <asm/user.h>
++#include <sys/user.h>
+ 
+ #ifdef DEBUG
+ namespace {

@@ -1,0 +1,15 @@
+--- a/src/xelf.cpp
++++ b/src/xelf.cpp
+@@ -35,7 +35,11 @@
+   TLS_ char mnemonic[32];
+   TLS_ int  count;
+ 
+-  int disasm_cb(FILE*, const char* fmt, ...)
++/* 
++  This function is invoked from legacy C codes in libopcode,
++  so linkage should be C.
++*/
++extern "C" int disasm_cb(FILE*, const char* fmt, ...)
+   {
+     va_list args;
+     va_start(args, fmt);

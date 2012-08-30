@@ -1,0 +1,12 @@
+Index: tracef-0.16/src/trace.cpp
+===================================================================
+--- tracef-0.16.orig/src/trace.cpp	2011-06-21 02:52:21.000000000 +0900
++++ tracef-0.16/src/trace.cpp	2011-06-21 02:53:10.000000000 +0900
+@@ -5,6 +5,7 @@
+ #include <string>
+ #include "trace.h"
+ #include <sys/user.h>
++#include <limits.h>
+ 
+ #ifdef DEBUG
+ namespace {

@@ -1,0 +1,54 @@
+Index: tracef-0.16/configure.ac
+===================================================================
+--- tracef-0.16.orig/configure.ac	2011-06-20 03:13:53.000000000 +0900
++++ tracef-0.16/configure.ac	2011-06-20 03:13:54.000000000 +0900
+@@ -23,8 +23,8 @@
+ AC_HAVE_LIBRARY(boost_program_options,, [AC_MSG_ERROR([libboost is not found])])
+ 
+ AC_CHECK_HEADER(libelf.h,,[AC_MSG_ERROR([libelf.h is not found])])
+-AC_CHECK_HEADER(libdwarf/libdwarf.h,,[AC_MSG_ERROR([libdwarf.h is not found])])
+-AC_CHECK_HEADER(libdwarf/dwarf.h,,[AC_MSG_ERROR([dwarf.h is not found])])
++AC_CHECK_HEADER(libdwarf.h,,[AC_MSG_ERROR([libdwarf.h is not found])])
++AC_CHECK_HEADER(dwarf.h,,[AC_MSG_ERROR([dwarf.h is not found])])
+ AC_CHECK_HEADER(bfd.h,,[AC_MSG_ERROR([bfd.h is not found])])
+ dnl AC_CHECK_HEADER(pthread.h,,[AC_MSG_ERROR([pthread.h is not found])])
+ AC_CHECK_HEADER(boost/utility.hpp,,[AC_MSG_ERROR([boost/utility.h is not found])])
+Index: tracef-0.16/src/ftrace/prototype.cpp
+===================================================================
+--- tracef-0.16.orig/src/ftrace/prototype.cpp	2011-06-20 03:13:53.000000000 +0900
++++ tracef-0.16/src/ftrace/prototype.cpp	2011-06-20 03:13:54.000000000 +0900
+@@ -19,7 +19,7 @@
+ #include <sys/stat.h>
+ 
+ #include <libelf.h>
+-#include <libdwarf/dwarf.h>
++#include <dwarf.h>
+ 
+ #include "xelf.h"
+ #include "prototype.h"
+Index: tracef-0.16/src/ftrace/prototype.h
+===================================================================
+--- tracef-0.16.orig/src/ftrace/prototype.h	2011-06-20 03:13:53.000000000 +0900
++++ tracef-0.16/src/ftrace/prototype.h	2011-06-20 03:13:54.000000000 +0900
+@@ -3,7 +3,7 @@
+ #define DWARF_H_
+ 
+ #include <string>
+-#include <libdwarf/libdwarf.h>
++#include <libdwarf.h>
+ #include <boost/shared_ptr.hpp>
+ 
+ namespace hoge {
+Index: tracef-0.16/src/main.h
+===================================================================
+--- tracef-0.16.orig/src/main.h	2011-06-20 03:40:07.000000000 +0900
++++ tracef-0.16/src/main.h	2011-06-20 03:44:33.000000000 +0900
+@@ -19,6 +19,8 @@
+ #include <boost/shared_ptr.hpp>
+ #include <boost/static_assert.hpp>
+ 
++#include <stdint.h>
++
+ // ILP32 and LP64 are supported. LLP64 is not.
+ BOOST_STATIC_ASSERT(sizeof(uintptr_t) == sizeof(unsigned long));
+ 

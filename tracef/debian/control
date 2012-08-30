@@ -1,0 +1,16 @@
+Source: tracef
+Section: misc
+Priority: extra
+Maintainer: Takahide Nojima <nozzy123nozzy@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, libelf-dev, libdwarf-dev, binutils-dev, libboost1.49-dev, libboost-program-options1.49-dev, quilt
+Standards-Version: 3.9.2
+Homepage: http://binary.nahi.to/hogetrace/
+#Vcs-Git: git://git.debian.org/collab-maint/tracef.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/tracef.git;a=summary
+
+Package: tracef
+Architecture: i386 amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: call tree generator using ptrace.
+ tracef is generator of call tree. It seems to like strace and ltrace 
+ commands,however tracef can also generate call tree of all functions.
