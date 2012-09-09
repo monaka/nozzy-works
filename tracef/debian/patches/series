@@ -4,3 +4,4 @@ asm-to-sys-fixup-003
 char_bit_fix-004
 remove-sample-from-build-005
 adapt_print_insn-006
+add_debug_options-007
