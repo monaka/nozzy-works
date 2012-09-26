@@ -1,0 +1,103 @@
+--- a/src/opt.cpp
++++ b/src/opt.cpp
+@@ -40,7 +40,8 @@
+       pid_(DONT_ATTACH),
+       fd_(-1),
+       visible_desc_("Options"),
+-      input_(false)
++      input_(false),
++	debug_on(false)
+   {
+     namespace po = boost::program_options;
+     visible_desc_.add_options()
+@@ -105,6 +106,7 @@
+       )
+       ("exclude,X", po::value<std::vector<std::string> >(&tmp_),
+        "Don't trace function matching (mangled) symbol 'arg'")
++	("debug,d","print debugging message of this")
+       ; 
+   }
+ 
+@@ -330,7 +332,9 @@
+     if (vm.count("dup-fd")) {
+       dup_fd_ = true;
+     }
+-
++    if (vm.count("debug")) {
++      debug_on= true;
++    }
+     std::copy(tmp_.begin(), tmp_.end(), 
+               std::inserter(exclude_syms_, exclude_syms_.begin()));
+ 
+--- a/src/opt.h
++++ b/src/opt.h
+@@ -42,6 +42,7 @@
+     bool print_call_tree_; // rather than list
+     int  offset_;
+     bool dup_fd_;
++    bool debug_on;
+ 
+     pid_t pid_;
+     std::set<std::string> exclude_syms_;
+--- a/src/process.cpp
++++ b/src/process.cpp
+@@ -6,18 +6,12 @@
+ #include <sys/wait.h>
+ #include <ext/functional>
+ #include <boost/bind.hpp>
++#include <iostream>
+ 
+ #include "process.h"
+ #include "printer.h"
+ #include "xelf.h"
+ 
+-#ifdef DEBUG
+-namespace {
+-  std::stringstream dbg;
+-  // std::ostream& dbg = std::cerr;
+-}
+-#endif
+-
+ // from binutils/include/demangle.h
+ #define DMGL_PARAMS      (1 << 0)   /* Include function args */
+ #define DMGL_ANSI        (1 << 1)   /* Include const, volatile, etc */
+@@ -88,7 +82,8 @@
+ 
+   // waitpid(2) stuff
+   bool do_wait_for_debugee(hoge::trace_event& ev, 
+-                           int& signo, pid_t& current_pid)
++                           int& signo, pid_t& current_pid,
++                           boost::shared_ptr<const hoge::cl_options> popt)
+   {
+     using namespace hoge;
+     
+@@ -139,8 +134,7 @@
+       ev = EV_SIG_EXIT;
+     }
+ 
+-#ifdef DEBUG
+-    // if (ev != EV_TRACING) 
++    if (popt->debug_on==true)
+     {
+       char buf[128] = {0};
+       std::snprintf(buf, sizeof(buf) - 1,
+@@ -149,9 +143,8 @@
+                     str_trace_event(ev),
+                     current_pid, signo,
+                     (signo == _NSIG ? "_NSIG" : ::strsignal(signo)));
+-      dbg << buf << std::endl;
++      std::cerr << buf << std::endl;
+     }
+-#endif
+     return true;
+   }
+ 
+@@ -444,7 +437,7 @@
+     trace_event ev;
+     pid_t debugee_pid;
+ 
+-    if (! do_wait_for_debugee(ev, signo, debugee_pid)) {
++    if (! do_wait_for_debugee(ev, signo, debugee_pid, popt)) {
+       throw std::string("done"); // XXX
+     } 
+ 

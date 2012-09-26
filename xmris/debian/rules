@@ -17,7 +17,7 @@ PKGDIR  = $(CURDIR)/debian/$(PACKAGE)
 	dh --with quilt $@
 
 override_dh_auto_configure:
-	xmkmf -a
+	xmkmf -a 
 
 override_dh_fixperms:
 	dh_fixperms
