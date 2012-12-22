@@ -85,8 +85,8 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
-	if (($request->header('Host') =~ /www[0-9]+\.megavideo\.com/ ) &&
-		($request->url =~ /^\/files\//)) {
+	if (($request->header('Host') =~ /yourupload\.com/ ) &&
+		($request->url =~ /\.flv\?/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
@@ -120,7 +120,7 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
-	if (($request->header('Host') =~ /videoweed\.es$/ ) &&
+	if (($request->header('Host') =~ /videoweed\.(es|com)$/ ) &&
 		($request->url =~ /\.flv\?/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
@@ -149,6 +149,11 @@ sub search_method {
 	}
 	if (($request->header('Host') =~ /daotube\.com$/ ) &&
 		($request->url =~ /\.flv/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
+	if (($request->header('Host') =~ /photobucket\.com/ ) &&
+		($request->url =~ /\.jpg/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
