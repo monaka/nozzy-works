@@ -1,0 +1,283 @@
+gdbのpython拡張もすげー
+
+ 1 $(SRC)/gdb/python以下にc言語で全力実装したpythonライブラリ本体がある。
+　　なので、$(SRC)/gdb/python/lib/以下の.pyスクリプトはgdb本体に内臓
+　　されているpython環境を拡張したもののみ。
+
+ 2. gdbは、python拡張を利用するために、$(SRC)/gdb/python/python.c中の
+　　_initialize_python()を実行。こうすると、gdb内部でpython処理系
+　　が実行されている状態になる。なお、pythonのgdbモジュールはこの時に
+    モジュールとしてロード登録されたのと等価になる
+　　　（モジュール本体もgdbのバイナリ中に実装済み）
+
+3. ./gdb/python/python.cのGdbMethodsにgdbモジュールの内部メソッド
+　が定義されている。
+
+4. どこまで処理系として利用できるか試しに遊んでみる
+
+(gdb) python
+>import os
+>print os.environ
+>[ctrl+D]
+{'PERL_MM_OPT': 'INSTALL_BASE=/home/nojima/perl5', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'GJS_DEBUG_OUTPUT': 'stderr', 'LINES': '58', 'PERL_LOCAL_LIB_ROOT': '/home/nojima/perl5', 'QT_IM_MODULE': 'uim', 'LOGNAME': 'nojima', 'WINDOWID': '35651589', 'PATH': '/home/nojima/perl5/bin:/home/nojima/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games', 'GNOME_KEYRING_CONTROL': '/home/nojima/.cache/keyring-vN0u12', 'DEBFULLNAME': 'Takahide Nojima', 'DISPLAY': ':0', 'SSH_AGENT_PID': '3736', 'LANG': 'ja_JP.utf8', 'TERM': 'xterm', 'SHELL': '/bin/zsh', 'XAUTHORITY': '/var/run/gdm3/auth-for-nojima-oXZIP7/database', 'SESSION_MANAGER': 'local/nightmare:@/tmp/.ICE-unix/3685,unix/nightmare:/tmp/.ICE-unix/3685', 'XDG_DATA_DIRS': '/usr/share/gnome:/usr/local/share/:/usr/share/', 'WINDOWPATH': '7', 'EDITOR': '/usr/bin/vi', 'XMODIFIERS': '@im=uim', 'QUILT_PATCHES': 'debian/patches', 'GPG_AGENT_INFO': '/home/nojima/.cache/keyring-vN0u12/gpg:0:1', 'HOME': '/home/nojima', 'USERNAME': 'nojima', 'QUILT_REFRESH_ARGS': '-p ab --no-timestamps --no-index', 'PERL_MB_OPT': '--install_base /home/nojima/perl5', 'PERL5LIB': '/home/nojima/perl5/lib/perl5/x86_64-linux-gnu-thread-multi:/home/nojima/perl5/lib/perl5', 'SSH_AUTH_SOCK': '/home/nojima/.cache/keyring-vN0u12/ssh', 'GDMSESSION': 'gnome', 'COLUMNS': '80', 'DBUS_SESSION_BUS_ADDRESS': 'unix:abstract=/tmp/dbus-e0ocDnwoAG,guid=38b5c51cefe8a2acce74588350a5d019', '_': '/usr/bin/gdb', 'XDG_SESSION_COOKIE': '9c90623ed4d5890e0fa845d30000000d-1353043990.955697-864603684', 'GTK_IM_MODULE': 'uim', 'DESKTOP_SESSION': 'gnome', 'DEBEMAIL': 'nozzy123nozzy@gmail.com', 'GNOME_KEYRING_PID': '3667', 'PERL5OPT': '-I/home/nojima/perl5/include', 'OLDPWD': '/home/nojima/prog/debian/gdb', 'GDM_LANG': 'ja_JP.utf8', 'SHLVL': '1', 'PWD': '/home/nojima', 'COLORTERM': 'gnome-terminal', 'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'USER': 'nojima'}
+
+(gdb) python
+>import gdb
+>print gdb.history
+><built-in function history>
+(gdb) python
+>import gdb
+>print gdb.breakpoints()
+[ctrl+D]
+>None
+(gdb)
+
+$ gdb --args /bin/ls
+...
+(gdb) python
+>import gdb
+>print gdb.objfiles()
+>[<gdb.Objfile object at 0x7f3a1cf2b130>]
+(gdb)
+
+$pwd
+/home/nojima/prog/gdb-python
+~/prog/gdb-python/ cat gdb-hello.py 
+class HelloWorld (gdb.Command):
+  """ Greet the whole world """
+  def __init__ (self):
+     super(HelloWorld, self).__init__ ("hello-world",gdb.COMMAND_OBSCURE)
+
+  def invoke (self,arg, from_tty):
+     print "Hello, World!"
+
+HelloWorld()
+
+$gdb
+> source gdb-hello.py
+> hello-world
+Hello, World!
+>
+
+5. 取り急ぎpythonのバージョン調べてみる。
+$gdb 
+(gdb) python
+>import sys
+>print sys.version_info
+>sys.version_info(major=2, minor=7, micro=3, releaselevel='final', serial=0)
+(gdb) 
+
+というわけで、python-2.7.3の処理系
+
+6. 基本ポリシーとして、ユーザが独自拡張したい場合は、gdb.*を継承して、何かするのが流儀のような気がする。
+（もちろん、def発行しまくって手続き系で組むこともできるが...)
+
+7.とりあえず、どんなシンボルあるかなー
+
+(gdb) python
+>import gdb
+>import inspect
+>print inspect.getmembers(gdb.Symtab_and_line)
+>[('__class__', <type 'type'>), ('__delattr__', <slot wrapper '__delattr__' of 'object' objects>), ('__doc__', 'GDB symtab_and_line object'), ('__format__', <method '__format__' of 'object' objects>), ('__getattribute__', <slot wrapper '__getattribute__' of 'object' objects>), ('__hash__', <slot wrapper '__hash__' of 'object' objects>), ('__init__', <slot wrapper '__init__' of 'object' objects>), ('__new__', <built-in method __new__ of type object at 0xb964c0>), ('__reduce__', <method '__reduce__' of 'object' objects>), ('__reduce_ex__', <method '__reduce_ex__' of 'object' objects>), ('__repr__', <slot wrapper '__repr__' of 'object' objects>), ('__setattr__', <slot wrapper '__setattr__' of 'object' objects>), ('__sizeof__', <method '__sizeof__' of 'object' objects>), ('__str__', <slot wrapper '__str__' of 'gdb.Symtab_and_line' objects>), ('__subclasshook__', <built-in method __subclasshook__ of type object at 0xb964c0>), ('is_valid', <method 'is_valid' of 'gdb.Symtab_and_line' objects>), ('line', <attribute 'line' of 'gdb.Symtab_and_line' objects>), ('pc', <attribute 'pc' of 'gdb.Symtab_and_line' objects>), ('symtab', <attribute 'symtab' of 'gdb.Symtab_and_line' objects>)]
+
+とのこと。
+
+8. なんかよーわからんが、os.path.append()しても、import構文のサーチパスに反映しない
+とゆー現象が発生して、/usr/games/renpyまでは動かんかった。
+(理由は不明）
+
+9. gdbのpython拡張について、各classの説明読みたいなら、次のようにすると読める。
+
+  (gdb) python
+  >from pydoc import help
+  >print help.help("gdb")
+　>CTL+D
+  ....gdbモジュールの説明がでるー....
+
+
+   が、pydoc.Helper.help(request)について、
+   requestがstrオブジェクトじゃないと勝手にオブジェクト
+　を判定してhelpだそうとするので、class gdb.Commandと組み合わせると
+  invoke(self,arg)にてargがunicodeなので、unicodeモジュールの説明しか
+　出ない。なのでstr(arg)としてstrオブジェクトにて　引き渡さないとダメ。
+
+
+      ----------応用:gdb-helpviewer.py-------------
+import pydoc
+class HelpViewer (gdb.Command):
+  """ Greet the whole world """
+  def __init__ (self):
+     super(HelpViewer, self).__init__ ("pydoc",gdb.COMMAND_OBSCURE)
+     self.help=pydoc.Helper()     
+
+  def invoke (self,arg, from_tty):
+     print self.help.help(str(arg))
+
+HelpViewer()
+      ----------応用:gdb-helpviewer.py-------------
+
+  実行：
+　　gdb
+    (gdb) source gdb-helpviewer.py
+    (gdb) pydoc gdb
+      ... gdbモジュールの説明 ....
+
+10 いっそのことpythonすくりぷとにしちゃえ
+
+  #!/home/YOURNAME/archer/install/bin/gdb -P
+  print "hello from python"
+
+
+See.   http://tromey.com/blog/?p=548
+
+11. tutorial/wiki
+
+http://sourceware.org/gdb/wiki/PythonGdb
+
+http://sourceware.org/gdb/wiki/PythonGdbTutorial
+※関係者なのか？？
+
+12. gdb.Frameオブジェクト使ってみた。
+
+~/prog/gdb-python/ gdb /bin/ls               
+GNU gdb (GDB) 7.4.1-debian
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /bin/ls...(no debugging symbols found)...done.
+(gdb) b opendir
+Breakpoint 1 at 0x4024a0
+(gdb) run
+Starting program: /bin/ls 
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, 0x00007ffff74c9be0 in opendir ()
+   from /lib/x86_64-linux-gnu/libc.so.6
+(gdb) python print gdb.newest_frame()
+{stack=0x7fffffffe150,code=0x7ffff74c9be0,!special}
+(gdb) python
+>import inspect
+>a=gdb.newest_frame()
+>print inspect(a)
+>Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+TypeError: 'module' object is not callable
+Error while executing Python code.
+(gdb) python
+>import inspect
+>a=gdb.newest_frame()
+>print inspect.getmembers(a)
+>[('__class__', <type 'gdb.Frame'>), ('__delattr__', <method-wrapper '__delattr__' of gdb.Frame object at 0x7f0df52d8130>), ('__doc__', 'GDB frame object'), ('__eq__', <method-wrapper '__eq__' of gdb.Frame object at 0x7f0df52d8130>), ('__format__', <built-in method __format__ of gdb.Frame object at 0x7f0df52d8130>), ('__ge__', <method-wrapper '__ge__' of gdb.Frame object at 0x7f0df52d8130>), ('__getattribute__', <method-wrapper '__getattribute__' of gdb.Frame object at 0x7f0df52d8130>), ('__gt__', <method-wrapper '__gt__' of gdb.Frame object at 0x7f0df52d8130>), ('__hash__', <method-wrapper '__hash__' of gdb.Frame object at 0x7f0df52d8130>), ('__init__', <method-wrapper '__init__' of gdb.Frame object at 0x7f0df52d8130>), ('__le__', <method-wrapper '__le__' of gdb.Frame object at 0x7f0df52d8130>), ('__lt__', <method-wrapper '__lt__' of gdb.Frame object at 0x7f0df52d8130>), ('__ne__', <method-wrapper '__ne__' of gdb.Frame object at 0x7f0df52d8130>), ('__new__', <built-in method __new__ of type object at 0xb943a0>), ('__reduce__', <built-in method __reduce__ of gdb.Frame object at 0x7f0df52d8130>), ('__reduce_ex__', <built-in method __reduce_ex__ of gdb.Frame object at 0x7f0df52d8130>), ('__repr__', <method-wrapper '__repr__' of gdb.Frame object at 0x7f0df52d8130>), ('__setattr__', <method-wrapper '__setattr__' of gdb.Frame object at 0x7f0df52d8130>), ('__sizeof__', <built-in method __sizeof__ of gdb.Frame object at 0x7f0df52d8130>), ('__str__', <method-wrapper '__str__' of gdb.Frame object at 0x7f0df52d8130>), ('__subclasshook__', <built-in method __subclasshook__ of type object at 0xb943a0>), ('block', <built-in method block of gdb.Frame object at 0x7f0df52d8130>), ('find_sal', <built-in method find_sal of gdb.Frame object at 0x7f0df52d8130>), ('function', <built-in method function of gdb.Frame object at 0x7f0df52d8130>), ('is_valid', <built-in method is_valid of gdb.Frame object at 0x7f0df52d8130>), ('name', <built-in method name of gdb.Frame object at 0x7f0df52d8130>), ('newer', <built-in method newer of gdb.Frame object at 0x7f0df52d8130>), ('older', <built-in method older of gdb.Frame object at 0x7f0df52d8130>), ('pc', <built-in method pc of gdb.Frame object at 0x7f0df52d8130>), ('read_var', <built-in method read_var of gdb.Frame object at 0x7f0df52d8130>), ('select', <built-in method select of gdb.Frame object at 0x7f0df52d8130>), ('type', <built-in method type of gdb.Frame object at 0x7f0df52d8130>), ('unwind_stop_reason', <built-in method unwind_stop_reason of gdb.Frame object at 0x7f0df52d8130>)]
+
+んでもって、gdb.Frameオブジェクトで遊ぶと次のとおり、
+
+(gdb) bt
+#0  0x00007ffff74c9be0 in opendir () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00000000004035e7 in ?? ()
+#2  0x00007ffff7440ead in __libc_start_main ()
+   from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00000000004048a9 in ?? ()
+#4  0x00007fffffffe6a8 in ?? ()
+#5  0x000000000000001c in ?? ()
+#6  0x0000000000000001 in ?? ()
+#7  0x00007fffffffe99c in ?? ()
+#8  0x0000000000000000 in ?? ()
+(gdb) python
+>a=gdb.newest_frame()
+>print a.pc
+><built-in method pc of gdb.Frame object at 0x7f0df52d8170>
+(gdb) python
+>a=gdb.newest_frame()
+>print a.pc()
+>140737342381024
+(gdb) python
+>a=gdb.newest_frame()
+>print "addr=%x" % (a.pc())
+>addr=7ffff74c9be0
+(gdb) python
+>a=gdb.newest_frame()
+>print (a.name())
+>opendir
+(gdb) python
+>a=gdb.newest_frame()
+>b=a.next()
+>print (b.name())
+>Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+AttributeError: 'gdb.Frame' object has no attribute 'next'
+Error while executing Python code.
+(gdb) python
+>a=gdb.newest_frame()
+>b=a.older()
+>print (b.name())
+>None
+(gdb) python
+>a=gdb.newest_frame()
+>b=a.older()
+>b=a.newer()
+>print (b.name())
+>Traceback (most recent call last):
+  File "<string>", line 4, in <module>
+AttributeError: 'NoneType' object has no attribute 'name'
+Error while executing Python code.
+(gdb) python
+>a=gdb.newest_frame()
+>b=a.newer()
+>print (b.name())
+>Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+AttributeError: 'NoneType' object has no attribute 'name'
+Error while executing Python code.
+(gdb) python
+>a=gdb.newest_frame()
+>b=a.older()
+>a=b.older()
+>print (a.name())
+>__libc_start_main
+
+gdb.Frame.older/newerで行ったり来たりできる。
+
+gdbのマニュアルから引き抜いた、実装済みのpython class
+
+    class Block(__builtin__.object)
+    class BlockIterator(__builtin__.object)
+    class Breakpoint(__builtin__.object)
+    class BreakpointEvent(StopEvent)
+    class Command(__builtin__.object)
+    class ContinueEvent(ThreadEvent)
+    class Event(__builtin__.object)
+    class EventRegistry(__builtin__.object)
+    class ExitedEvent(Event)
+    class Field(__builtin__.object)
+    class FinishBreakpoint(Breakpoint)
+    class Frame(__builtin__.object)
+    class Function(__builtin__.object)
+    class GdbError(exceptions.Exception)
+    class Inferior(__builtin__.object)
+    class InferiorThread(__builtin__.object)
+    class Membuf(__builtin__.object)
+    class MemoryError(error)
+    class NewObjFileEvent(Event)
+    class Objfile(__builtin__.object)
+    class Parameter(__builtin__.object)
+    class Progspace(__builtin__.object)
+    class SignalEvent(StopEvent)
+    class StopEvent(ThreadEvent)
+    class Symbol(__builtin__.object)
+    class Symtab(__builtin__.object)
+    class Symtab_and_line(__builtin__.object)
+    class ThreadEvent(Event)
+    class Type(__builtin__.object)
+    class TypeIterator(__builtin__.object)
+    class Value(__builtin__.object)
+    class error(exceptions.RuntimeError)
+
+
+
+

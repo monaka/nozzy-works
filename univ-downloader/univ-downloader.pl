@@ -147,7 +147,17 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
+	if (($request->header('Host') =~ /\.tokyo-tube\.com$/ ) &&
+		($request->url =~ /=\.flv/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
 	if (($request->header('Host') =~ /daotube\.com$/ ) &&
+		($request->url =~ /\.flv/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
+	if (($request->header('Host') =~ /anitube\.com\.br$/ ) &&
 		($request->url =~ /\.flv/)) {
 		pcap_close($pcap);
 		download_video_streams($request);

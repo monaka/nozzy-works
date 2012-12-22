@@ -1,0 +1,46 @@
+1. strace.py gdb.py読むとわかるが、
+  基本的に、ptrace.Applicationを継承して作るみたい。
+
+2. だいたいの流れは次のとおり。
+
+class FOO(Application):
+	def __init__(self):
+		Application.__init__(self)
+		self.parseOptions()
+		self.setupLog()
+
+	def runDebugger(self):
+		self.setupDebugger()
+		try:
+			self.process = self.createProcess()
+		except err:
+			writeError(getLogger(),err,"Unable to crate child process")
+			return
+		if not self.process:
+			return
+
+	def main(self):
+		self.debugger=PtraceDebugger()
+		try:
+			self.runDebugger()
+		except err:
+			writeError(getLogger(),err,"Debugger error")
+		self.debugger.quit()
+ 
+3. ptrace.debugger.Application は、
+　　　　ptrace.debuggerが予定している数々のコマンドラインオプション、
+	引数を勝手にパースして特定用途のdebuggerが作れるようにしてある。
+
+4. class ptrace.debugger.process.PtraceProcessは、
+　　　1. system callをおいかけるのに便利な関数
+　　　2. debugger作りに基本とおぼしき処理
+　のほとんどを搭載。なお、ptrace.debugger.Applicationは、
+　createChildあたりで、このPtraceProcessオブジェクトを返却
+  あとは、このオブジェクトにある手続きを呼んでデバッグを開始。
+
+5. syscallについては思い入れがあるようで、
+　　ptrace.debugger.syscall_state.SyscallState
+　　ptrace.syscall.ptrace_syscall.PtraceSyscall
+   が存在する。
+
+
