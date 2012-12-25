@@ -9,10 +9,12 @@ iptables -F FORWARD
 iptables -F OUTPUT
 iptables -F -t nat
 
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+# iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -p tcp --tcp-flags FIN,SYN FIN -j ACCEPT
 iptables -A INPUT -p tcp --tcp-flags SYN,RST RST -j ACCEPT
-iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+# iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN FIN -j ACCEPT
 iptables -A OUTPUT -p tcp --tcp-flags SYN,RST RST -j ACCEPT
 iptables -A INPUT -i lo -s 0/0 -d 0/0 -j ACCEPT
