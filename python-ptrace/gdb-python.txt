@@ -278,6 +278,13 @@ gdbのマニュアルから引き抜いた、実装済みのpython class
     class Value(__builtin__.object)
     class error(exceptions.RuntimeError)
 
+http://tromey.com/blog/?p=515
+の例によれば、gdb.Function使うと、
+(gdb) break function if $caller_is("main")
+のように、pythonで書いたfunctionを利用して
+breakの条件とかに利用可能。
+(gdb.Functionの使い方はinfo gdb参照)
+
 
 
 
