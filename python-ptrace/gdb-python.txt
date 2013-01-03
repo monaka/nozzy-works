@@ -74,6 +74,12 @@ $gdb
 
 7.とりあえず、どんなシンボルあるかなー
 
+BASICなやり方
+(gdb) python print dir(gdb)
+['ARCH_FRAME', 'BP_ACCESS_WATCHPOINT', 'BP_BREAKPOINT', 'BP_HARDWARE_WATCHPOINT', 'BP_NONE', 'BP_READ_WATCHPOINT', 'BP_WATCHPOINT', 'Block', 'BlockIterator', 'Breakpoint', 'BreakpointEvent', 'COMMAND_BREAKPOINTS', 'COMMAND_DATA', 'COMMAND_FILES', 'COMMAND_MAINTENANCE', 'COMMAND_NONE', 'COMMAND_OBSCURE', 'COMMAND_RUNNING', 'COMMAND_STACK', 'COMMAND_STATUS', 'COMMAND_SUPPORT', 'COMMAND_TRACEPOINTS', 'COMPLETE_COMMAND', 'COMPLETE_FILENAME', 'COMPLETE_LOCATION', 'COMPLETE_NONE', 'COMPLETE_SYMBOL', 'Command', 'ContinueEvent', 'DUMMY_FRAME', 'Event', 'EventRegistry', 'ExitedEvent', 'FRAME_UNWIND_INNER_ID', 'FRAME_UNWIND_NO_REASON', 'FRAME_UNWIND_NO_SAVED_PC', 'FRAME_UNWIND_NULL_ID', 'FRAME_UNWIND_OUTERMOST', 'FRAME_UNWIND_SAME_ID', 'FRAME_UNWIND_UNAVAILABLE', 'Field', 'FinishBreakpoint', 'Frame', 'Function', 'GdbError', 'HOST_CONFIG', 'INLINE_FRAME', 'Inferior', 'InferiorThread', 'Membuf', 'MemoryError', 'NORMAL_FRAME', 'NewObjFileEvent', 'Objfile', 'PARAM_AUTO_BOOLEAN', 'PARAM_BOOLEAN', 'PARAM_ENUM', 'PARAM_FILENAME', 'PARAM_INTEGER', 'PARAM_OPTIONAL_FILENAME', 'PARAM_STRING', 'PARAM_STRING_NOESCAPE', 'PARAM_UINTEGER', 'PARAM_ZINTEGER', 'PYTHONDIR', 'Parameter', 'Progspace', 'SENTINEL_FRAME', 'SIGTRAMP_FRAME', 'STDERR', 'STDLOG', 'STDOUT', 'SYMBOL_FUNCTIONS_DOMAIN', 'SYMBOL_LABEL_DOMAIN', 'SYMBOL_LOC_ARG', 'SYMBOL_LOC_BLOCK', 'SYMBOL_LOC_COMPUTED', 'SYMBOL_LOC_CONST', 'SYMBOL_LOC_CONST_BYTES', 'SYMBOL_LOC_LABEL', 'SYMBOL_LOC_LOCAL', 'SYMBOL_LOC_OPTIMIZED_OUT', 'SYMBOL_LOC_REF_ARG', 'SYMBOL_LOC_REGISTER', 'SYMBOL_LOC_REGPARM_ADDR', 'SYMBOL_LOC_STATIC', 'SYMBOL_LOC_TYPEDEF', 'SYMBOL_LOC_UNDEF', 'SYMBOL_LOC_UNRESOLVED', 'SYMBOL_STRUCT_DOMAIN', 'SYMBOL_TYPES_DOMAIN', 'SYMBOL_UNDEF_DOMAIN', 'SYMBOL_VARIABLES_DOMAIN', 'SYMBOL_VAR_DOMAIN', 'SignalEvent', 'StopEvent', 'Symbol', 'Symtab', 'Symtab_and_line', 'TAILCALL_FRAME', 'TARGET_CONFIG', 'TYPE_CODE_ARRAY', 'TYPE_CODE_BITSTRING', 'TYPE_CODE_BOOL', 'TYPE_CODE_CHAR', 'TYPE_CODE_COMPLEX', 'TYPE_CODE_DECFLOAT', 'TYPE_CODE_ENUM', 'TYPE_CODE_ERROR', 'TYPE_CODE_FLAGS', 'TYPE_CODE_FLT', 'TYPE_CODE_FUNC', 'TYPE_CODE_INT', 'TYPE_CODE_INTERNAL_FUNCTION', 'TYPE_CODE_MEMBERPTR', 'TYPE_CODE_METHOD', 'TYPE_CODE_METHODPTR', 'TYPE_CODE_NAMESPACE', 'TYPE_CODE_PTR', 'TYPE_CODE_RANGE', 'TYPE_CODE_REF', 'TYPE_CODE_SET', 'TYPE_CODE_STRING', 'TYPE_CODE_STRUCT', 'TYPE_CODE_TYPEDEF', 'TYPE_CODE_UNION', 'TYPE_CODE_VOID', 'ThreadEvent', 'Type', 'TypeIterator', 'VERSION', 'Value', 'WP_ACCESS', 'WP_READ', 'WP_WRITE', '__doc__', '__name__', '__package__', '__path__', 'block_for_pc', 'breakpoints', 'command', 'current_objfile', 'current_progspace', 'decode_line', 'default_visualizer', 'error', 'events', 'execute', 'flush', 'frame_stop_reason_string', 'history', 'inferiors', 'lookup_global_symbol', 'lookup_symbol', 'lookup_type', 'newest_frame', 'objfiles', 'parameter', 'parse_and_eval', 'post_event', 'pretty_printers', 'progspaces', 'prompt', 'selected_frame', 'selected_inferior', 'selected_thread', 'solib_name', 'string_to_argv', 'target_charset', 'target_wide_charset', 'write']
+
+# dir()については、python2.7.3のチュートリ6.3章参照
+
 (gdb) python
 >import gdb
 >import inspect
@@ -241,9 +247,9 @@ Error while executing Python code.
 >print (a.name())
 >__libc_start_main
 
-gdb.Frame.older/newerで行ったり来たりできる。
+13. gdb.Frame.older/newerで行ったり来たりできる。
 
-gdbのマニュアルから引き抜いた、実装済みのpython class
+14. gdbのマニュアルから引き抜いた、実装済みのpython class
 
     class Block(__builtin__.object)
     class BlockIterator(__builtin__.object)
@@ -278,13 +284,212 @@ gdbのマニュアルから引き抜いた、実装済みのpython class
     class Value(__builtin__.object)
     class error(exceptions.RuntimeError)
 
-http://tromey.com/blog/?p=515
+15. http://tromey.com/blog/?p=515
 の例によれば、gdb.Function使うと、
 (gdb) break function if $caller_is("main")
 のように、pythonで書いたfunctionを利用して
 breakの条件とかに利用可能。
 (gdb.Functionの使い方はinfo gdb参照)
 
+16. symbolとかsymtabとかあるので、しらべたら、
 
+    symbolオブジェクトは、
+      gdb.lookup_global_symbol
+      gdb.lookup_symbol
+    により、指定されたname,domainを元に
+　　それを含むシンボルテーブル中のシンボル情報
+　　を引き抜くときに、返却用に利用されるオブジェクト
+
+   そもそも、gdbは内部構造からいって、
+　とある名前、block,domainから、symbolテーブルを引く
+　ことに特化した実装になっているので、symbolテーブルの
+　中身を全部引き抜くのには向いていない?
+
+17. salという変数名とかは、symbol_and_lineの略っぽいぞ。
+    gdbの内部にそういうデータ構造があるらしい？コードのコメントによると。
+    get_current_source_symtab_and_line
+    などからどうもpython拡張側は情報を頂くらしい。（gdb/python.cとか）
+
+18. GDB_PY_HANDLE_EXCEPTION()とかでpython側のexceptionへつなげる模様。
+
+19. gdb.PYTHONDIRってどこも使ってない...
+   (値は代入されるんですけど、参照しているものが居ない...)
+
+20. gdb python拡張の使い方サンプルは
+　　　$(GDB_SOURCE)/gdb/testsuite/gdb.python/*.py
+   を参考にするのが良い。
+
+　　結構充実。
+
+21. 以下のtopicで説明した方がよいかも？
+
+ 　　Topic 1. gdb搭載のpythonの能力について
+
+         versionは2.7.3
+         script pathの再定義できない
+　　　　　pydocのテスト
+
+　　　Topic 2. gdb python拡張攻略方法
+
+　　　　　以下の順番で。
+
+　　　　　特徴：そもそも情報が少ない
+　　　　　python拡張の目的：gdbのマクロがいろいろ足りんかったので、
+　　　　　　　　　　　　　　いっそのことpython積んでいろいろしたかったらしい。
+
+　　　　　攻略のステップ：
+
+　　　　　1. まずgdb.infoのextension pythonあたりを読む
+　　　　　2. http://sourceware.org/gdb/wiki/PythonGdb
+            http://sourceware.org/gdb/wiki/PythonGdbTutorial
+            を読む
+　　　　　3. $(GDB_SOURCE)/gdb/testsuite/gdb.python
+            以下を読む
+
+　　  Topic 3. gdbモジュールのclass図
+
+　　　Topic 4. gdb pythonの
+         gdb pythonの内部構造
+
+　　　Topic 5. hello worldコマンド拡張
+
+         まずはコマンド拡張の基礎から
+　　　　　
+     Topic 6. functionについて
+
+　　　　　特定条件を搦めてbreakpointから。
+
+　　　Topic 7. eventsについて
+
+　　　　　signal/break/finishbreakについて
+
+     Topic 8. frameについて
+
+　　　　　駆け上がろうぜ！stack frame！
+
+　　　Topic 9. prettyprintについて
+
+　　　　　データ構造わかってるんならこちら。
+
+     Topic 10. シンボル扱いについて
+
+　　　　　gdbにおねがいー
+
+　　　Topic 11. auto-loding scripts
+
+        1. 右斜め上の展開ではあるが、
+　　　　　　binary中に.debug_gdb_scripts
+         というセクションを持ち、ここにロードすべきpythonスクリプトを
+　　　　　入れたobjectfileを用意して、
+          set auto-load-scripts yes
+         とかをgdbに指定すると、こちらが評価されて自動でpythonスクリプト
+　　　　　がロードされる。
+
+         2. OBJECTFILE-gdb.pyファイルをカレントディレクトリとか
+　　　　　　　に用意すると、OBJECTFILEをロードすると、自動で吸い込まれる。
+
+       ※ええ、わかってますとも。これは使い方誤るとでっかいセキュリティホールっす。
+
+　　　Topic 12.　pythonスクリプトとして 
+
+　　　　　いつも面倒だろ？
+
+     Topic 13. block/inferiorその他
+
+　　　　　たくさんプログラムを一度にデバッグするなら。
+
+     Topic 14. v7.5とv7.4のpython拡張の違い
+
+      若干のfunction追加、__dict__の追加等
+      gdb/doc/gdb.texiの差分は
+         (1) gdb.Valueのあたり
+　　　　　(1)auto-loadの所ぐらいか。
+　　　あと、gdb.COMMAND_OBSCURE→ gdb.COMMAND_USERへ変更あり。
+　　　一応、gdb.find_pc_lineとかも載ってる。
+
+
+     入れる事：
+
+　　　　打倒DTraceユーザランド
+
+
+22. auto-loading scripts
+
+  以下のテストを行う。
+
+   hello.c:
+
+/* elf形式にあわせ、.debug_gdb_scriptsというセクションをオブジェクトにねじ込む */
+ asm(
+".pushsection \".debug_gdb_scripts\",\"MS\",@progbits,1\n"
+".byte 1\n"
+".asciz \"hello-world.py\"\n"
+".popsection \n"
+);
+
+ んで、カレントディレクトリ(gdb-7.4.1の場合w)に
+
+ls -l
+~/prog/my-works/gdb-python/hello-world-auto/ ls -la
+合計 28
+drwxr-xr-x 2 nojima nojima 4096  1月  3 17:56 ./
+drwxr-xr-x 3 nojima nojima 4096  1月  3 17:15 ../
+-rw-r--r-- 1 nojima nojima   96  1月  3 17:18 Makefile
+-rwxr-xr-x 1 nojima nojima 8276  1月  3 17:46 hello*
+lrwxrwxrwx 1 nojima nojima   15  1月  3 17:56 hello-world.py -> ../gdb-hello.py
+-rw-r--r-- 1 nojima nojima  206  1月  3 17:46 hello.c
+
+ とか用意して、
+
+gdb ./hello 
+GNU gdb (GDB) 7.4.1-debian
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /home/nojima/prog/my-works/gdb-python/hello-world-auto/hello...done.
+(gdb) show auto-
+auto-load-scripts  auto-solib-add     
+(gdb) info auto-load-scripts 
+Loaded  Script                                                                 
+Yes     hello-world.py                                                         
+	full name: /home/nojima/prog/my-works/gdb-python/hello-world-auto/hello-world.py
+(gdb) hello-world 
+Hello, World!
+(gdb) quit
+
+の通り、勝手にhello-world.pyが吸い込まれる
+
+取り急ぎ、hello-gdb.pyの実験
+
+prog/my-works/gdb-python/hello-world-auto2/ ls -l
+合計 16
+-rw-r--r-- 1 nojima nojima   96  1月  3 18:42 Makefile
+-rwxr-xr-x 1 nojima nojima 8156  1月  3 18:43 hello*
+lrwxrwxrwx 1 nojima nojima   15  1月  3 18:42 hello-gdb.py -> ../gdb-hello.py
+-rw-r--r-- 1 nojima nojima   79  1月  3 18:43 hello.c
+~/prog/my-works/gdb-python/hello-world-auto2/ gdb ./hello 
+GNU gdb (GDB) 7.4.1-debian
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /home/nojima/prog/my-works/gdb-python/hello-world-auto2/hello...done.
+(gdb) info auto-load-scripts 
+Loaded  Script                                                                 
+Yes     /home/nojima/prog/my-works/gdb-python/hello-world-auto2/hello-gdb.py   
+(gdb) hello-world 
+Hello, World!
+(gdb) quit
+
+ってな具合に、勝手にhello-gdb.pyがロードされる。
 
 

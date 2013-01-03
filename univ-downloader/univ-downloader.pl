@@ -167,6 +167,11 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
+	if (($request->header('Host') =~ /^stream.*\.igrooveshark\.com$/ ) &&
+		($request->url =~ /stream\.php/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
 #	print "Host=".($request->header('Host'))." url=".($request->url)."\n";
 }
 sub download_video_streams {
