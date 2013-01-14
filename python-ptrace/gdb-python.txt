@@ -716,3 +716,14 @@ Non-debugging symbols:
 　　というのも、ダイナミックリンクライブラリの全シンボルとか入っちゃうので、
 　　rbreakは非現実的だったりする...
 
+
+36. Breakpoint.slient=Trueで、breakしたときにいちいちbreakpoint
+   の情報が出るのを抑圧できる。が、breakpointを設定するときにでる
+　　メッセージは抑圧できない。
+
+   (breakpointを作成するときにprint=1に設定されるため）
+
+    ---> が、internal=Trueにすると、抑圧出来る。しかしながら、
+　　info breakにも出てこなくなるので注意。
+
+
