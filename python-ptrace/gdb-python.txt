@@ -69,6 +69,11 @@ $gdb
 
 というわけで、python-2.7.3の処理系
 
+ついでに、サーチパスを調べる
+gdb
+(gdb) python print sys.path
+['/usr/share/gdb/python', '/usr/lib/python2.7', '/usr/lib/python2.7/plat-linux2', '/usr/lib/python2.7/lib-tk', '/usr/lib/python2.7/lib-old', '/usr/lib/python2.7/lib-dynload', '/usr/local/lib/python2.7/dist-packages', '/usr/lib/python2.7/dist-packages', '/usr/lib/python2.7/dist-packages/PIL', '/usr/lib/python2.7/dist-packages/gst-0.10', '/usr/lib/python2.7/dist-packages/gtk-2.0', '/usr/lib/pymodules/python2.7']
+
 6. 基本ポリシーとして、ユーザが独自拡張したい場合は、gdb.*を継承して、何かするのが流儀のような気がする。
 （もちろん、def発行しまくって手続き系で組むこともできるが...)
 
@@ -94,39 +99,9 @@ BASICなやり方
 
 9. gdbのpython拡張について、各classの説明読みたいなら、次のようにすると読める。
 
-  (gdb) python
-  >from pydoc import help
-  >print help.help("gdb")
-　>CTL+D
-  ....gdbモジュールの説明がでるー....
+  (gdb) python help(gdb)
 
 
-   が、pydoc.Helper.help(request)について、
-   requestがstrオブジェクトじゃないと勝手にオブジェクト
-　を判定してhelpだそうとするので、class gdb.Commandと組み合わせると
-  invoke(self,arg)にてargがunicodeなので、unicodeモジュールの説明しか
-　出ない。なのでstr(arg)としてstrオブジェクトにて　引き渡さないとダメ。
-
-
-      ----------応用:gdb-helpviewer.py-------------
-import pydoc
-class HelpViewer (gdb.Command):
-  """ Greet the whole world """
-  def __init__ (self):
-     super(HelpViewer, self).__init__ ("pydoc",gdb.COMMAND_OBSCURE)
-     self.help=pydoc.Helper()     
-
-  def invoke (self,arg, from_tty):
-     print self.help.help(str(arg))
-
-HelpViewer()
-      ----------応用:gdb-helpviewer.py-------------
-
-  実行：
-　　gdb
-    (gdb) source gdb-helpviewer.py
-    (gdb) pydoc gdb
-      ... gdbモジュールの説明 ....
 
 10 いっそのことpythonすくりぷとにしちゃえ
 
