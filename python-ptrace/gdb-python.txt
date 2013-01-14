@@ -1,4 +1,4 @@
-gdbのpython拡張もすげー
+>gdbのpython拡張もすげー
 
  1 $(SRC)/gdb/python以下にc言語で全力実装したpythonライブラリ本体がある。
 　　なので、$(SRC)/gdb/python/lib/以下の.pyスクリプトはgdb本体に内臓
@@ -329,7 +329,7 @@ breakの条件とかに利用可能。
          script pathの再定義できない
 　　　　　pydocのテスト
 
-　　　Topic 2. gdb python拡張攻略方法
+ 　　Topic 2. gdb python拡張攻略方法
 
 　　　　　以下の順番で。
 
@@ -355,12 +355,18 @@ breakの条件とかに利用可能。
 
          まずはコマンド拡張の基礎から
 　　　　　
+     Topic 6. 変数の値のとり方
+
+　　　　　gdb.Value()を使うには。
+
      Topic 6. functionについて
 
 　　　　　特定条件を搦めてbreakpointから。
 
 　　　Topic 7. eventsについて
 
+         gdb.BreakPoints
+         
 　　　　　signal/break/finishbreakについて
 
      Topic 8. frameについて
@@ -389,6 +395,7 @@ breakの条件とかに利用可能。
 　　　　　　　に用意すると、OBJECTFILEをロードすると、自動で吸い込まれる。
 
        ※ええ、わかってますとも。これは使い方誤るとでっかいセキュリティホールっす。
+        しかも、defaultで有効だし！
 
 　　　Topic 12.　pythonスクリプトとして 
 
@@ -492,4 +499,220 @@ Hello, World!
 
 ってな具合に、勝手にhello-gdb.pyがロードされる。
 
+23. gdb.functionの例：
+
+~/prog/my-works/gdb-python/test-function/ gdb ./chkfunc
+GNU gdb (GDB) 7.4.1-debian
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /home/nojima/prog/my-works/gdb-python/test-function/chkfunc...done.
+(gdb) break foo_a if $caller_is("caller_bar")
+Breakpoint 1 at 0x400518: file chkfunc.c, line 12.
+(gdb) run
+Starting program: /home/nojima/prog/my-works/gdb-python/test-function/chkfunc 
+caller is main!
+
+Breakpoint 1, foo_a (str=0x40060c "caller is bar!") at chkfunc.c:12
+12		printf("%s\n",str);
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 5334] will be killed.
+
+Quit anyway? (y or n) y
+
+24. なぜか、pydocにはgdb.LazyString classの説明が出てこない。
+
+25. くそっ、gdbはデバッグシンボル無しのバイナリには無力?
+　　Jumpテーブルにはシンボル定義されているのに、シンボルが見つからん...
+   ※特にfoo@plt系が無力なようにみえるぜ。
+
+26. rbreakは確かにシンボル全部にbreakできそうだが、どこのシンボル読んでるんだ?
+    -> $SRC/gdb/symtab.cにrbreakの実装がある。
+    -> search_symbols()を使って調べるっぽい
+   (実装内容が、pythonのgdb.lookup_global_symbol()と若干違う...)     
+
+27. gdb.lookup_global_symbol()では、
+
+　　　 $(SRC)/gdb/symtab.c中のlookup_symbol_global()で探す。
+　　　 -->
+        Step1.  $(SRC)/gdb/solib.c中のsolib_global_lookupでライブラリ中の
+　　　　　　     グローバルシンボルを探し、
+　　　　 Step2. なければ、$(SRC)/gdb/symtab.c中のlookup_symbol_aux_symtabs()で
+　　　　　　　　　$(SRC)/gdb/symtab.c中のlookup_block_symbolで探す
+
+
+28. gdb.value()の使い方が...本当か?これは？
+
+     gdb-value.expみると、
+
+　　　Step1. コマンド実行（この時値がprintされるようにする）
+  　　Step2. 直後、gdb.history(0)の値をgdb.valueでひろう。
+     Step3. Step2.で得られたデータを元に操作をかける。
+
+
+    まあ、Step1〜Step2は、gdb.parse_and_eval()あたりで手に入る。
+     
+class CheckStr(gdb.Command):
+        """ gdb.value checking """
+        def __init__(self):
+                super(CheckStr,self).__init__("checkstr",gdb.COMMAND_OBSCURE)
+        def invoke (self,arg, from_tty):
+                str_arg_val=gdb.parse_and_eval("str");
+                print "str="+str_arg_val.string();
+
+CheckStr()
+
+
+ しておき、
+(gdb) list foo_a
+6	".asciz \"test-func.py\"\n"
+7	".popsection \n"
+8	);
+9	
+10	void foo_a(const char *str)
+11	{
+12		printf("%s\n",str);
+13	
+14	}
+
+な場所で
+
+(gdb) b foo_a
+Breakpoint 1 at 0x400518: file chkfunc.c, line 12.
+(gdb) run
+Starting program: /home/nojima/prog/my-works/gdb-python/test-function/chkfunc 
+
+Breakpoint 1, foo_a (str=0x40061b "caller is main!") at chkfunc.c:12
+12		printf("%s\n",str);
+(gdb) checkstr 
+str=caller is main!
+
+となる。
+
+    なお、parse_and_evalは変数専用なので、注意が必要。
+
+29.gdb.decode_line(arg)は
+
+　　argに入れた文字列を、LINESPECと、その他文字列に分解し、
+　　(remain,locations)のTupleにして返却。
+
+　　とにかく、LINESPECに該当するような文字列は強制的に
+　　LINESPECとして扱われる。
+
+　　さらにlocationsは、gdb.Symtab_and_lineオブジェクトの
+　　Tupleとなる。
+　　locations=(location,localtion,location,...)こんな感じ。
+    なので、locationsについて何かしたければ、
+    for loc in locations:
+         ...do about loc...
+
+    にする必要有り。
+
+30 取り急ぎ、gdb.Breakpointsにてサンプルは_LPrintfCommand()
+~/prog/my-works/gdb-python/test-function/ gdb ./chkfunc
+GNU gdb (GDB) 7.4.1-debian
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /home/nojima/prog/my-works/gdb-python/test-function/chkfunc...done.
+(gdb) lprintf foo_a,"str=%s",str
+_LPrintfCommmand arg=foo_a,"str=%s",str
+_LPrintfCommmand remaining="str=%s",str locations=symbol and line for chkfunc.c, line 11
+Breakpoint 1 at 0x400518: file chkfunc.c, line 12.
+(gdb) run
+Starting program: /home/nojima/prog/my-works/gdb-python/test-function/chkfunc 
+caller is main!
+caller is bar!
+str=caller is main!str=caller is bar![Inferior 1 (process 5323) exited normally]
+(gdb)  d 1
+(gdb) lprintf foo_a,"str=%s\n",str
+_LPrintfCommmand arg=foo_a,"str=%s\n",str
+_LPrintfCommmand remaining="str=%s\n",str locations=symbol and line for chkfunc.c, line 11
+Breakpoint 2 at 0x400518: file chkfunc.c, line 12.
+(gdb) run
+Starting program: /home/nojima/prog/my-works/gdb-python/test-function/chkfunc 
+str=caller is main!
+caller is main!
+str=caller is bar!
+caller is bar!
+[Inferior 1 (process 5361) exited normally]
+
+ってな感じで、既存のbreakpointの機能を元に拡張できる。
+ただ、この拡張済みbreakpointを利用するには、この拡張済みbreakpointのオブジェクト
+経由でbreakpointを仕掛ける必要がある。
+
+※Non stopになるのはご愛嬌。なんでかはわからん。
+
+31. gdbには、info functionsというfunctionのシンボルテーブルをいっぺんに
+引き抜く必殺手続きがある。
+こちらをpython経由で使ってみた。
+
+(gdb) python str=gdb.execute("info functions",False,True)
+(gdb) python print str
+All defined functions:
+
+File chkfunc.c:
+void caller_bar(void);
+void foo_a(const char *);
+int main(int, char **);
+
+Non-debugging symbols:
+0x00000000004003b8  _init
+0x00000000004003e0  puts
+0x00000000004003e0  puts@plt
+0x00000000004003f0  __libc_start_main
+0x00000000004003f0  __libc_start_main@plt
+0x0000000000400400  _start
+0x000000000040042c  call_gmon_start
+0x0000000000400450  deregister_tm_clones
+0x0000000000400480  register_tm_clones
+0x00000000004004c0  __do_global_dtors_aux
+0x00000000004004e0  frame_dummy
+0x0000000000400560  __libc_csu_fini
+0x0000000000400570  __libc_csu_init
+0x00000000004005fc  _fini
+
+ただ、この結果は本フォーマットでparseする必要があるので、
+便利かどうかは疑問すぎる。
+
+32. rbreakの実装をおいかけたら、search_symbolsという
+　　専用の関数つかってsymbolテーブル洗ってた。
+　　このあたりは独自実装っぽくて、唯一他コマンドで利用
+　　されているのは、info functionsぐらい。
+
+33. くっそー、rbreakとfinishは帯に短し、たすきに長しだーっ
+　　finish--->現在のスタックから出ると無効になる一時的なbreakpoint
+             次のスタックとかに移動するといきなり無効になるので、
+　　　　　　　コールトレースには不向き。
+
+     とおもたら、
+
+　　　　Step1. breakして、
+       Step2. gdb.breakなら、finishしまくり、(このときstack +1)
+       Step3. gdb.finishbreakなら、continueしまくり（このときstack -1)
+       Step4. finishでエラー発生なら、無視して、continue
+             (理由：breakpointが定められんとか...あるので)
+
+     とかよさげ。これでコールトレース取れるか?
+
+34. rbreak & info breakで整形されたアドレスが手に入るので、
+　　こちらをparseし、一旦deleteしてから、逐一gdb.breakすれば、
+　　実行トレースは手に入りそうだ。
+   (でも、相変わらずreturnの場所は手に入らんがな！）
+
+35. コールトレースとる時、plugins.soなんてのは結構悪夢。
+　　というのも、ダイナミックリンクライブラリの全シンボルとか入っちゃうので、
+　　rbreakは非現実的だったりする...
 
