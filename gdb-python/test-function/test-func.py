@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# coding:utf-8
 import gdb
 class CallerIs (gdb.Function):
 	""" test Caller is specified caller """
