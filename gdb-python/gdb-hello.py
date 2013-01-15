@@ -4,7 +4,7 @@ class HelloWorld (gdb.Command):
      super(HelloWorld, self).__init__ ("hello-world",gdb.COMMAND_OBSCURE)
 
   def invoke (self,arg, from_tty):
-     print "Hello, World!"
+     print "Hello, World! arg=["+arg+"]"
 
 HelloWorld()
 

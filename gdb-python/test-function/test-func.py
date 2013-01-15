@@ -120,6 +120,7 @@ class _PrepareCallTracer(gdb.Command):
 		gdb.execute("rbreak",False, True)
 		break_info=self._retrive_ptrs()
 		gdb.execute("delete",False, True)
+		gdb.execute("set pagination off")
 		for addr,name in break_info.iteritems():
 			_CallTracerBreakpoint(r'*'+addr,
 					      name,self._stack)

@@ -474,6 +474,12 @@ Hello, World!
 
 ってな具合に、勝手にhello-gdb.pyがロードされる。
 
+もちろんだが、いつも使うようなものは、
+$(HOME)/.gdbinitに
+source /foo/bar/my-gdb-func.py
+
+とか入れておくとgdbが起動時にいつも吸い込まれる。
+
 23. gdb.functionの例：
 
 ~/prog/my-works/gdb-python/test-function/ gdb ./chkfunc
