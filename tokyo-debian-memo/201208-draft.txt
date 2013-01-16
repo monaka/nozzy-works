@@ -1,0 +1,368 @@
+
+1. dh_makeshlibs
+
+ 本プログラムはDebian-policy Manual Chapter 8の内容を実施するために
+存在する。
+  debian/tmp/DEBIAN/shlibs
+
+とかのファイルの用途と目的は
+　http://www.debian.org/doc/debian-policy/ch-sharedlibs.html#s-sharedlibs-shlibdeps
+
+あたりを参照。
+
+ 
+ L140-155: かたっぱしから、debian/tmp/以下を探しまくり。条件↓
+           find \( -name '*.so' -or -name '*.so.*' \)
+
+　次に見つかったライブラリにobjdump -p libxxxx.so.xxxx
+して、SONAME行からバージョン情報かなにかを引き抜き。（See. L162-172)
+
+  debian/tmp/DEBIANとか無かったら作成。(see. L177)
+
+  debian/package名/DEBIAN/shlibs
+  debian/package名/DEBIAN/symbols
+
+とか作成するみたい。なお、symbolsはパッケージメンテナ
+によりsymbolsファイルはメンテされ、debian/配下で提供されている事が必要。
+（つまり、どこかで
+一度は作っておく必要あり。なお、dpkg-gensymbolsは、このsymbolsファイル
+を作成/更新するのに便利な機能を持つ。例: -cとか。）
+
+※http://lists.debian.org/debian-devel/2007/06/msg00197.html
+　参照。
+
+ また、shlibsはdebian/control
+       Depends: ${shlibs:Depends}
+       Recommends: ${shlibs:Recommends}
+
+を置き換えるのに使われるみたいだが、いつ置き換えるのかよーわからん。
+
+　　----> dh_gencontrolの時、debian/package名.substvar見て一斉に書き換える。
+　　　　　なお、substvar本体はdh_shlibdepsで作成。
+　　　　　そもそもsubstvarはcontrolファイル中のマクロ変数を置き換える
+　　　　　為に存在するものなので、dh_shlibdepsでも既存のsubstvarの内容
+　　　　　をコピーして最後に付け加える感じで動く。
+　　　　　※付け加えられるものは、dpkg-shlibdeps -Oで出力されるものを参照。
+
+取り急ぎ、symbolsまで生成するのは、
+  ~/prog/debian/gstreamer-tools/gstreamer0.10-0.10.35/debian/ 
+あたりで行われていた。
+
+
+あー、いろいろ調べるとそもそも以下の順番で呼び出されるのが前提。
+
+  dh_makeshlibs  ---> DEBIAN/shlibs DEBIAN/symbols等作る
+  dh_shlibdeps   
+  dh_installdeb
+　dh_gencontrol
+
+で、これら一連の流れで、最後にパッケージの諸々が出来上がる。
+
+ところで、DEBIAN/symbolsとDEBIAN/shlibsの使い分け（というかどうすんのさこれ）
+みたいな議論は以下のバグレポートに載せられている
+
+    #634192
+    #571776
+
+で、#571776にて今年(2012)議論が延々と...
+※Debian policy-manual用のパッチがすげー
+　で、2012/7/8現在まだ反映されてないのか？？
+
+-->で、最新のdebian policy manual(20120814版)だと、
+git clone 'http://anonscm.debian.org/git/dbnpolicy/policy.git'
+で入手可能。この８章が大幅加筆されており、shlibsファイルの
+役割について記載されている。
+
+--->簡単にいうと、objdump -p BINARY-EXECのDYNAMICセクションに
+記載されているNEEDEDという語句に動作に必要なshared libraryの記載があり、
+この内容が合致するかどうかを知るためにshlibsファイルに記載を
+しておく。あとで、dpkg-gencontrolにより、subvarが作られ、
+controlファイルの${shlibs}とかがこれらにより置き換えられる
+という仕組みとのこと。
+
+なお、lddとるとたくさんの依存関係が出てくるが、BINARY-EXEC側が
+必要としているもののみではなく、さらに必要としているライブラリ
+の依存まで引っ張ってくるので、たくさんでてくる。
+
+例：
+ objdump -p /usr/bin/xeyes
+ ...中略...
+  NEEDED               libXext.so.6
+  NEEDED               libXmu.so.6
+  NEEDED               libXt.so.6
+  NEEDED               libX11.so.6
+  NEEDED               libXrender.so.1
+  NEEDED               libm.so.6
+  NEEDED               libc.so.6
+ 
+ objdump -p  /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   NEEDED               libxcb.so.1
+   NEEDED               libdl.so.2
+   NEEDED               libc.so.6
+
+こんな監事。
+
+---> lddの正体は/usr/bin/lddのshスクリプト。中でやってるのは、
+　　　/lib/ld-linux.so.2 --verify binary
+　　　/lib64/ld-linux-x86-64.so2 --verify binary
+を選択的に実行してるみたい。
+　　　で、sh -x /usr/bin/ldd /usr/bin/xeyesとかすると、
+    ...中略...
+LD_TRACE_LOADED_OBJECTS=1 LD_WARN= LD_BIND_NOW= LD_LIBRARY_VERSION= LD_VERBOSE= /lib64/ld-linux-x86-64.so.2 /usr/bin/xeyes
+	linux-vdso.so.1 =>  (0x00007fffd9bff000)
+	libXext.so.6 => /usr/lib/x86_64-linux-gnu/libXext.so.6 (0x00007fae4ab46000)
+	libXmu.so.6 => /usr/lib/x86_64-linux-gnu/libXmu.so.6 (0x00007fae4a92c000)
+	libXt.so.6 => /usr/lib/x86_64-linux-gnu/libXt.so.6 (0x00007fae4a6c4000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007fae4a388000)
+	libXrender.so.1 => /usr/lib/x86_64-linux-gnu/libXrender.so.1 (0x00007fae4a17f000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fae49efc000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fae49b75000)
+	libSM.so.6 => /usr/lib/x86_64-linux-gnu/libSM.so.6 (0x00007fae4996e000)
+	libICE.so.6 => /usr/lib/x86_64-linux-gnu/libICE.so.6 (0x00007fae49752000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fae49532000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fae4932e000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fae4ad77000)
+	libuuid.so.1 => /lib/x86_64-linux-gnu/libuuid.so.1 (0x00007fae49128000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007fae48f25000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fae48d20000)
+
+てな感じ。    
+
+なんと、上川さん、
+http://www.netfort.gr.jp/~dancer/column/libpkg-guide/libpkg-guide.html
+なるガイド描いてるやん。
+
+--->debian-developers-referenceの6.7.2章に上の文献の紹介あり。
+
+https://wiki.kubuntu.org/stefanlsd/dpkg-gensymbols
+もsymbolファイルについて参考になるなあ。
+
+実は依存関係解決にshlibsが不都合になる場合が指摘されている
+---> 実際には使いもしないAPIがライブラリに混ざっており、こちらの為に
+　　　実際には他の使いもしないライブラリの依存まで解決しなければ
+　　　ならないのを何とかしたい。
+　　　（これは、testフェーズ等で、余計な依存の為に
+　　　　テストが進まないとかを避けたいらしい）
+
+ ---> で、単純にライブラリの依存関係だけ記載したshlibsだけだと
+　　　不十分(*1)なので、symbolを利用して依存関係をもっと最小限にしてみようと
+　　　いう試みがある。
+　　　　http://wiki.debian.org/Projects/ImprovedDpkgShlibdeps
+      --->すでにdpkg-shlibdepsには搭載されている模様。なお、
+　　　　　The Debian Administrators handbookの著者である
+　　　　　Raphaël Hertzogさんのプレゼン資料↓
+　　　　　http://raphaelhertzog.com/2010/10/30/latest-features-of-dpkg-dev-debian-packaging-tools/
+　　　　　dpkgにこのsymbolファイルから依存関係を求める改造が
+　　　　　入ったのは、2007/9/25のアナウンスのもよう。
+　　　　　http://lists.debian.org/debian-devel-announce/2007/09/msg00004.html
+
+
+dpkg-shlibdepsがこのsymbolファイルを賢く扱う能力がある。
+--->まず対象のバイナリファイルを
+　　　objdump -w -f -p -T -R バイナリ
+して、リンクすべき関数名の情報と、必要なライブラリを得る。
+    で、どうもNEEDED扱いになってるはずのライブラリ名の中に
+　 　結局リンクすべき関数名を付き合わせると、一つもはいっていない
+　　　ものがけっこうあるので、これを依存関係の候補からはずす。
+という事をしている。...(*1)
+
+まあ、このあたりの動作調べたければ、たとえば、
+  apt-get source gnome-shell
+  cd gnome-shell-X.X.X
+  dpkg-shlibdeps -v -v -v -O /usr/bin/gnome-shell
+してdebugメッセージを見ながらdpkg-shlibdepsを読むとよく判って良い感じ。
+
+※結構gnome-shell側ではリンク予定のライブラリの一部ぐらいしか見てない事が分かる。
+
+a. /var/lib/dpkg/info/lib*.symbols
+b. /var/lib/dpkg/info/*.shlibs
+なんてファイルがある。
+--->見るとライブラリを含むパッケージかなぁ...
+---> dpkg-shlibdepsの使うライブラリでで、
+　　　dpkg-query --control-path等引いてこのディレクトリを見つけてる。
+　　　例：
+　　　　dpkg-query --control-path libasound2
+      /var/lib/dpkg/info/libasound2:amd64.postinst
+      /var/lib/dpkg/info/libasound2:amd64.md5sums
+      /var/lib/dpkg/info/libasound2:amd64.postrm
+      /var/lib/dpkg/info/libasound2:amd64.shlibs
+      /var/lib/dpkg/info/libasound2:amd64.symbols
+      
+   こんな感じ。
+(Dpkg::Path::get_control_path()が心臓部）
+
+dpkg :
+
+shlibsやら、symbolを真に理解するには、dpkgの振る舞いを知る必要あり。
+dpkg-shlibsとかあるしね...
+ところで、dpkgは/etc/dpkg/以下の*.cfgにより振る舞いを変える
+
+dpkg では、controlファイル群(DEBIAN/*で作られる奴）をADMINファイル
+として扱い、マクロADMINDIR(/var/lib/dpkg)以下に別途展開して処理
+する模様。先のsymbolsとか、shlibsとかのファイルはインストール後
+ここに展開される。
+
+-------Deb専原稿------------
+
+1. 今回のテーマの説明
+
+　　debhelperのマニュアルを翻訳した際、
+　　いつか解析しようと思っていたコマンド３つを取り上げます。
+
+　 　・dh_makeshlibs
+    ・dh_shlibdeps
+
+2. 今回の発表の対象
+
+　　共有ライブラリと、共有ライブラリのパッケージ作成に関する予備知識はある程度
+　ある人向けの内容となります。
+
+　　参考文献：
+　　　1. ローダー&リンカー
+　　　2. O'Reilly Binary Hacks
+　　　3. Debian Library Packaging guide
+
+
+3. dhからの呼び出され方
+
+　　以下の順番でdhから呼び出されます。
+
+     ...中略...
+　　　dh_makeshlibs
+     dh_shlibdeps
+     dh_installdeb
+     dh_gencontrol
+     ...中略...
+
+
+4. ${shlibs:Depends}、${shlibs:Recommends}マクロ
+
+   今回のdebhelperコマンドはこれらマクロに関わる処理を行います。
+
+　　共有ライブラリの依存関係を人手でメンテナンスしつづけるのは大変面倒な
+　作業になり、また、多くのケースでは機械的に依存関係を求める事も可能なので、
+　パッケージ作成時に機械的に共有ライブラリの依存関係を生成出来る仕組みがあります。
+　こちらのマクロはこの機能を利用する為のものとなります。
+
+　　これらマクロをcontrolファイルのDepends行に入れておくと、
+　　debhelperを使ってパッケージを作成した場合、自動で算出した共有ライブラリとの
+　　依存関係の情報で置き換えてくれます。
+
+　　　例：debian/control
+
+     生成されたcontrol
+
+   試しに手元のバイナリについてどんな形で置き換えられるかは、
+　展開済みのソースパッケージがあれば、dpkg-shlibdeps -Oで検証できます。
+
+　　例：
+
+5. shlibsファイルと、symbolファイル
+　　
+　　5.1 shlibsファイル
+
+　　　　　ファイル形式例
+　　　　　
+        SONAMEと共有ライブラリ本体のバージョンのみの情報で、必要な共有ライブラリへの
+　　　　依存関係を算出するやり方で利用されるファイルです。このやり方は最も単純で、
+　　　　最も保守的に共有ライブラリへの依存関係を算出できるという特徴があります。
+
+　　　　　本ファイルを使った依存関係算出の方法は最も基本的な方法ですので、
+　　　　BUG#634192、#571776でdebian-policyへ掲載すべきとの要望があり、
+　　　　対応がなされた模様です。こちらについては、　　　　　
+
+　　　　　　git clone 'http://anonscm.debian.org/git/dbnpolicy/policy.git'
+
+　　　　すればshlibsファイルに関する記載が大幅追記されたdebian policyが読めます。
+
+　　5.2 symbolファイル
+
+　　　　 ファイル形式例
+
+　　　　共有ライブラリの依存関係を洗い出す際、SONAMEが変わらない限りは、
+　　　バイナリが必要としているシンボルを過不足無く搭載しているライブラリと
+　　　バージョンのみを依存関係として含めると都合が良い事が多いです。例えば、
+
+　　　　　・バージョンの上がったライブラリの元で
+　　　　ビルドして依存関係を求めたが、実は古いバージョンのライブラリでも
+　　　　全く問題なく動的リンク出来る場合は古いバージョンのライブラリも含んで
+　　　　依存対象としたい
+
+　　　　　・依存しているライブラリAがライブラリBを必要としているが、
+　　　　　バイナリからはライブラリBのシンボルを一切利用していないので、
+　　　　　バイナリ本体の依存関係としてライブラリBを外したい
+
+      図参照。
+
+　　　　という事があります。こちらが出来ると、例えばsidからtesting
+      へバイナリを移動させるときに、依存関係にある数多くのライブラリ全部も同時に
+　　　sidからtestingへ完全に移動できるようになるまで、バイナリ本体をtesting環境の
+　　　ものとして移動出来ないという問題を極力避ける事ができます。
+
+　　　　共有ライブラリの提供している全シンボルと、各シンボルについて
+　　　搭載されたバージョンを記載したファイルを用意すれば、本件は対応出来る
+　　　ようになります。これがsymbolファイルとなります。
+　　　　
+6. substvarファイル
+
+　　${shlibs:Depends}、${shlibs:Recommends}マクロを置き換える際に
+　　dh_gencontrolが参照する中間ファイルとなります。dh_gencontrolが動作
+　　する前にdebhelperコマンドがsubstvarファイルを追記を繰り返す
+　　ことにより生成しておき、最後にdh_gencontrolがマクロ部分を
+　　適宜置き換えたcontrolファイルを別に生成します。
+
+7. 今回のdebhelperコマンドの内部で主に利用されているdpkgパッケージに含まれるコマンド
+
+　今回のdebhelperコマンドは内部でdpkgパッケージに含まれるいくつかのコマンド
+　を利用して処理を行っています。
+
+　図参照
+
+7.1. dpkg-gensymbols
+
+　　dh_makeshlibs内部にて、ライブラリメンテナがソースに含めているsymbolファイルを
+　　元にし、実際に構築したライブラリから得られるシンボルの差分を含めたsymbolファイル
+　　を生成するのに使われます。この生成されたsymbolファイルはライブラリ
+　　パッケージのcontrolファイル群として含められます。
+
+　　なお、dh_makeshlibsでdpkg-gensymbolsを呼び出す時、-c 4が指定されて
+　　呼び出されます。
+
+7.2. dpkg-shlibdeps
+
+    dh_shlibdepsはほとんどdpkg-shlibdepsのラッパーコマンドとも
+　　言えるぐらい、共有ライブラリの依存関係算出にあたって、
+　　dpkg-shlibdepsをそのまま利用しています。
+
+　　　dpkg-shlibdepsの動作は
+
+　　　　1.コマンドラインから与えられたバイナリファイルが必要とする共有ライブラリへの
+　　　　　動的リンクに必要な情報を
+      　　objdump -w -f -p -T -R　バイナリファイル
+　　　　　コマンドを使って探り、
+
+       2. 1.で得られた情報のうち、NEEDEDに記載されているSONAMEと同じファイル名を持つ
+　　　　　　ライブラリファイルを/lib,/usr/lib以下から探し当て、
+
+　　　　3. 発見したライブラリファイルのフルパスを元にdpkg -Sを利用して
+         ライブラリのパッケージ名を割り出し、
+
+　　　　4. dpkg-query --control-path　ライブラリパッケージ名を使って
+　　　　　/var/lib/dpkg/info/以下にあるライブラリパッケージの提供するshlibsファイル/
+　　　　　symbolファイルを取得し、
+
+　　　　5. 1.で得たバイナリファイルの動的リンクに必要なシンボル名と、4.で得た
+　　　　　　shlibsファイル/symbolファイルを検証することによりバイナリファイル
+　　　　　にとって最適な依存関係を算出し、
+
+　　　　6. substvarファイルに算出した依存情報を記載する
+
+　　という動作を行います。
+
+ 　参考までに、こちらの動作をどのように行っているかを観察するには、
+　  dpkg-shlibdeps -v -v -v -O バイナリファイル
+　をバイナリファイルに対応するソースパッケージ展開後のディレクトリで、
+　実行するとよく判ります。
+
+
+

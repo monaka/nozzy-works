@@ -1,0 +1,1450 @@
+Adb入手の方法：
+
+1. android sdkを落とす
+　URL: http://developer.android.com/sdk/index.html
+ より、
+　http://dl.google.com/android/android-sdk_r17-linux.tgz
+　を入手し適当な場所に展開
+
+2. cd android-sdk-linux/tools/する
+
+3. aptitude install openjdk-6-jre openjdk-6-jre-headless openjdk-6-jre-lib
+
+4. ネットワークを有効にして./android実行
+
+5. 出てきたGUIからAndroid SDK Platform-toolsのみ選択し、ダウンロード
+
+6. cd android-sdk-linux/platform-tools。
+   32bitライブラリをaptitudeでinstall。
+
+7. 始めてadb繋ぐときは
+   mkdir -p ~/.android && echo 0x2080 > ~/.android/adb_usb.ini && adb kill-server && adb devices
+   を実行しておく。
+
+8. ./adb devicesで何らかのシリアル番号が出てくればOK
+
+以下はadbのTips。
+
+1. usbをejectすると、２度目から全くadbから認識できなくなる。
+   この場合は非常に面倒くさいが、nooterを入れてUSBつなぎ、ランプが緑になったことを
+　 確認してから引き抜き、nooterのsdを取り出して再度電源ONする。
+
+   なお、電源長押しのOFF/ON程度では復活できない。
+
+　　----->あくまで推測だが、usbがejectしたことをadbdが判らず、
+　　　　　　無効になったdeviceをつかんだままになっているのでは？と思われ。
+         また、電源長押しは本当に電源を切っているのではなく、
+　　　　　いわゆるハイバネモードになっているのでは？と思った。
+        (でないと、なぜ電源長押しのOFF/ONで復活できないか、わからん）
+
+Memo:
+
+1. arm のdisassemblerとしては、aptitude install binutils-multiarchして
+   objdump -D --target~binary -z -w --architecture=arm foo.bin
+  してみた。
+
+  が、あってんだかあってないんだかまったくわからんコード。
+　auto-nooter-2-12-15.imgの最初512バイトすらこのままでいいのかわるいのか...
+  auto-nooter-2-12-15.imgの1stパーティションに梱包済みのMLOというよーわからん
+　バイナリも直接食わせてみたが、これもよーわからん。
+
+   ---->心臓部はx-loader。これがブートアップのコードの塊。
+　　　　こいつで１段めブートして、次UBootを実行。最後にImageを実行。
+
+2. nook colorのrootとりだが、入手したnook colorがfirmware1.2.0なので、
+　　autonooter使えず....bareboneというのを使うことになりそう。
+
+3. burns&nobleはnook colorのGPL部分についてはソースを「一部」公開している
+
+　　http://www.barnesandnoble.com/u/Terms-of-Service-NOOK-Color/379003278/
+
+    例：
+    http://images.barnesandnoble.com/PResources/download/Nook/source-code/nookcolor_1.2.tgz
+
+4. カーネル再構築やら、ブートやら。
+http://nookdevs.com/NookColor:_Build_the_Original_Kernel
+
+5. sdカードにRicho R5C822チップ経由で書き込みをしようとすると、
+　相当昔(2009ぐらい）からいろいろありすぎて、
+[ 1585.144079] mmc0: error -110 whilst initialising SD card
+[ 1585.150459] mmc0: Reset 0x1 never completed.
+[ 1595.296040] mmc0: Timeout waiting for hardware interrupt.
+[ 1595.326716] mmc0: Reset 0x2 never completed.
+[ 1595.326716] mmc0: Reset 0x4 never completed.
+（@ linux-image-3.2.0-2-amd64にて）
+
+　とかでまったく読み書きできんという問題がある。で、/etc/modulesに
+　http://ggutter.blogspot.jp/2009/06/mmc0-error-110-whilst-initialising-sd.html
+  とか参考にして、
+
+　　　mmc_block
+     tifm_sd
+
+  とかぶち込んでおくと、/etc/init.d/kmodでロードされて読み書きできて幸せかも?
+　(まじかー)
+
+6. google play!には、androidをchroot環境でubuntu動かすアプリがある。
+
+7. nooter 0.2 zipはろくな説明/解説が無いが、以下のようにして使う
+
+　　詳しくは：
+　　　http://blog.livedoor.jp/duponmid/archives/4067279.html
+
+　　nooter焼いたSDぶちこみ、usbケーブル刺すだけで、いきなりusb0が
+　　RNDISのケーブルに変貌。ここで、
+　　　aptitude install dhcpcdして
+　　　sudo dhcpcd usb0
+
+   とかすると、nook color側でdhcpdが動いてるので、ネットワークReadyになる。
+
+　　あとは、ssh root@192.168.2.2するだけで、rootでログインできて好き放題
+　　できる。
+
+    内臓nook colorのdiskみたければ、fdisk -lでぜんぶ丸見え。
+
+8. なんと、前田さんはchumbyでarmのchrootで2009年頃debianを動作させる
+　　ことに成功してる。(qemuのversatileカーネルでベースを作って、
+　　loopマウントかけてchrootという手）
+
+9. nook colorのarmアーキテクチャでkernelコンパイルするには、
+   emdebian.orgの
+
+     ・gcc-4.6-base-armel-crossを使う?
+ 　　・gcc-4.6-arm-linux-gnueabiを使う?
+
+　　See. 
+     http://martinezjavier.blogspot.jp/2011/09/building-your-own-nook-color-android.html
+   注：android cyanogenmod用のやり方だけどな。
+　　　　gcc-arm-linux-gnueabiが指定だけどな。
+
+   /etc/apt/source.listに
+　　deb http://www.emdebian.org/debian/ unstable main
+　　をいれて、aptitude update!
+
+10. kernelのイメージは特定の製品のものしか存在しないので、何とかして
+　　別途ビルドする必要がある。ここでは、開発中のCM9のソースを使ってみる。
+    ソースのありか：
+
+　　　https://github.com/fat-tire/android_device_bn_encore.git
+
+　　git cloneして利用。
+
+    →と思って中身みたら、
+
+　　　　・カーネルはprecompiled済み
+　　　　・その他よく判らんバイナリがどっさり
+
+　　って感じでがっかりだー。
+
+   →というわけで、
+　　　http://martinezjavier.blogspot.jp/2011/09/building-your-own-nook-color-android.html
+　　みて、CM7をgetするべく画策中。
+
+11. debianの場合、クロスバイナリを作るには、apt-crossなんかがある。
+　
+12. debianのARM用のバイナリビルドはgccには何使ってるんだ?
+   それとも、ARM上でビルドか?
+
+13. カーネルビルドしたいのは、RINDSを使いたいため。もうusb経由のadbは不安定で
+　　いやじゃぁ。とおもったら、こいつのせい?↓
+
+　　　------ /dev/mmcblk1p1中の/uRamdisk中のdefault.prop---
+#
+# ADDITIONAL_DEFAULT_PROPERTIES
+#
+ro.secure=0
+ro.allow.mock.location=0
+ro.debuggable=0
+persist.service.adb.enable=0
+　　　------ /dev/mmcblk1p1中の/uRamdisk中のdefault.prop---
+本当は
+
+　　　------ /dev/mmcblk1p1中の/uRamdisk中のdefault.prop---
+#
+# ADDITIONAL_DEFAULT_PROPERTIES
+#
+ro.secure=0
+ro.allow.mock.location=0
+ro.debuggable=1
+persist.service.adb.enable=1
+　　　------ /dev/mmcblk1p1中の/uRamdisk中のdefault.prop---
+
+と思ったらビンゴ。
+
+----> 4/12　嘘でしたー。一度eject /dev/sdbを実行すると、
+      2度とつながらん。adbをexitで抜ける程度では、
+　　　問題ないので、usbに変化が起きるとadbdがトラブル
+　　　のでは？という仮説が...
+
+というわで、以下の手法で改造。
+
+　Step 1. nooter0.2をつっこみ、usb突っ込んで sudo dhcpcd usb0してssh root@192.168.2.2する。
+　Step 2. 以下全部手動でやる。
+
+          mount -o rw /dev/mmcblk1p1 /mnt
+          mkdir /tmp/rd
+          cd /tmp/rd
+          dd if=/mnt/uRamdisk bs=64 skip=1 | gunzip -c | cpio -i
+          vi default.propして上の内容に書き換え。
+          find . -regex "./.*"| cpio -o -H newc | gzip > /tmp/ramdisk.gz
+          cd /tmp
+          mkimage -T ramdisk -C gzip -A arm -d /tmp/ramdisk.gz /mnt/uRamdisk
+          umount /mnt
+          mount /dev/mmcblk1p6 /mnt
+          cd /mnt/property
+          echo -n 1 > /mnt/property/persist.service.adb.enable
+          umount /mnt
+
+   Step 3. exitして、dhcpcd落とし、miniSD抜いて、nook colorぶーと
+
+　　Step 4. ロック外してusb突っ込み、adb devicesして
+　　　　　　 List of devices attachedにデバイス表示されればOK!
+
+    なお、eject /dev/sdbすると、adbポートも外れるみたい...-->２度と復帰できず。
+
+14.まぢかー。TIはOMAP3のカーネル配ってるぜー。
+
+  http://processors.wiki.ti.com/index.php/OMAP3_GIT_Linux_Kernel
+
+  GFXだろうが何だろうがいっぱいあるぜー
+
+15. versatileつかってイメージ作るの超簡単だった...
+
+    sudo aptitude install debian-installer-6.0-netboot-armel
+    sudo aptitude install qemu-system
+    qemu-img -f raw arm-versatile.img 10G
+    qemu-system-arm -M versatilepb -kernel /usr/lib/debian-installer/images/armel/versatile/vmlinuz-2.6.32-5-versatile -initrd /usr/lib/debian-installer/images/armel/versatile/initrd.gz -hda ./arm-versatile.img -append "root=/dev/ram desktop=lxde priority=medium"
+
+    (なお、arm-versatile.imgは初期化しないと、sidのメニューでてこない感じ...)
+    あとは普通にdebianインストーラが立ち上がるので、指示にしたがって
+　　インストールするだけ。なお、ネットワークはよく判らんが、勝手につながる。
+    あと、画面、キーボードなどいったいどういう仮定のハードなんだか...?
+    （本当ドキュメントないのでわからん）
+
+    あとは、普通にデスクトップと、sshサーバーとモバイルを選べばLXDEで入る。
+　　Gnomeに比べてちっさいのでメモリもスワップせず、動作。
+
+    インストラーコンポーネントのダウンロードは何も選ばない？
+
+    ただ、インストールにすごい時間がかかる。
+　　　---> 普通にDesktop環境、モバイル環境、
+　　　　　　ベースシステムで約9時間ぐらいかかった。
+
+    あとは、できたイメージをkpart -a `pwd`/arm-versatile.imgして
+　　 mount /dev/mapper/loop0p1 `pwd`/mntとかして、
+　　 cp mnt/boot/vmlinuz-3.2.0-2-versatile .
+　　 cp mnt/boot/initrd.img-3.2.0-2-versatile .
+     して、
+    qemu-system-arm -M versatilepb -kernel `pwd`/vmlinuz-3.2.0-2-versatile -initrd `pwd`/initrd.img-3.2.0-2-versatile -hda ./arm-versatile.img -append "root=/dev/sda1"
+
+　　で起動してやると、XDMが立ち上がり、なんかしらんが、ログインできるようになる。
+
+    デフォルトのGnomeの場合、
+    ----> メモリ128MBではGnome環境はまぢで使い物にならん。swap出まくり。
+　　　　　最低でも512MBぐらいいる感じ。
+
+    取り急ぎ、sqeezeが入る模様。
+
+    また、すっごいわけわからんが、この状況でブートしても、ネットワークは生きている...
+    (ネットワークは、smc91Cxxxというタイプらしい...)
+    また、どこのネットワークが使われているのかしらんが、これって擬似的なネットワーク？
+
+    /etc/apt/source.listにsidの定義追加して、そのまま
+    aptitude updateして、sidにしてみる。
+       ----->あー、これ筋悪すぎ。タダでさえ、メモリは無い（128MB?)、CPUは遅いなど
+　　　　　　　で、swapが発生しまくりで使い物にならん。
+
+　　また、キーボードの配列がおかしい模様で、JP106のうち、|\あたりのキーが
+　　まったく入らん...(loadkey jp106も、loadkey -dもデータがない模様で
+　　NGとなる。（debian unstableでも同様)
+     --->実はCtrl+alt+f1でコンソールにして、叩くと、
+　　　　　｜は入るが、エラーがぼろぼろ出る。
+
+16. qemuは、
+
+    CPU: ARM926EJ-S
+    VGA: clcd-pl11x (PL110 ) VGA
+    Eth0: SMC91C11xFDcd 
+
+17. あー、LXDEはaccessibilityがガタガタなので、ソフトキーボードが使えない...
+    ぎゃぁああ
+
+18. nook colorのroot取ってadb shellして、cat /proc/versionすると、
+　　Linux version 2.6.32.9 (build@dhabuildimage19) (gcc version 4.4.0 (GCC) ) #1 PREEMPT Wed Apr 20 21:10:11 PDT 2011
+　　なんだそうな。
+   cat /proc/cpuinfo 
+   # cat /proc/cpuinfo
+Processor	: ARMv7 Processor rev 2 (v7l)
+BogoMIPS	: 297.12
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0xc08
+CPU revision	: 2
+
+Hardware	: OMAP3621 EVT1A board
+Revision	: 0005
+Serial		: 2004430007432009
+
+  だそうな。
+  dmesgとると、
+    Memory 256+256=512MB
+    
+  ---------------ここから--------------
+# dmesg
+<6>Initializing cgroup subsys cpu
+<5>Linux version 2.6.32.9 (build@dhabuildimage19) (gcc version 4.4.0 (GCC) ) #1 PREEMPT Wed Apr 20 21:10:11 PDT 2011
+<4>CPU: ARMv7 Processor [413fc082] revision 2 (ARMv7), cr=10c53c7f
+<4>CPU: VIPT nonaliasing data cache, VIPT nonaliasing instruction cache
+<4>Machine: OMAP3621 EVT1A board
+<4>Ignoring unrecognised tag 0x54410008
+<4>Memory policy: ECC disabled, Data cache writeback
+<7>On node 0 totalpages: 131072
+<7>free_area_init_node: node 0, pgdat c0592458, node_mem_map c068c000
+<7>  Normal zone: 1024 pages used for memmap
+<7>  Normal zone: 0 pages reserved
+<7>  Normal zone: 130048 pages, LIFO batch:31
+<6>DIE ID: 056000029ED80000015F031B03024018 
+<6>OMAP3630 ES1.2 (l2cache iva sgx neon isp 192mhz_clk )
+<6>omap_sam_base (VA) == 0xfe400000
+<6>omap_sram_start (PA) == 0x40200000
+<6>omap_sram_size (SIZE) == 0x10000
+<6>SRAM: Mapped pa 0x40200000 to va 0xfe400000 size: 0x100000
+<6>Reserving 14745600 bytes SDRAM for VRAM
+<4>Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 130048
+<5>Kernel command line: console=ttyO0,115200n8 androidboot.console=ttyO0 initrd rw init=/init videoout=omap24xxvout omap_vout_mod.video1_numbuffers=6 omap_vout_mod.vid1_static_vrfb_alloc=y omap_vout_mod.video2_numbuffers=6 omap_vout_mod.vid2_static_vrfb_alloc=y omapfb.vram=0:8M no_console_suspend backlighttype=1476AY
+<6>PID hash table entries: 2048 (order: 1, 8192 bytes)
+<6>Dentry cache hash table entries: 65536 (order: 6, 262144 bytes)
+<6>Inode-cache hash table entries: 32768 (order: 5, 131072 bytes)
+<6>Memory: 256MB 256MB = 512MB total
+<5>Memory: 492032KB available (5008K code, 1295K data, 192K init, 0K highmem)
+<5>Virtual kernel memory layout:
+<5>    vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+<5>    fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+<5>    vmalloc : 0xe0800000 - 0xf8000000   ( 376 MB)
+<5>    lowmem  : 0xc0000000 - 0xe0000000   ( 512 MB)
+<5>    pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)
+<5>    modules : 0xbf000000 - 0xbfe00000   (  14 MB)
+<5>      .init : 0xc0008000 - 0xc0038000   ( 192 kB)
+<5>      .text : 0xc0038000 - 0xc051c000   (5008 kB)
+<5>      .data : 0xc0544000 - 0xc0595790   ( 326 kB)
+<6>Hierarchical RCU implementation.
+<6>NR_IRQS:402
+<6>IRQ: Found an INTC at 0xfa200000 (revision 4.0) with 96 interrupts
+<6>Total of 96 interrupts on 1 active controller
+<6>Clocking rate (Crystal/Core/MPU): 26.0/332/600 MHz
+<6>Reprogramming SDRC clock to 332000000 Hz
+<6>GPMC revision 5.0
+<6>OMAP GPIO hardware version 2.5
+<6>OMAP clockevent source: GPTIMER1 at 32768 Hz
+<4>Console: colour dummy device 80x30
+<6>Calibrating delay loop... 595.25 BogoMIPS (lpj=581632)
+<4>Mount-cache hash table entries: 512
+<6>Initializing cgroup subsys debug
+<6>Initializing cgroup subsys cpuacct
+<6>Initializing cgroup subsys freezer
+<6>CPU: Testing write buffer coherency: ok
+<6>regulator: core version 0.5
+<6>NET: Registered protocol family 16
+<6>ram_console: got buffer at 8e000000, size 20000
+<6>ram_console: error in header, 7
+<6>ram_console: no valid data in buffer (sig = 0x00000000)
+<6>console [ram-1] enabled
+<4>board-3621_evt1a.c: audio_dac_3100_dev_init ...
+<4>board-3621_evt1a.c: audio_dac_3100_dev_init > set AUDIO_CODEC_RESET_GPIO to output Low!
+<4>board-3621_evt1a.c: audio_dac_3100_dev_init ...
+<4>board-3621_evt1a.c: audio_dac_3100_dev_init > set AUDIO_CODEC_POWER_ENABLE_GPIO to output and value high!
+<4>board-3621_evt1a.c: audio_dac_3100_dev_init > set AUDIO_CODEC_RESET_GPIO to output and value high!
+<4>Enabling backlight PWM for LCD
+<4>board-3621_evt1a.c: kxtf9_dev_init ...
+<4>board-3621_evt1a.c: kxtf9_dev_init > Init kxtf9 irq pin 113 !
+<4>board-3621_evt1a.c: max17042_dev_init ...
+<4>board-3621_evt1a.c: max17042_dev_init > Init max17042 irq pin 100 !
+<4>max17042 GPIO pin read 1
+<6>CPU variant: OMAP3621 Board: 800MHz only
+<6>OMAP DMA hardware revision 5.0
+<4>bio: create slab <bio-0> at 0
+<6>regulator: vdd_lcdtp: 3300 mV normal 
+<5>SCSI subsystem initialized
+<6>usbcore: registered new interface driver usbfs
+<6>usbcore: registered new interface driver hub
+<6>usbcore: registered new device driver usb
+<6>i2c_omap i2c_omap.1: bus 1 rev4.0 at 100 kHz
+<4>TWL4030: Bad order of scripts (sleep script before wakeup) Leads to bootfailure on some boards
+<6>twl4030: PIH (irq 7) chaining IRQs 368..375
+<6>twl4030: power (irq 373) chaining IRQs 376..383
+<6>twl4030: gpio (irq 368) chaining IRQs 384..401
+<3>SD/MMC devices, enumerating first eMMC.
+<3>SD/MMC devices, checking for SD card devices attached.
+<6>regulator: VUSB1V5: 1500 mV normal standby
+<6>regulator: VUSB1V8: 1800 mV normal standby
+<6>regulator: VUSB3V1: 3100 mV normal standby
+<7>twl4030_usb twl4030_usb: HW_CONDITIONS 0x70/112; link 0
+<7>twl4030_usb twl4030_usb: twl4030_phy_suspend: FUNC_CTRL 0x48
+<7>twl4030_usb twl4030_usb: twl4030_phy_suspend
+<6>twl4030_usb twl4030_usb: Initialized TWL4030 USB module, charger detection activated
+<6>regulator: VMMC1: 1850 <--> 3150 mV at 3000 mV normal standby
+<6>i2c_omap i2c_omap.2: bus 2 rev4.0 at 400 kHz
+<6>Sangoma WANPIPE Router v1.1 (c) 1995-2000 Sangoma Technologies Inc.
+<6>Switching to clocksource 32k_counter
+<6>musb_hdrc: version 6.0, musb-dma, peripheral, debug=0
+<7>twl4030_usb twl4030_usb: HW_CONDITIONS 0x70/112; link 0
+<7>musb_hdrc: ConfigData=0xde (UTMI-8, dyn FIFOs, bulk combine (X), bulk split (X), HB-ISO Rx, HB-ISO Tx, SoftConn)
+<7>musb_hdrc: MHDRC RTL version 1.800 
+<7>musb_hdrc: setup fifo_mode 4
+<7>musb_hdrc: 28/31 max ep, 16384/16384 memory
+<6>musb_hdrc: USB Peripheral mode controller at fa0ab000 using DMA, IRQ 92
+<6>NET: Registered protocol family 2
+<6>IP route cache hash table entries: 4096 (order: 2, 16384 bytes)
+<6>TCP established hash table entries: 16384 (order: 5, 131072 bytes)
+<6>TCP bind hash table entries: 16384 (order: 4, 65536 bytes)
+<6>TCP: Hash tables configured (established 16384 bind 16384)
+<6>TCP reno registered
+<6>NET: Registered protocol family 1
+<6>Trying to unpack rootfs image as initramfs...
+<6>Freeing initrd memory: 184K
+<6>dspbridge_init: 600000 bytes @ 81900000
+<6>evt_wifi_init: start
+<4>Enabling VAUX for wifi 
+<6>omap-iommu omap-iommu.0: isp registered
+<6>iovmm-omap initialized isp, major: 253, base-minor: 0
+<6>ashmem: initialized
+<5>VFS: Disk quotas dquot_6.5.2
+<4>Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+<6>msgmni has been set to 961
+<6>alg: No test for stdrng (krng)
+<6>io scheduler noop registered
+<6>io scheduler cfq registered (default)
+<4>max8903_charger_enable: dtct_status 0x00
+<6>OMAP DSS rev 2.0
+<6>OMAP DISPC rev 3.0
+<6>dsi_init calling
+<6>OMAP DSI rev 1.0
+<4>Enabling power for LCD
+<4>spi_probe mode : 0, per_word 16, chip_select 0, speed 375000, master_bus 4,master_cs 1 
+<6>omap-hsuart.0: ttyO0 at MMIO 0x4806a000 (irq = 72) is a OMAP UART0
+<6>console [ttyO0] enabled
+<6>omap-hsuart.1: ttyO1 at MMIO 0x4806c000 (irq = 73) is a OMAP UART1
+<6>brd: module loaded
+<6>loop: module loaded
+<6>encore_modem_mgr: Initializing Encore Modem Manager
+<6>PPP generic driver version 2.4.2
+<6>ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+<7>ehci_hcd: block sizes: qh 60 qtd 96 itd 160 sitd 96
+<6>usbcore: registered new interface driver usbserial
+<6>usbserial: USB Serial Driver core
+<6>USB Serial support registered for Sierra USB modem
+<6>usbcore: registered new interface driver sierra
+<6>sierra: v.1.7.36:USB Driver for Sierra Wireless USB modems
+<6>android init
+<6>android_probe pdata: c0554700
+<6>android_bind
+<7>android_bind_config
+<6>android_usb gadget: android_usb ready
+<6>f_adb init
+<6>android_register_function adb
+<6>f_mass_storage init
+<6>android_register_function usb_mass_storage
+<6>mass_storage_bind_config
+<6>fsg_probe pdata: c0553ab0
+<6>android_usb gadget: Number of LUNs=2
+<6>adb_bind_config
+<6>input: gpio-keys as /devices/platform/gpio-keys/input/input0
+<6>input: twl4030-keypad as /devices/platform/i2c_omap.1/i2c-1/1-004a/twl4030_keypad/input/input1
+<6>cyttsp_init:Cypress TrueTouch(R) Standard Product
+<6>cyttsp_init:I2C Touchscreen Driver (Built Apr 20 2011 @ 21:09:20)
+<4>cyttsp:Reseting TMA340
+<4>cyttsp:Start Probe 1.2
+<4>
+<4>cyttsp::found BL, Overriding maxx & maxy
+<6>cyttsp_initialize:cyttsp-i2c: Register input device
+<6>input: cyttsp-i2c as /devices/platform/i2c_omap.2/i2c-2/2-0022/input/input2
+<6>cyttsp_initialize:Setting up interrupt 259
+<6>cyttsp_initialize:cyttsp_initialize:  Create sysfs_group successfully!
+<4>cyttsp:Start Probe PASS
+<6>cyttsp_power_on:BL101: f=00 s=11 err=D0 bl=010B bld=010B R=16
+<6>cyttsp_power_on:BL102: tver=1100 a_id=AA1D aver=0006
+<6>cyttsp_power_on:BL103: c_id=C0C1C2
+<6>kxtf9 1-000f: WHO_AM_I = 0x01
+<6>input: kxtf9_accel as /devices/virtual/input/input3
+<6>using rtc device, twl_rtc, for alarms
+<6>twl_rtc twl_rtc: rtc core: registered twl_rtc as rtc0
+<6>i2c /dev entries driver
+<6>Linux video capture interface: v2.00
+<6>omap-previewer omap-previewer: omap-previewer: Registered preview wrapper
+<6>omap3isp omap3isp: Revision 15.0 found
+<6>omap-iommu omap-iommu.0: isp: version 1.1
+<7>Saving csi2 context
+<7>Restoring csi2 context
+<7>Saving csi2 context
+<4>max17042: max17042_init ...
+<4>max17042: max17042_probe ...
+<4>max17042: next history save at 4294845265
+<4>max17042: max17042_probe > IRQ is 260
+<4>max17042 GPIO pin read 1
+<4>max17042: max17042_device_power_on ...
+<4>max17042: max17042_hw_init ...
+<4>max17042:  BATTERY      Detected!
+<4>config = 0x2214
+<4>Valert = 0xff9b
+<4>Salert = 0xff05
+<4>config = 0x2214
+<4>config = 0x2214
+<4>shdntimer = 0x0002
+<4>max17042: max17042_verify ...
+<6>max17042 1-0036: Version = 0x0092
+<6>max17042 1-0036: support ver. 1.0.0 enabled
+<4>MAXIM 8903 Charger registering!
+<4>MAXIM 8903 Charger Initializing...
+<4>MAXIM8903: Request CHARGER FLT IRQ successfully!
+<4>MAX8903: Charging is already disabled!
+<4>Charger Unplugged!
+<6>OMAP Watchdog Timer Rev 0x31: initial timeout 60 sec
+<6>cpuidle: using governor ladder
+<6>cpuidle: using governor menu
+<6>omap_pwm_led omap_pwm_led: OMAP PWM LED (lcd-backlight) at GP timer 8/0
+<6>Registered led device: lcd-backlight
+<6>logger: created 64K log 'log_main'
+<6>logger: created 256K log 'log_events'
+<6>logger: created 64K log 'log_radio'
+<6>logger: created 64K log 'log_system'
+<6>Advanced Linux Sound Architecture Driver Version 1.0.21.
+<1>##+tlv320dac3100_init
+<6>mmc0: new high speed MMC card at address 0001
+<6>mmcblk0: mmc0:0001 SEM08G 7.39 GiB 
+<6> mmcblk0: p1 p2 p3 p4 < p5 p6 p7 p8 >
+<4>IRQ 317/dac3100: IRQF_DISABLED is not guaranteed on shared IRQs
+<1>##-tlv320dac3100_init
+<4>No device for DAI TLV320dac3100
+<4>No device for DAI omap-mcbsp-dai-0
+<4>No device for DAI omap-mcbsp-dai-1
+<4>No device for DAI omap-mcbsp-dai-2
+<4>No device for DAI omap-mcbsp-dai-3
+<4>No device for DAI omap-mcbsp-dai-4
+<6>asoc: TLV320dac3100 <-> omap-mcbsp-dai-0 mapping ok
+<6>cyttsp_power_on:SI102: tver=1100 a_id=AA1D aver=0006
+<6>cyttsp_power_on:SI103: c_id=C0C1C2
+<6>ALSA device list:
+<6>  #0: OMAP3 EDP (dac3100)
+<6>oprofile: using timer
+<4>Netfilter messages via NETLINK v0.30.
+<4>nf_conntrack version 0.5.0 (7694 buckets, 30776 max)
+<4>CONFIG_NF_CT_ACCT is deprecated and will be removed soon. Please use
+<4>nf_conntrack.acct=1 kernel parameter, acct=1 nf_conntrack module option or
+<4>sysctl net.netfilter.nf_conntrack_acct=1 to enable it.
+<4>ctnetlink v0.93: registering with nfnetlink.
+<6>xt_time: kernel timezone is -0000
+<6>ip_tables: (C) 2000-2006 Netfilter Core Team
+<6>arp_tables: (C) 2002 David S. Miller
+<6>TCP cubic registered
+<6>Initializing XFRM netlink socket
+<6>NET: Registered protocol family 10
+<6>lo: Disabled Privacy Extensions
+<6>Mobile IPv6
+<6>IPv6 over IPv4 tunneling driver
+<6>sit0: Disabled Privacy Extensions
+<6>ip6tnl0: Disabled Privacy Extensions
+<6>NET: Registered protocol family 17
+<6>NET: Registered protocol family 15
+<3>Power Management for TI OMAP3.
+<6><6>SR: Nvalues not fused for1.2G, disabled
+<6>SR1:Fused Nvalues for VDD1OPP4 aa9f94
+<6>SR2:Fused Nvalues for VDD2OPP3 11191216
+<6>SR2:Fused Nvalues for VDD2OPP2 10127092
+<6>SR2:Fused Nvalues for VDD2OPP1 10082506
+<6>sr1_opp_margin[1]=37500
+<6>sr1_opp_margin[2]=37500
+<6>sr1_opp_margin[3]=37500
+<6>steps added, volt will berecaliberated automatically
+<6>SR2:Fused Nvalues for VDD2OPP1 10088927
+<6>SmartReflex driver initialized
+<7>Disabling unused clock "uart3_ick"
+<7>Disabling unused clock "gpio2_dbck"
+<7>Disabling unused clock "gpio3_dbck"
+<7>Disabling unused clock "gpio4_dbck"
+<7>Disabling unused clock "gpio6_dbck"
+<7>Disabling unused clock "uart3_fck"
+<7>Disabling unused clock "gpio1_dbck"
+<7>Disabling unused clock "sad2d_ick"
+<7>Disabling unused clock "dpll4_m6x2_ck"
+<7>Disabling unused clock "dpll4_m5x2_ck"
+<7>Disabling unused clock "dpll3_m3x2_ck"
+<7>Disabling unused clock "sys_clkout1"
+<6>VFP support v0.3: implementor 41 architecture 3 part 30 variant c rev 3
+<4>------------[ cut here ]------------
+<4>WARNING: at kernel/mutex-debug.c:78 debug_mutex_unlock+0xac/0x118()
+<4>Modules linked in:
+<4>[<c003db20>] (unwind_backtrace+0x0/0xd8) from [<c0071008>] (warn_slowpath_common+0x48/0x60)
+<4>[<c0071008>] (warn_slowpath_common+0x48/0x60) from [<c009763c>] (debug_mutex_unlock+0xac/0x118)
+<4>[<c009763c>] (debug_mutex_unlock+0xac/0x118) from [<c03e8674>] (__mutex_unlock_slowpath+0xb4/0x120)
+<4>[<c03e8674>] (__mutex_unlock_slowpath+0xb4/0x120) from [<c026d898>] (cyttsp_init_worker+0x1c8/0x200)
+<4>[<c026d898>] (cyttsp_init_worker+0x1c8/0x200) from [<c0086888>] (worker_thread+0x1f0/0x2a0)
+<4>[<c0086888>] (worker_thread+0x1f0/0x2a0) from [<c008a204>] (kthread+0x78/0x80)
+<4>[<c008a204>] (kthread+0x78/0x80) from [<c00399d0>] (kernel_thread_exit+0x0/0x8)
+<4>---[ end trace fcd5e14c69cc5ef7 ]---
+<3>rotation = 0, var->rotate = 0 
+<6>OMAP DISPCONTROL read (stallmode)0
+<6>OMAP DISPCONTROL read (gpout)1
+<6>OMAP DISPCONTROL read (stallmode)1
+<4>pvr: Initializing 3rd party display driver
+<4>pvr: Found 1 framebuffers
+<4>pvr: -> Populating display device 0
+<4>pvr: Flipping support
+<4>pvr: Buffers available: 3 (2457600 bytes per buffer)
+<6>twl_rtc twl_rtc: setting system clock to 2012-04-11 01:19:18 UTC (1334107158)
+<7>Restoring csi2 context
+<6>omap3 omap3isp CSI memvs initted
+<7>Saving csi2 context
+<6>omap_vout: registered and initialized			video device 2 [v4l2]
+<6>omap_vout: registered and initialized			video device 3 [v4l2]
+<6>Freeing init memory: 192K
+<3>init: /init.rc: 8: invalid command 'sleep'
+<3>init: /init.rc: 307: user option requires a user id
+<3>init: /init.rc: 349: ignored duplicate definition of service 'keystore'
+<4>EXT2-fs warning: checktime reached, running e2fsck is recommended
+<4>EXT3-fs warning: maximal mount count reached, running e2fsck is recommended
+<6>kjournald starting.  Commit interval 5 seconds
+<6>EXT3 FS on mmcblk0p6, internal journal
+<6>EXT3-fs: mounted filesystem with ordered data mode.
+<4>EXT3-fs warning: maximal mount count reached, running e2fsck is recommended
+<6>kjournald starting.  Commit interval 5 seconds
+<6>EXT3 FS on mmcblk0p7, internal journal
+<6>EXT3-fs: recovery complete.
+<6>EXT3-fs: mounted filesystem with ordered data mode.
+<3>init: Mount returned errno=2
+<3>init: cannot find '/system/bin/boardfeatureprop.sh', disabling 'device-type'
+<3>init: cannot find '/system/bin/debuglog.sh', disabling 'debuglog'
+<3>init: cannot find '/system/bin/memmon', disabling 'memmon'
+<6>enabling adb
+<6>adb_open
+<6>proc_load: Processor Loaded /system/lib/dsp/baseimage.dof
+<6>omap mailbox rev 4.0
+<6>proc_start: dsp in running state
+<3>procwrap_detach: deprecated dspbridge ioctl
+<1>##- Data length: 2
+<6>warning: `zygote' uses 32-bit capabilities (legacy support in use)
+<4>pvr: Swap chain will have 3 buffers for display 1
+<6>request_suspend_state: wakeup (3->0) at 24694976946 (2012-04-11 01:19:40.357757623 UTC)
+<6>kxtf9 1-000f: IRQ TILT [1]
+<6>kxtf9 1-000f: IRQ TAP1 [1]
+<7>twl4030_usb twl4030_usb: USB_DTCT_CTRL=04
+<7>twl4030_usb twl4030_usb: HW_CONDITIONS 0xf0/240; link 1
+<7>twl4030_usb twl4030_usb: USB_DTCT_CTRL=04
+<7>twl4030_usb twl4030_usb: HW_CONDITIONS 0xf0/240; link 1
+<7>twl4030_usb twl4030_usb: twl4030_usb_set_mode: ULPI mode
+<7>twl4030_usb twl4030_usb: twl4030_phy_resume
+<6>android_usb gadget: high speed config #1: android
+<4>max8903_charger_enable: dtct_status 0x04
+<4>max8903_charger_enable: B&N USB  CHARGER(500mA) Detected!
+<4>MAX8903: Charging is now enabled!
+<6>kxtf9 1-000f: IRQ TILT [8]
+<1>##- Data length: 2
+<6>kxtf9 1-000f: IRQ TILT [1]
+<6>request_suspend_state: sleep (0->3) at 345024017396 (2012-04-11 01:25:00.686798073 UTC)
+    -------------ここまで-------------
+
+19. nooterから見たpartion、
+
+   /dev/mmcblk1p1 W95 FAT32 LBA(0x0c) ---> ブート用領域
+   /dev/mmcblk1p2 W95 FAT32 LBA(0x0c) ---> /rom用
+　　　（BCB,devconf/,log/,max17042.binがある...)
+　 /dev/mmcblk1p3 linux (0x83)        --->　工場出荷設定保存(レスキュー用？）
+　　　（中身：factory.zip,rombackup.zip)
+   /dev/mmcblk1p5 linux (0x83)        --->　/system用?
+   /dev/mmcblk1p6 linux (0x83)        --->　/data用
+   /dev/mmcblk1p7 linux (0x83)        --->　もとから内臓用データ
+    (マニュアルとか...)
+   /dev/mmcblk1p8 W95 FAT32 LBA(0x0c) ---> ユーザdata?
+   しかもこれはnooterではデバイスファイルできてないので、一筋縄ではマウントできない...
+
+   ------nooterで見たこぴぺ-------------------
+# ls -l /dev/mmcblk1*
+brw-rw----    1 root     root      179,   8 Apr 12 00:31 /dev/mmcblk1
+brw-rw----    1 root     root      179,   9 Apr 12 00:31 /dev/mmcblk1p1
+brw-rw----    1 root     root      179,  10 Apr 12 00:31 /dev/mmcblk1p2
+brw-rw----    1 root     root      179,  11 Apr 12 00:31 /dev/mmcblk1p3
+brw-rw----    1 root     root      179,  12 Apr 12 00:31 /dev/mmcblk1p4
+brw-rw----    1 root     root      179,  13 Apr 12 00:31 /dev/mmcblk1p5
+brw-rw----    1 root     root      179,  14 Apr 12 00:31 /dev/mmcblk1p6
+brw-rw----    1 root     root      179,  15 Apr 12 00:31 /dev/mmcblk1p7
+   ------こぴぺ-------------------
+
+　　　mknod -m 0660 mmcblk1p8 b 179 16してmountしようとしたが、
+　　有効なblock deviceじゃないと言われて終了...
+   # mount /dev/mmcblk1p8 /mnt
+   mount: /dev/mmcblk1p8 is not a valid block device
+
+   ところで多分、nook colorのルートファイルシステムはRamdisk上。
+
+20 adbdはinit.rcで呼び出されているように見える。
+ただ、shチックな書き方されてるが、shの文法じゃなさそう。
+
+21. goldfishとは、開発環境か何かの類か？
+
+22. /etcは/system/etcのシンボリックリンクだそうな。
+   (See. init.rc)
+
+23. nook colorはudevとかで制御しているわけでは無い模様...がっかり。
+
+24. ちょっとよく判らんが、nooter起動直後のリブート以降はadbが復活。
+　　 nooter入れていない場合の電源OFF/ONでは復帰できず。なんだろう...?
+    (ただ、今回がちゃがちゃpartitionをいじってるので、
+      そのために何かのmodify timeが変わっているかもしれず...)
+
+25. nook color引き抜く前に、adb rebootとして、rebootしている間に
+　　ケーブル引き抜くとadbは復活したまま。
+
+26 nook color のdf結果
+
+# mount
+rootfs / rootfs ro,relatime 0 0
+tmpfs /dev tmpfs rw,relatime,mode=755 0 0
+devpts /dev/pts devpts rw,relatime,mode=600 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+none /acct cgroup rw,relatime,cpuacct 0 0
+tmpfs /mnt/asec tmpfs rw,relatime,mode=755,gid=1000 0 0
+none /dev/cpuctl cgroup rw,relatime,cpu 0 0
+/dev/block/mmcblk0p2 /rom vfat rw,sync,noatime,nodiratime,uid=1000,gid=1000,fmask=0117,dmask=0007,allow_utime=0020,codepage=cp437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+/dev/block/mmcblk0p5 /system ext2 ro,relatime,errors=continue 0 0
+/dev/block/mmcblk0p6 /data ext3 rw,nosuid,nodev,noatime,nodiratime,errors=continue,data=ordered 0 0
+/dev/block/mmcblk0p7 /cache ext3 rw,nosuid,nodev,noatime,nodiratime,errors=continue,data=ordered 0 0
+
+27. 取り急ぎNookでchrootのやり方
+
+ mount -t ext3 /dev/mmcblk0p2 /mnt
+ mount -t devpts devpts /mnt/dev/pts
+ mount -t proc proc /mnt/proc
+ mount -t sysfs sysfs /mnt/sys
+ chroot /mnt /bin/bash
+ 
+ 以上。
+
+XXX. 以下は勉強会発表後のメモ：
+
+ deb http://www.emdebian.org/debian/ unstable main
+
+を/etc/apt/source-listに。これでarm用などのコンパイラが利用できる。
+---->とおもったら開発中の為emdebian側リポジトリにいろいろ足りなさすぎ。
+　　　で、squeeze版を入れようとしたら、今度は、debian-sid側で
+　　　廃止になったモジュールとかに依存してインストールが不可能。
+
+仕方ないので、lxcでsqueeze環境を用意して、そこにemdebianを突っ込むことにする。
+以下はそのやり方。
+
+事前準備：
+debian-sid側（母艦）のネットワークを
+sudo aptitude install bridge-utilsしておき、
+-----/etc/network/interfaces/-----
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+auto br0
+iface br0 inet static
+        address 192.168.0.1
+        netmask 255.255.255.0
+        bridge_ports none
+        bridge_stp off
+        bridge_fd 0
+        bridge_maxwait 0
+-----/etc/network/interfaces/-----
+こんな感じでbr0をセットアップ。
+
+step1.  sudo aptitude install lxc
+
+step2. 
+ ----下準備------
+ sudo mount -t cgroup cgroup /dev/fs/cgroup
+ vi /etc/fstabに
+# for lxc
+cgroup		/sys/fs/cgroup	cgroup	defaults	0	0
+を追記しておく。
+※lv  /usr/share/doc/lxc/README.Debianによれば、将来自動追記できるようにする
+　とのことです。
+ ----下準備------
+
+step3. debootstrapでインストール
+場所は：/var/lib/lxc/以下にsqueeze-emdebianとして用意。
+
+sudo debootstrap --verbose --variant=minbase --arch=amd64 --include ifupdown,lo
+cales,libui-dialog-perl,dialog,dhcp3-client,netbase,net-tools,iproute,openssh-se
+rver,vim,sudo,build-essential,less,lv,aptitude squeeze /var/lib/lxc/squeeze-emdebian http://ftp.jp.debian.org/debian
+
+step 4. いろいろ直す。
+sudo 
+rootfs=/var/lib/lxc/squeeze-emdebian
+vi $rootfs/etc/network/interface
+----ここから-----
+# Used by ifup(8) and ifdown(8). See the interfaces(5) manpage or
+# /usr/share/doc/ifupdown/examples for more information.
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+	address 192.168.0.4
+	netmask 255.255.255.0
+	nameservers 220.159.212.200 220.159.212.201
+	gateway 192.168.0.1
+----中身-------
+※↑最初空っぽなのでびっくり。
+vi $rootfs/etc/hosts
+---こっから----
+...中略...
+squeeze-emdebian 192.168.0.4
+...中略...
+---こっから----
+vi $rootfs/etc/apt/source.list
+----こっから-----
+deb http://ftp.jp.debian.org/debian squeeze main contrib non-free
+deb-src http://ftp.jp.debian.org/debian squeeze main contrib non-free
+deb http://security.debian.org/ squeeze/updates main contrib non-free
+deb http://www.emdebian.org/debian/ squeeze main
+deb-src http://www.emdebian.org/debian/ squeeze main
+----ここまで-----
+
+env LANG=C sudo chroot $rootfs /usr/sbin/update-rc.d -f umountfs remove
+env LANG=C sudo chroot $rootfs /usr/sbin/update-rc.d -f hwclock.sh remove
+env LANG=C sudo chroot $rootfs /usr/sbin/update-rc.d -f hwclockfirst.sh remove
+env LANG=C sudo chroot $rootfs passwd
+env LANG=C sudo chroot $rootfs /usr/sbin/usradd -m -s /bin/bash -c 'takahide nojima' nojima
+env LANG=C sudo chroot $rootfs passwd nojima
+sudo cp /etc/resolv.conf $rootfs/etc/
+
+vi $rootfs/etc/hostname 
+---ここから----
+squeeze-emdebian
+---ここまで----
+vi $rootfs/etc/inittab
+---ここから----
+以下をコメントアウト
+# What to do when the power fails/returns.
+# pf::powerwait:/etc/init.d/powerfail start
+# pn::powerfailnow:/etc/init.d/powerfail now
+# po::powerokwait:/etc/init.d/powerfail stop
+
+...中略...
+# tty1とかあるのを引用の通りに変更（→こうしないと最後login出てこなくて泣けてくる）
+1:2345:respawn:/sbin/getty 38400 console
+# ...仮想コンソールの定義は全部削る-----
+---ここまで-----
+
+vi /etc/lxc/squeeze-emdebian.confの中身を以下のとおりに定義
+
+-----ここから-----
+lxc.tty = 12
+lxc.pts = 1024
+lxc.rootfs = /var/lib/lxc/squeeze-emdebian
+lxc.cgroup.devices.deny = a
+# /dev/null and zero
+lxc.cgroup.devices.allow = c 1:3 rwm
+lxc.cgroup.devices.allow = c 1:5 rwm
+# consoles
+lxc.cgroup.devices.allow = c 5:1 rwm
+lxc.cgroup.devices.allow = c 5:0 rwm
+lxc.cgroup.devices.allow = c 4:0 rwm
+lxc.cgroup.devices.allow = c 4:1 rwm
+# /dev/{,u}random
+lxc.cgroup.devices.allow = c 1:9 rwm
+lxc.cgroup.devices.allow = c 1:8 rwm
+lxc.cgroup.devices.allow = c 136:* rwm
+lxc.cgroup.devices.allow = c 5:2 rwm
+# rtc
+lxc.cgroup.devices.allow = c 254:0 rwm
+# network
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br0
+lxc.network.name = eth0
+lxc.network.hwaddr = 52:54:00:A8:00:04
+-----/etc/network/interfaces/-----
+ここまで。ところで、lxc.ttyは適当に空き探しておく。
+
+step 5. 以上できたら以下を実行して対応
+sudo lxc-start -n squeeze-emdebian -f /etc/lxc/squeeze-emdebian.conf
+止めは
+sudo lxc-stop -n squeeze-emdebian
+
+*よく考えたらもうchrootでいいじゃん。
+
+mkdir squeeze-emdebian
+sudo debootstrap --arch amd64 --include emdebian-archive-keyring,sudo,lv,build-essential,binutils-multiarch squeeze `pwd`/squeeze-emdebian http://ftp.jp.debian.org/debian
+I: Retrieving Release
+I: Retrieving Release.gpg
+I: Checking Release signature
+I: Valid Release signature (key id 9FED2BCBDCD29CDF762678CBAED4B06F473041FA)
+I: Retrieving Packages
+I: Validating Packages
+I: Resolving dependencies of required packages...
+...中略...
+I: Configuring gpgv...
+I: Configuring gnupg...
+I: Configuring debian-archive-keyring...
+I: Configuring apt...
+I: Configuring libept1...
+I: Configuring apt-utils...
+I: Configuring aptitude...
+I: Configuring tasksel-data...
+I: Configuring tasksel...
+I: Base system installed successfully.
+(モバイル環境でも大体15分くらい...かな？）
+$
+$env LANG=C sudo chroot `pwd`/squeeze-emdebian
+echo -e "deb http://www.emdebian.org/debian/ squeeze main\ndeb-src http://www.emdebian.org/debian/ squeeze main" >> /etc/apt/sources.list
+apt-get update
+useradd -m -s /bin/bash -c 'myname' foo
+passwd foo
+/etc/hostsに
+---------ここから----------
+127.0.0.1  localhost nightmare
+---------ここまで---------
+/etc/sudoer.d/fooをfoo用に書きまくり、
+su - foo
+sudo apt-get install gcc-4.4-arm-linux-gnueabi
+これで。
+
+次から使いたければ、
+env LANG=C chroot `pwd`/squeeze-emdebian /bin/bash
+でいくらでもログイン可能。
+
+*
+
+*Nook Color用カーネルリコンパイルは
+
+　http://images.barnesandnoble.com/PResources/download/Nook/source-code/nookcolor_1.4.tgz
+
+からカーネル＆U-boot&x-loaderのソース落としてくる。
+
+ Step 1. tar xzf nookcolor_1.4.tgz
+
+ Step 2. cd dist/u-boot
+
+ Step 3. sudo aptitude install gcc-4.4-arm-linux-gnueabi
+
+ Step 4. make -j2 ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi- omap3621_evt1a_config
+         make -j2 ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi- 
+
+         でu-bootのmake完了
+
+ Step 5. cd ../kernel
+
+ Step 6. make -j2 ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi- omap3621_evt1a_defconfig
+         env PATH=$PATH:../u-boot/tools make -j2 ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi- uImage
+
+ Step 7. cd ../x-loader
+
+ Step 8. make -j2 ARCH=arm omap3621_evt1a_config
+         make -j2 ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi- ift
+
+以上でコンパイル完了。全部コンパイルしても30分以内？
+
+* u-boot解析
+
+　--->心臓部の定義は：include/configs/omap3621_evt1a.hにある。
+　　　#define CONFIG_EXTRA_ENV_SETTINGSがかなり興味深いのでは?
+     マニュアルにらめっこで意味を追いかけるのも吉。
+
+ 基本的にCPUのモードとか決めてる。omap3621_evt1a.hのコメント部分から、
+TIの3430 Zoom2用から拝借?
+ (TI Zoom2は→
+　http://www.ti.com/general/docs/wtbu/wtbugencontent.tsp?templateId=6123&navigationId=12013&contentId=53575&DCMP=wtbu_zoom&HQS=Other+PR+zoom2_technical　）
+
+* x-loader解析
+
+　x-loader.bin.iftとは、付属READMEによると、　
+　　1. Use Texas Instruments IFT to sign x-load.bin. This results in a
+　　signed image called x-load.bin.ift.
+
+　との事で、TIの署名入りバイナリとなる模様。
+
+* debian sidのarm版なんと、xが依存関係不足で全く入らん
+  ( xserver-xorg-abi-11がないらしい...)
+　ので、testingと混ぜる事を検討する必要あり。
+   ---> testing混ぜると無事全部入る。
+
+
+* qemu-omap3はなんかしらんが、エラー
+* qemu -MにてOMAP系選んでも全部エラー
+* 取り急ぎ、
+wget http://wiki.qemu.org/download/qemu-0.9.1.tar.gz
+からqemu-0.9.1落として、qemu-omap3との差分を検証してみる。
+　---->なんかMakefileからしてちょっと変更点多すぎないか?
+　（qemu-omap3はgitか何かから落としたのか?）
+代わりに
+wget http://wiki.qemu.org/download/qemu-0.9.1-i386.tar.gz
+とゆーよくわからんでかい奴を落としてみた。
+--->コンパイル済みバイナリだったーorz
+
+仕方ないので、
+
+ git clone git://git.qemu.org/qemu.git qemu-git
+
+して、
+
+ cd qemu-git
+ git tag --list
+ git checkout release_0_9_1
+
+とかして差分チェックしたところ、qemu-omap3は
+
+　　1) Makefileにqemu-nbdが搭載
+　　2) VERSIONファイルは0.9.1のまま
+
+ということから、0.9.1-> 0.10.0の間の開発版(git)から、
+ブランチ切って改造仕掛けた可能性高い。
+
+   3) Makefileにifdef CONFIG_AIOの項目が無いことから、
+     v0.9.1 〜 3c529d93 2008-12-12 16:41以前
+　　　の間っぽい。
+   --->なので、git log --graphした結果、
+       8de24106355d2以前のものっぽいので、
+       git checkout 8de2410
+       してみた。
+
+　　　　--->おっと、cache-utils.oは存在しないので、
+* commit 4fbfcd6d53cffc5cde141df7afa9045a4987b5cd
+| Author: aurel32 <aurel32@c046a42c-6fe2-441c-8c8c-71466251a162>
+| Date:   Wed Dec 10 18:17:06 2008 +0000
+
+以前だ。
+
+さらに、Makefile.targetの内容から、
+OP_CFLAGS += -Wall -Wundef -Wendif-labels -Wwrite-strings -Wmissing-prototypes
+に-Wmissing-prototypesが付与される前から、
+
+* commit d0ef528a3ecf8d554052ed6e3799b53c6c935300
+| Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
+| Date:   Sun Dec 7 19:13:12 2008 +0000
+
+以前か？
+
+Makefile.targetからtranslate.o:が抜かれる前なので、
+* commit 955a7dd5e857bdeb1d41893a5ac9c1e02c327382
+| Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
+| Date:   Sun Dec 7 14:18:02 2008 +0000
+以前か？
+
+さらに、Makefile.targetにfmopl.o:が追加される前
+* commit 1ea879e5580f63414693655fcf0328559cdce138
+| Author: malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
+| Date:   Wed Dec 3 22:48:44 2008 +0000
+以前か？
+さらに auido/alsaaudio.cにstruct st_sample *srcが追加されていることから
+* commit 8b0de438d4c814fc2d7d1330a146a2e1cb8877b2
+| Author: blueswir1 <blueswir1@c046a42c-6fe2-441c-8c8c-71466251a162>
+| Date:   Wed Dec 3 16:29:47 2008 +0000
+以前か？
+
+Makefile.targetにomap3.oが追加されているので、Makefile.targetの日付から、
+2008-11-29 12:21:57以前だ。
+
+* commit 030370a210d7cc0293b6149566318b4585b307a8
+| Author: aurel32 <aurel32@c046a42c-6fe2-441c-8c8c-71466251a162>
+| Date:   Fri Nov 28 11:17:43 2008 +0000
+このあたりか？
+
+     どうもこのあたりがdiff最小となるっぽいなぁ。
+
+    ---->ここから追加分を洗ってやる。
+
+~/prog/nooter/qemu-omap3/$ diff -x '*.[od]' -b -B -ur qemu-git qemu-omap3 | lv
+
+     (1) namd_eccまわりのツールが追加
+ 　　(2) 16bit nand flashが追加
+     (3)  OMAP3の機能が追加
+     (4) omap1にいろいろ途中abortの為のexit(-1)が追加
+ 　　(5) omap2にomap_gp_timer_change_clkが追加
+      　　GPIOまわりが変更
+          omap3の定義が追加
+         L4 interconnectまわり改造
+     (6) omap_clk.cにomap3がもろもろ追加
+     (7) omap_dss.cがもろもろ改造
+        (omap_dss.cってlcdとかみたい...)
+     (8) translate.cにて細工があるぞ？なんだろう。
+     (9) vl.cにてはタイマー系改造か？
+     (10) qemu-omap3/hw/omap3.cが追加
+
+qemu-omap3をコンパイルするには、
+./configure --target-list=arm-softmmu --disable-gcc-check
+make
+なにかコンパイルオプションをいじるなら、
+　　config-host.mak
+をいじってmakeする。
+で最後のgccな内容は、
+gcc -g -Wl,--warn-common  -m64 -o qemu-system-arm vl.o /home/nojima/prog/nooter/qemu-omap3/qemu-omap3/osdep.o monitor.o pci.o loader.o isa_mmio.o machine.o fw_cfg.o /home/nojima/prog/nooter/qemu-omap3/qemu-omap3/block-raw-posix.o lsi53c895a.o esp.o usb-ohci.o eeprom93xx.o eepro100.o ne2000.o pcnet.o rtl8139.o e1000.o integratorcp.o versatilepb.o ps2.o smc91c111.o arm_pic.o arm_timer.o arm_boot.o pl011.o pl031.o pl050.o pl080.o pl110.o pl181.o pl190.o versatile_pci.o ptimer.o realview_gic.o realview.o arm_sysctl.o mpcore.o armv7m.o armv7m_nvic.o stellaris.o pl022.o stellaris_enet.o pl061.o arm-semi.o pxa2xx.o pxa2xx_pic.o pxa2xx_gpio.o pxa2xx_timer.o pxa2xx_dma.o pxa2xx_lcd.o pxa2xx_mmci.o pxa2xx_pcmcia.o pxa2xx_keypad.o pflash_cfi01.o gumstix.o zaurus.o ide.o serial.o nand.o ecc.o spitz.o tosa.o tc6393xb.o omap1.o omap_lcdc.o omap_dma.o omap_clk.o omap_mmc.o omap_i2c.o omap2.o omap_dss.o soc_dma.o omap3.o beagle.o palm.o tsc210x.o nseries.o blizzard.o onenand.o vga.o cbus.o tusb6010.o usb-musb.o tsc2005.o bt-hci-csr.o mst_fpga.o mainstone.o musicpal.o pflash_cfi02.o gdbstub.o gdbstub-xml.o ../libqemu_common.a libqemu.a  -lm -lz  -lrt -lpthread -lutil -L/usr/lib/x86_64-linux-gnu -lSDL
+なので、vl.cのmainがシステムのmainじゃぁ。
+
+---> u-boot のdebianパッケージソースを見て検証
+   u-boot/u-boot-2012.04.01/debian/target
+   に応じて、cpuアーキテクチャと生成されるバイナリが異なる。
+
+Makefile中
+661 %_config::      unconfig
+662         @$(MKCONFIG) -A $(@:_config=)
+ 
+がおそらくmake XXXXXX_configでXXXXX用アーキテクチャのバイナリを作成する
+肝っぽいぞ。
+
+gdbスタブのもとでqemu動かすとき
+
+ qemu-system-arm -M versatilepb -m 256 -kernel x-load.bin.ift -gdb tcp::1234
+
+とかやると*:1234/tcpでlistenするので、
+
+gdb-multiarchにて、
+(gdb) target remote tcp::1234
+...
+とかすると、このgdbstubに接続できる。
+...->ただ、なにかしらんがうまくarchitectureを認識できず...
+(qemu上のソースはgdbstub.cにその全貌がある）
+
+ gdbのソースから、
+
+　Architecture rejected target-supplied description
+
+を元に引っ張ると、$(GDBSRC)/gdb/target_description.c
+にそのwarningがある。みると、target_find_descriptionにて
+target.xmlをサーチして結局定義が見つからんとこのwarningがでる。
+
+binutils-multiarchですが、
+ objdump -D -z -w --architecture=arm -b binary x-load.bin.ift
+
+でMLOはdisassembile可能。
+
+(A)qemu　ARMでは、-kernelにて、$src/hw/arm_boot.c: arm_boot.cのarm_load_kernel()
+   にてロードが行われる。
+   カーネルイメージは、この時、load_elf(),load_image(),load_image_targphys()
+   の順でロードが試される。
+
+   load_image_targphys()は直接RAMにロードする模様であるが、
+    arm_load_kernel()に渡されたarm_boot_info *infoに基づき、
+   info->loader_start+KERNEL_LOAD_ADDRの位置からロードされる模様。
+   なお、例えば$src/hw/omap_sx1.cとかだと、
+    info->loader_start=OMAP_EMIFF_BASE-->(0x10000000)となる。
+
+   KERNEL_LOAD_ADDRは$src/hw/arm_boot.cにて定義があり、
+    0x00010000
+   との事。
+
+   $src/hw/arm_boot.cには簡易的bootloaderのコードがある。
+   （といってもPCぐらいを設定であるが）
+
+qemu-omap3の$src/hw/beagle.cに
+beagle_rom_emu()というomap35x内臓ROMのエミュレータがある。
+---> 見ると、nandからx-loader吸い込むのがデフォルト動作のようだ。
+
+* u-bootをversatilepbでコンパイルー
+----こっから---
+nojima@nightmare:~/u-boot/u-boot-2012.04.01$ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- versatilepb_config
+Configuring for versatilepb - Board: versatile, Options: ARCH_VERSATILE_PB
+nojima@nightmare:~/u-boot/u-boot-2012.04.01$ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -s
+Generating include/generated/asm-offsets.h
+nojima@nighmare:
+----ここまで----
+http://www.elinux.org/Virtual_Development_Board
+の
+qemu-system-arm -M versatilepb -m 128M -nographic -kernel u-boot
+
+の件、実行するとわかるが、
+
+qemu: fatal: Trying to execute code outside RAM or ROM at 0xffff0918
+
+R00=fffcbf64 R01=ffff0000 R02=00000000 R03=0101cd78
+R04=ffff0000 R05=fffcbf64 R06=ffff0000 R07=00000000
+R08=008fff78 R09=feff0000 R10=0101cd78 R11=00000000
+R12=008ffff0 R13=fffcbf58 R14=ffff0918 R15=ffff0918
+PSR=600001d3 -ZC- A svc32
+
+こんな感じで爆死。
+
+u-bootは
+.globl _start
+_start:
+        b       reset
+
+でしたので、問題なし。
+
+なぜか、
+ii  qemu-system       1.1.0~rc3+dfsg-1  QEMU full system emulation binaries
+で動いた。
+
+----------ここから-----------------
+~/prog/nooter/cross-compile/squeeze-emdebian/home/nojima/u-boot/u-boot-2012.04.01/ qemu-system-arm -M versatilepb -nographic -kernel u-boot   
+
+
+U-Boot 2012.04.01 (Jun 03 2012 - 21:24:10)
+
+DRAM:  128 MiB
+WARNING: Caches not enabled
+Flash: pflash_write: Unimplemented flash cmd sequence (offset 00000000, wcycle 0x0 cmd 0x0 value 0xf0)
+64 MiB
+*** Warning - bad CRC, using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+Net:   SMC91111-0
+VersatilePB # env
+env - environment handling commands
+
+Usage:
+env default -f - reset default environment
+env export [-t | -b | -c] [-s size] addr [var ...] - export environment
+env import [-d] [-t | -b | -c] addr [size] - import environment
+env print [name ...] - print environment
+env save - save environment
+env set [-f] name [arg ...]
+
+VersatilePB # print env
+## Error: "env" not defined
+VersatilePB # printenv
+baudrate=38400
+bootargs=root=/dev/nfs mem=128M ip=dhcp netdev=25,0,0xf1010000,0xf1010010,eth0
+bootdelay=2
+bootfile=/tftpboot/uImage
+ethact=SMC91111-0
+stderr=serial
+stdin=serial
+stdout=serial
+verify=n
+
+Environment size: 219/8188 bytes
+VersatilePB #
+----------ここまで-----------------
+
+なんと、qemu-1.1.0~rc3+dfsgで調べると、
+hw/versatilepb.c
+には
+http://www.elinux.org/Virtual_Development_Board
+で紹介されているようなflashメモリの改造が完了していた。
+--->とおもったら、hw/versatilepb.cの改造内容が全然違うやん。
+なので、残念ながらflash.imgからブートできない。
+※内容的に、64MBytes flashを認識し、0x34000000にマップはするが、
+強制的にkernelパラメタで指定されたものを吸い込んで起動するような内容になってる。
+
+ まあ、やってみれば判るが以下のとおり失敗する。（あたりまえ）
+-----ここから-----------
+~/prog/nooter/versatile-arm-image/u-boot-test/ dd if=/dev/zero of=flash.img bs=1M count=64
+64+0 レコード入力
+64+0 レコード出力
+67108864 バイト (67 MB) コピーされました、 0.282104 秒、 238 MB/秒
+█▓▒░nojima@nightmare░▒▓██▓▒░ 月  6月 04 06:56:44午前 
+~/prog/nooter/versatile-arm-image/u-boot-test/ dd if=../../cross-compile/squeeze-emdebian/home/nojima/u-boot/u-boot-2012.04.01/u-boot.bin of=flash.img conv=notrunc
+231+1 レコード入力
+231+1 レコード出力
+118344 バイト (118 kB) コピーされました、 0.00166092 秒、 71.3 MB/秒
+█▓▒░nojima@nightmare░▒▓██▓▒░ 月  6月 04 06:57:20午前 
+~/prog/nooter/versatile-arm-image/u-boot-test/ ls -l flash.img 
+-rw-r--r-- 1 nojima nojima 67108864  6月  4 06:57 flash.img
+█▓▒░nojima@nightmare░▒▓██▓▒░ 月  6月 04 06:57:26午前 
+~/prog/nooter/versatile-arm-image/u-boot-test/ qemu-system-arm -M versatilepb -nographic -pflash ./flash.img
+Kernel image must be specified
+█▓▒░nojima@nightmare░▒▓██▓▒░ 月  6月 04 06:57:47午前 
+~/prog/nooter/versatile-arm-image/u-boot-test/ ls
+flash.img
+█▓▒░nojima@nightmare░▒▓██▓▒░ 月  6月 04 06:58:59午前 
+~/prog/nooter/versatile-arm-image/u-boot-test/ touch dummy
+█▓▒░nojima@nightmare░▒▓██▓▒░ 月  6月 04 06:59:03午前 
+~/prog/nooter/versatile-arm-image/u-boot-test/ qemu-system-arm -M versatilepb -nographic -pflash ./flash.img -kernel ./dummy
+qemu: fatal: Trying to execute code outside RAM or ROM at 0x08000000
+
+R00=00000000 R01=00000183 R02=00000100 R03=00000000
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=00000000 R14=00000000 R15=08000000
+PSR=400001d3 -Z-- A svc32
+zsh: abort      qemu-system-arm -M versatilepb -nographic -pflash ./flash.img -kernel ./dummy
+-----ここまで-----------
+
+さらに、note-pcにqemu-1.0.1+dfsgのソースがあったので、
+hw/versatilepb.cの該当箇所を見ると
+ ----> flashのコードがそっくり無いぜ。だから
+-----------qemu-1.0.1+dfsgここから----------------------
+~/prog/nooter/cross-compile-region/squeeze-emdebian/home/nojima/nook/u-boot-2012.04.01/ qemu-system-arm -M versatilepb -m 256 -nographic -kernel ./u-boot 
+
+
+U-Boot 2012.04.01 (May 31 2012 - 01:38:22)
+
+DRAM:  128 MiB
+WARNING: Caches not enabled
+Flash: ## Unknown flash on Bank 1 - Size = 0x00000000 = 0 MB
+*** failed ***
+### ERROR ### Please RESET the board ###
+qemu: terminating on signal 15 from pid 4599
+-----------qemu-1.0.1+dfsgここまで----------------------
+
+となり、u-bootが動かん...orz
+
+※objdump -D -z -w --architecture=arm -b binary u-boot.bin
+　で確認すみ。
+
+さらに腹立ったので、env DEB_BUILD='noopt nostrip parallels=2'でコンパイルかけて、
+gdbでデバッグ中。
+
+　QEMUの
+　　arm_load_kernel(hw/arm_boot.c)中、
+
+1)    　-M versatilepbの場合 
+
+         info->load_start = 0x0,
+           #define KERNEL_LOAD_ADDR 0x00010000
+        なので、kernelとして入れたイメージはただのバイナリの場合、
+        0x00010000にロードされる。
+   　　なお、infoの値は以下のとおり。
+　　　　(gdb) p *info
+　　　　$14 = {ram_size = 134217728, kernel_filename = 0x7fffffffea6d "./u-boot.bin", 
+　　　  kernel_cmdline = 0x5555558186bd "", initrd_filename = 0x0, loader_start = 0, 
+　　　  smp_loader_start = 0, smp_priv_base = 0, nb_cpus = 1, board_id = 387, 
+　　　  atag_board = 0, is_linux = 0, initrd_size = 0, entry = 65536}
+
+　　　  (gdb) p/x info->board_id
+        $1=183
+      また、bootloader(<-arm_boot.cに定義すみマシンコード群）
+　　　に仕込まれたバイナリがromとして登録され、
+　　　最後にcpuの個数分qemu_register_reset(do_cpu_reset, env);
+　　　が呼ばれる。
+　　　　　　arm_load_kernel->rom_add_blob_fixed->rom_add_blob()
+    でロードされる。なお、bootloaderのロード先は0x0からのアドレス。
+
+　　　また、bootloaderに書き込まれるロードアドレスは、
+　　　arm_boot.cのコメントによれば、integratorcp_init()(hw/integratorcp.c)
+     で行われるらしい。
+
+つまりメモリマップは以下のとおり。
+
+　　 0x0      -0x0010000 bootloader[]
+     0x010000-           kernelで指定したデータ
+
+machine構造体の中身
+(gdb) p machine
+$17 = (QEMUMachine *) 0x555555b62d40
+(gdb) p *machine
+$18 = {name = 0x555555869f7a "versatilepb", alias = 0x0, 
+  desc = 0x555555869f86 "ARM Versatile/PB (ARM926EJ-S)", 
+  init = 0x5555557f91d0 <vpb_init>, use_scsi = 1, max_cpus = 1, no_serial = 0, 
+  no_parallel = 0, use_virtcon = 0, no_vga = 0, no_floppy = 0, no_cdrom = 0, 
+  no_sdcard = 0, is_default = 0, default_machine_opts = 0x0, 
+  compat_props = 0x0, next = 0x555555b62da0}
+(gdb) p machine->next
+$19 = (struct QEMUMachine *) 0x555555b62da0
+(gdb) p *machine->next
+$20 = {name = 0x555555869fa4 "versatileab", alias = 0x0, 
+  desc = 0x555555869fb0 "ARM Versatile/AB (ARM926EJ-S)", 
+  init = 0x5555557f9180 <vab_init>, use_scsi = 1, max_cpus = 0, no_serial = 0, 
+  no_parallel = 0, use_virtcon = 0, no_vga = 0, no_floppy = 0, no_cdrom = 0, 
+  no_sdcard = 0, is_default = 0, default_machine_opts = 0x0, 
+  compat_props = 0x0, next = 0x555555b63060}
+  
+
+※qemuのkernelで書き込まれたバイナリは、リンクリスト形式でromとして
+　内部に保存されるらしい。romのデータ登録にリンクリスト使うのはうまい。
+（実際には未使用領域だらけになる為リンクリストにしないともったいない）
+
+ qemu-system-armはvl.cのmain-->arm_load_kernel(hw/arm_boot.c)で呼ばれる。
+ hw/loader.cはaddr:0x0にデータロードしたりするのにいろいろ頑張ってくれる
+ utility関数群。
+
+ qemu-systemは最初にload_kernel()呼んで、ペリフェラル初期化して、
+ vm_start()呼んで、main_loop()する。
+
+*nook-color-officail-sourceのu-bootは以下のようにコンパイル
+   27  make -j2 ARCH=arm  CROSS_COMPILE=arm-linux-gnueabi- omap3621_evt1a_config
+   28  make -j2 ARCH=arm  CROSS_COMPILE=arm-linux-gnueabi- -s
+
+※make の-sはsilenceの意味。makefile中のecho文抑圧。
+
+してみたが、メモリマップが違いすぎるため、
+ qemu-system-arm -M versatilepb -m 128 -nographic -kernel u-boot       
+qemu: fatal: Trying to execute code outside RAM or ROM at 0x80e80000
+
+R00=00000000 R01=00000000 R02=00000000 R03=00000000
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=00000000 R14=00000000 R15=80e80000
+PSR=400001d3 -Z-- A svc32
+な感じで失敗に終る。
+
+u-bootはソース中、
+nojima@nightmare:~/u-boot/u-boot-2012.04.01$ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- versatilepb_config
+とすると、
+
+   1st . $(SRC)/mkconfig versatilepb が起動し、
+   2nd . $(SRC)/boards.cfgから各種設定が抜かれ、
+   3rd   $(SRC)/config.mkが生成され、
+   4th   $(SRC)/board/${vendor}/${board}が#define CONFIG_BOARDDIRに設定され、
+   5th   $(SRC)/include/configs/XXXX_config.hがロードされる。
+
+*nooter付属のu-bootは、おそらくbarnsから手に入るu-bootのソース中
+ omap3621zoom3を使ってコンパイルした？感じのバイナリに見える。
+
+ ---> u-boot.binのstringsの結果から。
+      CONFIG_BOOTARGSが同じ。
+      CONFIG_IPADDRが同じ。
+      V_PROMPTの文字列が同じ
+
+  なお、nookのオリジナル版であるomap3621_evt1aは、nook colorの製品事情に
+基づく仕様を全部スクリプトで実装したものになっている。
+
+ また、オリジナルのomap3621_evt1a版u-bootは突っ込むと、
+　　Loading...
+とだけ出てそのままハング?
+
+※なんと、このLoading...は、u-boot/tools/logos/o_nookcolor_logo_large.bmp
+だったりする。（あとはもろもろいろいろ）
+tools/Makefileにあるが、このMakefileにて、これらロゴをinclude/bmp_logo_b.h
+とかに変更。
+
+こちらの描画は、barnsソースのboard/omap3621_boxer_panel.cで描画されるみたい。
+common/lcd.cとかにはlcdデバイスをコンソール化できそうな内容がある。
+（フォントとか持ってるし...)
+また、bitmap_plotで、.h化されたbmpファイルを描画。
+
+stdout=lcd
+stderr=lcd
+とかすると、lcdを標準出力にできるか？？
+(See. common/console.c console_init_r())
+
+--->で実際、make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- omap3630zoom3_configとか、omap3621zoom3_configとかやってみたが、ソースが不完全でコンパイルは失敗に終わるみたい。
+
+なんと、versatileqemuとゆーのがある。
+
+* u-bootをversatileqemuでコンパイルー
+----こっから---
+nojima@nightmare:~/u-boot/u-boot-2012.04.01$ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- versatileqemu_config
+Configuring for versatilepb - Board: versatile, Options: ARCH_VERSATILE_PB
+nojima@nightmare:~/u-boot/u-boot-2012.04.01$ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -s
+Generating include/generated/asm-offsets.h
+nojima@nighmare:
+----ここまで----
+qemu-system-arm -M versatilepb -m 256 -nographic -kernel u-boot.bin
+
+U-Boot 2012.04.01 (Jun 05 2012 - 22:34:41)
+
+DRAM:  128 MiB
+WARNING: Caches not enabled
+Using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+Net:   SMC91111-0
+VersatilePB # printenv
+baudrate=38400
+bootargs=root=/dev/nfs mem=128M ip=dhcp netdev=25,0,0xf1010000,0xf1010010,eth0
+bootdelay=2
+bootfile=/tftpboot/uImage
+ethact=SMC91111-0
+stderr=serial
+stdin=serial
+stdout=serial
+verify=n
+
+Environment size: 219/8188 bytes
+VersatilePB # 
+
+というわけで、u-boot.binでも起動できたー。

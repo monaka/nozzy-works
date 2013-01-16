@@ -1,0 +1,116 @@
+1. はじめに
+2. ちょっとおさらい
+3. debhelperに共通のオプションについて
+-v ...
+--no-act
+-a
+-i 
+-p
+-N
+--remaining-pakages
+--ignore
+-P
+--mainpackage
+-O
+4. debhelperに共通の環境変数について
+DH_OPTIONS
+DH_INTERNAL_OPTIONS
+DH_ALWAYS_EXCLUDE
+DH_VERBOSE
+DH_NO_ACT
+
+
+5. 今月のコマンド:dh
+DH_COMPAT
+DH_INTERNAL_BUILDFLAGS
+
+
+
+
+6. 今月のコマンド:dh_shlib
+6. 
+
+
+---以下はメモ
+
+A.dh解析
+
+Dpkg::Buildflagsでしこたまコンパイルフラグをいじる。このあたり、dpkg-buildflags
+で得られる動作と全く同様。See. man dpkg-buildflags
+
+Debian::Debhelper::Dh_Lib::set_buildflags()ではdpkg-buildflags --list
+で得られるconfigure用フラグを探してきてセットする。
+
+debian-sidでdpkg-buildflags --dumpすると、
+CFLAGS=-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security
+CPPFLAGS=-D_FORTIFY_SOURCE=2
+CXXFLAGS=-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security
+FFLAGS=-g -O2
+LDFLAGS=-Wl,-z,relro
+が得られる。
+
+・--until,--after,--before,--remainingは廃止扱いとの警告がでる
+　（See. dh中warn_deprecatedにて。man dhにても記載あり)
+
+・$ENV{MAKEFLAGS}にXXXXX--jobserver-fds=[0-9]+があると、jobserverと通信する。
+ (See. Debian::Debhelper::Dh_Lib::is_make_jobserver_unavailable())
+  使えない場合はMAKEFLAGSクリア。
+
+・dh override_dh_hogefugaとかすると単に終了。(See. dh 335行あたり）
+  dh debian/rulesも同様
+
+・line343〜437あたりで、buildターゲットに応じた呼び出しシーケンスを作成。
+
+・--before,--after,--removeは扱いらしきものがある。(See. dh line 461-474)
+
+・/usr/share/perl5/Debian/Debhelper/Sequence/hoge.pm
+　という形で--with hogeがサポート。ここにhoge.pmぶち込むのは通常のパッケージ
+
+　　例: dpkg -S /usr/share/perl5/Debian/Debhelper/Sequence/gir.pmすると
+　　　　　gobject-introspectionパッケージガ得られる。
+
+・ /etc/dpkg/buildflags.confをDpkg::BuildFlags.pmのload_config()で吸い込んでる。
+※このファイルを持つパッケージが無い。apt-fileの結果
+
+・ $ENV{'XDG_CONFIG_HOME'}(See. Dpkg::BuildFlags)/dpkg/buildflags.conf
+ $ENV{'HOME'}/.config/dpkg/buildflags.conf
+にてDpkg::BuildFlags::load_user_config()で読み込む
+
+・DEB_HOGEFUGA_SET
+
+12/08 17:31 dh line520まで解析終了
+
+・--with addonについて、
+   こちらのaddonを指定すると、
+　　　/usr/share/perl5/Debian/Debhelper/Sequence/{addon}.pm
+   が吸い込まれる。（なお、この{addon}.pmはaddonを提供するそれぞれのパッケージが用意）
+ 　やってることは単純で、どこかの手続きに{addon}.pmで定義された手続きを挿入するだけ。
+  便利なのは例えば、autoreconfとかだとcleanでいろいろ消し、configで、また何かするとか
+　を一発指定できる。
+
+    {addon}.pmの中身は、dhコマンド側に実装されている
+　　　　insert_before,insert_after等の手続きが呼び出される。
+　　(See. /usr/share/doc/debhelper/PROGRAMMING.gz中 Sec. Sequence Addons以下）
+
+・Debian::Debebhelper::Dh_Lib::getpackage()ではdebian/controlを
+  吸い込んで記載されているパッケージリストを返却。
+
+・Debian/Debhelper/Dh_Lib.pmのlogfile()にて、debian/{package}debhelper.log
+  というファイル名が作成される。
+
+・どこまでやったかはMakefileだとそこに記載されているファイル群の依存関係で判定するが、dhの場合、Makefileに詳しく書かないので、debian/{package}debhelper.logファイルを頼りにどこまでやったかを判定している。
+
+・L631あたりで、いよいよ処理となるが、やってることは
+　$ENV{'DH_INTERNAL_OPTIONS'},$ENV{'DH_INTERNAL_OVERRIDE'}を消去し、
+　system("debian/rules rule")を呼び出す。ruleはすでにいろいろ定義されている奴から
+　実行していく。
+
+   make foo -> dh foo -> rules target呼び出し-> (debian/rules target 
+        -> dh target            --> )この間ループ
+           あるいは
+           Makefile内のtarget:が呼ばれる。
+
+ L695あたりまで解析終了
+
+
+                                             

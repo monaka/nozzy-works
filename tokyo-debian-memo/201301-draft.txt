@@ -1,0 +1,104 @@
+dh_XXXXコマンドが無用に複雑なのは、
+dhから呼び出される場合に、環境変数から情報をやりとりしたり
+するためである。
+
+
+1. dh_gencontrol
+
+dhによる呼び出しは、
+
+        dh_installdeb
+        dh_gencontrol　<--ここ
+        dh_md5sums
+        dh_builddeb
+
+このあたり。
+
+  実際には、dpkg-gencontrolのラッパー
+
+　　Step1. 各種ファイルのファイル名を用意
+　　　　　　debian/PACKAGE.subvars.BUILDARCH/BUILDOS/
+           debian/PACKAGE.changelog
+           tmpdir/DEBIAN/をroot:rootで作成（実際にはfakeroot経由が一般的だが）
+           
+   Step 2. 
+ 　　dpkg-gencontrol -pPACKAGE -pPACKAGE ... -l changelog \
+       -T debian/PACKAGE.subvers.XXXX -P tmpdir [dpkg-gencontrol-params...]
+
+     をdebian/controlに指定されたパッケージ個ほど呼び出す。
+
+　　Step 3. chmod 644 tmpdir/DEBIAN/control
+           chmod root:root tmpdir/DEBIAN/control
+
+　　　を実行する。
+
+2. そもそも、DEBIAN/controlファイルってなんだ？
+　　どこにあるのだ？
+   パッケージのどこに入ってるんだ?
+
+   まあ、パッケージ作成時に、
+     debian/PACKAGE-NAME/DEBIAN/以下
+　　にある。実際には、debian/controlファイルの１パッケージ分を
+　　抜き出して適当に文字列置き換えたみたいな内容になってる。
+
+3. Debian::Debhelper::Dh_Lib::init()
+
+　 環境変数：
+　　DH_OPTIONOS/DH_INTERNAL_OPTIONS
+   DH_ALWAYS_EXCLUDE/DH_VERBOSE/DH_NO_ACT
+  (以下は、Debian::Debhleper::Dh_Getopt::parseoptsにて）
+   DH_INTERNAL_OPTIONS/DH_OPTIONS
+　　を参照。
+
+　また、Debian::Debhleper::Dh_Getopt::getoptions()
+  にて、debhelper共通のオプションを取得してる。
+
+
+  →Debian::Debhelper::Dh_Lib::getpackages()は、
+　　debian/controlからパッケージリスト一覧を引き抜く。
+
+   また、getpackages(XXXX)は、XXXXに
+　　indep/both/archで動作が若干かわる。
+   アーキテクチャ判定にdpkg-architectureを呼び出して確認するらしい。
+　　dpkg-archtecture -a Debianアーキテクチャ文字列 -i アーキテクチャワイルドカード
+
+    詳しくは、man dpkg-archtectureによれば
+
+       Debian アーキテクチャ
+           Debian のアーキテクチャを示す文字列で、FTP アーカイブ内のバイナリツ
+           リーを指定する。例: i386, sparc, hurd-i386 。
+
+       アーキテクチャワイルドカード
+           アーキテクチャワイルドカードは、アーキテクチャ文字列のある部分に関
+           して実際に存在している任意のアーキテクチャ文字列にマッチする特別な
+           アーキテクチャ文字列である。一般的には、 <kernel>-<cpu>  という形式
+           をとる。例: linux-any, any-i386, hurd-any 。
+
+       GNU システムタイプ
+           ダッシュで区切られた 2 つの部分、CPU とシステム名からなるアーキテク
+           チャを識別する文字列。例:     i386-linux-gnu,      sparc-linux-gnu,
+           i386-gnu, x86_64-netbsd 。
+
+　　だそうな。
+
+4. dpkg-gencontrolコマンド何してる?
+
+   まず、changelogを解釈するらしい
+　　　--->Dpkg::Changelog::Parse::changelog_parse()で解釈
+　　　　　まず、debian/changelogのファイルから
+　　　　　"changelog-format: xxxx"というのを解釈。
+　　　　　んでもって、xxxxと同名の実行ファイルを
+　　　　　/usr/lib/dpkg/parsechangelog/以下に探し、
+　　　　　見つけ次第、xxxx -l debian/changelog ...options...
+         とかする
+
+      --->でもな、debian/changelogファイルのフォーマットは
+　　　　　　相変わらずこのフォーマットどおりじゃないー
+
+　　      
+5. dpkg-gencontrolは、とにかくDEBIAN/controlをいろんなファイルから
+　　データを読み取って作成しようとする。この時substvarなどから
+　　置換文字列などもどっさり引き抜き、置き換えを行う。
+
+
+
