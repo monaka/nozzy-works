@@ -101,4 +101,403 @@ dhによる呼び出しは、
 　　置換文字列などもどっさり引き抜き、置き換えを行う。
 
 
+6. 取り急ぎ、なにしてるかをDH_VERBOSE=1にしてみてみた。
 
+   env DH_VERBOSE=1 fakeroot dh_gencontrol
+
+~/prog/my-debian-pack/tracef/tracef-0.16/ env DH_VERBOSE=1 fakeroot dh_gencontrol
+	echo misc:Depends= >> debian/tracef.substvars
+	dpkg-gencontrol -ldebian/changelog -Tdebian/tracef.substvars -Pdebian/tracef
+dpkg-gencontrol: warning: Depends field of package tracef: unknown substitution variable ${shlibs:Depends}
+	chmod 644 debian/tracef/DEBIAN/control
+	chown 0:0 debian/tracef/DEBIAN/control
+   
+取り急ぎ、
+ perl -wd /usr/bin/dpkg-gencontrol -ldebian/changelog -Tdebian/tracef.substvars -Pdebian/tracef
+
+してみた。
+
+ DB<2> p %options
+filedebian/changelog
+  DB<3> s
+
+のみ指定した状態で、
+Dpkg::Changelog::Parse::changelog_parse(/usr/share/perl5/Dpkg/Changelog/Parse.pm:77):
+
+な感じ。
+
+Dpkg::Changelog::Parse::changelog_parse(/usr/share/perl5/Dpkg/Changelog/Parse.pm:102):
+102:		open(P, "-|", "tail", "-n", "40", $changelogfile);
+  DB<3> n
+Dpkg::Changelog::Parse::changelog_parse(/usr/share/perl5/Dpkg/Changelog/Parse.pm:103):
+103:		while(<P>) {
+  DB<3> p $changelogfile
+debian/changelog
+
+やっぱりこれか。
+で結局、changelog-format:
+なる文字列はdebian/changelogにはないので、
+$format=debian
+になるようだ。
+で、
+  DB<5> 
+Dpkg::Changelog::Parse::changelog_parse(/usr/share/perl5/Dpkg/Changelog/Parse.pm:115):
+115:		    $parser = $candidate;
+  DB<5> p $candidate
+/usr/lib/dpkg/parsechangelog/debian
+なので、
+  DB<2> c 137
+Dpkg::Changelog::Parse::changelog_parse(/usr/share/perl5/Dpkg/Changelog/Parse.pm:137):
+137:	    my $pid = open(P, "-|");
+  DB<3> p @exec
+/usr/lib/dpkg/parsechangelog/debian-ldebian/changelog
+
+んじゃー、これを実行↓
+~/prog/my-debian-pack/tracef/tracef-0.16/ cat debian/changelog | /usr/lib/dpkg/parsechangelog/debian -ldebian/changelog
+Source: tracef
+Version: 0.16-1
+Distribution: unstable
+Urgency: low
+Maintainer: Takahide Nojima <nozzy123nozzy@gmail.com>
+Date: Mon, 20 Jun 2011 01:15:38 +0900
+Changes: 
+ tracef (0.16-1) unstable; urgency=low
+ .
+   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+$
+なんだそうな。
+
+参考：Dpkg::Changelog::Parse::changelog_parse()をそのまま呼び出す
+コマンドがdpkg-parsechangelogとなる。
+例：
+█▓▒░nojima@nightmare░▒▓██▓▒░ 木  1月 17 03:43:59午前 
+~/prog/my-debian-pack/tracef/tracef-0.16/ dpkg-parsechangelog -ldebian/changelog 
+Source: tracef
+Version: 0.16-1
+Distribution: unstable
+Urgency: low
+Maintainer: Takahide Nojima <nozzy123nozzy@gmail.com>
+Date: Mon, 20 Jun 2011 01:15:38 +0900
+Changes: 
+ tracef (0.16-1) unstable; urgency=low
+ .
+   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+█▓▒░nojima@nightmare░▒▓██▓▒░ 木  1月 17 03:44:03午前 
+こんな感じ。
+
+※例えば、debian/changelog満載のtarとかでは、
+~/prog/debian/tar/tar-1.23/ cat debian/changelog | /usr/lib/dpkg/parsechangelog/debian -ldebian/changelog
+Source: tar
+Version: 1.23-2
+Distribution: unstable
+Urgency: low
+Maintainer: Bdale Garbee <bdale@gag.com>
+Date: Mon, 14 Jun 2010 11:05:57 -0600
+Closes: 523494 582706
+Changes: 
+ tar (1.23-2) unstable; urgency=low
+ .
+   * use xz when lzma is called for, and stop suggesting both lzma since it's
+     no longer used, and xz-utils since it's now priority required,
+     closes: #582706, #523494
+
+ということで、最新のchangelogからデータを得ている。
+
+main::(/usr/bin/dpkg-gencontrol:186):
+186:	my $src_fields = $control->get_source();
+  DB<11> n
+main::(/usr/bin/dpkg-gencontrol:187):
+187:	foreach $_ (keys %{$src_fields}) {
+  DB<11> p $src_fields
+Source: tracef
+Section: misc
+Priority: extra
+Maintainer: Takahide Nojima <nozzy123nozzy@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), dh-autoreconf, libelf-dev, libdwarf-dev, binutils-dev, libboost1.49-dev, libboost-program-options1.49-dev, quilt
+Standards-Version: 3.9.2
+Homepage: http://binary.nahi.to/hogetrace/
+
+どうも$controlはdebian/controlファイルの中身を保持してるらしい。
+
+  DB<12> l
+187==>	foreach $_ (keys %{$src_fields}) {
+188:	    if (m/^Source$/) {
+189:		set_source_package($src_fields->{$_});
+190 	    } else {
+191:	        field_transfer_single($src_fields, $fields);
+192 	    }
+193 	}
+194 	
+195 	# Scan binary package
+196:	foreach $_ (keys %{$pkg}) {
+  DB<12> p %{$pkg}
+PackagetracefArchitecturei386 amd64Depends${shlibs:Depends}, ${misc:Depends}Descriptioncall tree generator using ptrace.
+tracef is generator of call tree. It seems to like strace and ltrace
+commands,however tracef can also generate call tree of all functions.
+  DB<13> use Data::Dumper
+
+  DB<14> p Dumper($pkg)
+$VAR1 = bless( do{\(my $o = {
+                   'allow_duplicate' => 0,
+                   'allow_pgp' => 0,
+                   'name' => 'package\'s section of control info file',
+                   'drop_empty' => 0,
+                   'fields' => {
+                                 'Package' => 'tracef',
+                                 'Architecture' => 'i386 amd64',
+                                 'Depends' => '${shlibs:Depends}, ${misc:Depends}',
+                                 'Description' => 'call tree generator using ptrace.
+tracef is generator of call tree. It seems to like strace and ltrace
+commands,however tracef can also generate call tree of all functions.'
+                               },
+                   'out_order' => [],
+                   'type' => 2,
+                   'in_order' => [
+                                   'Package',
+                                   'Architecture',
+                                   'Depends',
+                                   'Description'
+                                 ]
+                 })}, 'Dpkg::Control' );
+
+  DB<16> l
+216 			      $host_arch, "@archlist");
+217:		    $fields->{$_} = $host_arch;
+218 		}
+219 	    } else {
+220:	        field_transfer_single($pkg, $fields);
+221 	    }
+222 	}
+223 	
+224 	# Scan fields of dpkg-parsechangelog
+225:	foreach $_ (keys %{$changelog}) {
+  DB<16> l
+226:	    my $v = $changelog->{$_};
+227 	
+228:	    if (m/^Source$/) {
+229:		set_source_package($v);
+230:	    } elsif (m/^Version$/) {
+231 	        # Already handled previously.
+232:	    } elsif (m/^Maintainer$/) {
+233 	        # That field must not be copied from changelog even if it's
+234 	        # allowed in the binary package control information
+235 	    } else {
+  DB<16> p Dumper($changelog)
+$VAR1 = bless( do{\(my $o = {
+                   'allow_duplicate' => 0,
+                   'allow_pgp' => 0,
+                   'name' => 'parsed version of changelog',
+                   'drop_empty' => 1,
+                   'fields' => {
+                                 'Source' => 'tracef',
+                                 'Version' => '0.16-1',
+                                 'Distribution' => 'unstable',
+                                 'Urgency' => 'low',
+                                 'Maintainer' => 'Takahide Nojima <nozzy123nozzy@gmail.com>',
+                                 'Date' => 'Mon, 20 Jun 2011 01:15:38 +0900',
+                                 'Changes' => '
+tracef (0.16-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>'
+                               },
+                   'out_order' => [
+                                    'Source',
+                                    'Binary-Only',
+                                    'Version',
+                                    'Distribution',
+                                    'Urgency',
+                                    'Maintainer',
+                                    'Date',
+                                    'Closes',
+                                    'Changes'
+                                  ],
+                   'type' => 512,
+                   'in_order' => [
+                                   'Source',
+                                   'Version',
+                                   'Distribution',
+                                   'Urgency',
+                                   'Maintainer',
+                                   'Date',
+                                   'Changes'
+                                 ]
+                 })}, 'Dpkg::Control::Changelog' );
+
+ DB<18> c 379
+dpkg-gencontrol: warning: Depends field of package tracef: unknown substitution variable ${shlibs:Depends}
+ at /usr/share/perl5/Dpkg/ErrorHandling.pm line 59
+	Dpkg::ErrorHandling::warning('Depends field of package tracef: unknown substitution variabl...', 'shlibs:Depends') called at /usr/share/perl5/Dpkg/Substvars.pm line 256
+	Dpkg::Substvars::substvars('Dpkg::Substvars=HASH(0x130ec10)', '${shlibs:Depends}, ${misc:Depends}', 'msg_prefix', 'Depends field of package tracef: ') called at /usr/bin/dpkg-gencontrol line 268
+main::(/usr/bin/dpkg-gencontrol:379):
+379:	my $sversion = $fields->{'Version'};
+  DB<19> p $fileslistfile
+debian/files
+なんだそうな。
+
+なんと、debian/filesを再作成してた。
+
+で、出来上がるdebian/filesは、
+/prog/my-debian-pack/tracef/tracef-0.16/debian/ cat files    
+tracef_0.16-1_amd64.deb misc extra
+なんだそうな。
+
+300 $oppackage = $fields->{'Package'};
+302 my $pkg_type = $pkg->{'Package-Type'} ||
+303                $pkg->get_custom_field('Package-Type') || 'deb';
+304 
+379 my $sversion = $fields->{'Version'};
+
+で、
+ $forcefilename = sprintf("%s_%s_%s.%s", $oppackage, $sversion,
+382                          $fields->{'Architecture'} || "", $pkg_type)
+383        unless ($forcefilename);
+384 print(Y $substvars->substvars(sprintf("%s %s %s\n", $forcefilename,
+385                       $fields->{'Section'} || '-',
+386                       $fields->{'Priority'} || '-')))
+すると、先の中身が出来上がる。
+
+  DB<21> p Dumper($fields)
+$VAR1 = bless( do{\(my $o = {
+                   'allow_duplicate' => 0,
+                   'allow_pgp' => 0,
+                   'name' => 'control info of a .deb package',
+                   'drop_empty' => 1,
+                   'fields' => {
+                                 'Section' => 'misc',
+                                 'Priority' => 'extra',
+                                 'Maintainer' => 'Takahide Nojima <nozzy123nozzy@gmail.com>',
+                                 'Homepage' => 'http://binary.nahi.to/hogetrace/',
+                                 'Package' => 'tracef',
+                                 'Architecture' => 'amd64',
+                                 'Description' => 'call tree generator using ptrace.
+tracef is generator of call tree. It seems to like strace and ltrace
+commands,however tracef can also generate call tree of all functions.',
+                                 'Version' => '0.16-1',
+                                 'Installed-Size' => '9'
+                               },
+                   'out_order' => [
+                                    'Package',
+                                    'Package-Type',
+                                    'Source',
+                                    'Version',
+                                    'Built-Using',
+                                    'Kernel-Version',
+                                    'Architecture',
+                                    'Subarchitecture',
+                                    'Installer-Menu-Item',
+                                    'Essential',
+                                    'Origin',
+                                    'Bugs',
+                                    'Maintainer',
+                                    'Installed-Size',
+                                    'Pre-Depends',
+                                    'Depends',
+                                    'Recommends',
+                                    'Suggests',
+                                    'Enhances',
+                                    'Conflicts',
+                                    'Breaks',
+                                    'Replaces',
+                                    'Provides',
+                                    'Built-Using',
+                                    'Section',
+                                    'Priority',
+                                    'Multi-Arch',
+                                    'Homepage',
+                                    'Description',
+                                    'Tag',
+                                    'Task'
+                                  ],
+                   'type' => 32,
+                   'in_order' => [
+                                   'Section',
+                                   'Priority',
+                                   'Maintainer',
+                                   'Homepage',
+                                   'Package',
+                                   'Architecture',
+                                   'Description',
+                                   'Version',
+                                   'Installed-Size'
+                                 ]
+                 })}, 'Dpkg::Control' );
+
+
+
+なんか、
+ DEBIAN/control
+を作る以外に、
+ debian/files
+をこっそりつくってるぞー。
+
+dpkg-gencontrolでは、パッケージの依存関係の最適化を行っている。
+
+--->どう最適化するって？
+
+Dpkg::Arch::read_triplettable(/usr/share/perl5/Dpkg/Arch.pm:223):
+223:	    open TRIPLETTABLE, "$pkgdatadir/triplettable"
+224:		or syserr(_g("cannot open %s"), "triplettable");
+  DB<32> p $pkgdatadir
+/usr/share/dpkg
+
+なんと、/usr/share/dpkg/{abitable|archtable|cputable|ostable|triplettable}
+が変換テーブル。
+
+依存関係をDpkg::Deps::KnownFactsとかで、virtual packageへの
+依存とかに置き換えたりする。
+
+Dpkg::Control::Fieldsにはおもしろい定義がある。
+
+dpkg-gencontrolの
+42 # Process dependency fields in a second pass, now that substvars have been
+243 # initialized.
+244 
+245 my $facts = Dpkg::Deps::KnownFacts->new();
+246 $facts->add_installed_package($fields->{'Package'}, $fields->{'Version'},
+247                               $fields->{'Architecture'}, $fields->{'Multi-Arch'});
+248 if (exists $pkg->{"Provides"}) {
+249     my $provides = deps_parse($substvars->substvars($pkg->{"Provides"}, no_warn => 1),
+250                               reduce_arch => 1, union => 1);
+251     if (defined $provides) {
+252         foreach my $subdep ($provides->get_deps()) {
+253             if ($subdep->isa('Dpkg::Deps::Simple')) {
+254                 $facts->add_provided_package($subdep->{package},
+255                         $subdep->{relation}, $subdep->{version},
+256                         $fields->{'Package'});
+257             }
+258         }
+259     }
+260 }
+261 
+262 my (@seen_deps);
+263 foreach my $field (field_list_pkg_dep()) {
+264     # Arch: all can't be simplified as the host architecture is not known
+265     my $reduce_arch = debarch_eq('all', $pkg->{Architecture} || "all") ? 0 : 1;
+266     if (exists $pkg->{$field}) {
+267         my $dep;
+268         my $field_value = $substvars->substvars($pkg->{$field},
+269             msg_prefix => sprintf(_g("%s field of package %s: "), $field, $pkg->{Package    }));
+270         if (field_get_dep_type($field) eq 'normal') {
+271             $dep = deps_parse($field_value, use_arch => 1,
+272                               reduce_arch => $reduce_arch);
+273             error(_g("error occurred while parsing %s field: %s"), $field,
+274                   $field_value) unless defined $dep;
+275             $dep->simplify_deps($facts, @seen_deps);
+276             # Remember normal deps to simplify even further weaker deps
+277             push @seen_deps, $dep;
+278         } else {
+279             $dep = deps_parse($field_value, use_arch => 1,
+280                               reduce_arch => $reduce_arch, union => 1);
+281             error(_g("error occurred while parsing %s field: %s"), $field,
+282                   $field_value) unless defined $dep;
+283             $dep->simplify_deps($facts);
+284             $dep->sort();
+285         }
+286         error(_g("the %s field contains an arch-specific dependency but the " .
+287                  "package is architecture all"), $field)
+288             if $dep->has_arch_restriction();
+289         $fields->{$field} = $dep->output();
+290         delete $fields->{$field} unless $fields->{$field}; # Delete empty field
+291     }
+292 }
+にはきっと何か秘密があるにちがいない...
