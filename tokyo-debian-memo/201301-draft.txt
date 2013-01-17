@@ -5,6 +5,20 @@ dhから呼び出される場合に、環境変数から情報をやりとりし
 
 1. dh_gencontrol
 
+バイナリパッケージ用のcontrolファイルを自動作成するコマンド。
+自動作成にあたり、利用されるソースパッケージのファイルは、
+debian/control,debian/changelog,debian/subversが利用される。
+
+作られるのは、
+   debian/<PACKAGENAME>/DEBIAN/control
+   debian/files (←パッケージのアップロード用に使われる情報）
+
+となる。
+
+なお、controlファイルの定義については、debian policyマニュアルの
+5. Control files and their fields
+に説明がある。
+
 dhによる呼び出しは、
 
         dh_installdeb
@@ -170,7 +184,7 @@ $
 参考：Dpkg::Changelog::Parse::changelog_parse()をそのまま呼び出す
 コマンドがdpkg-parsechangelogとなる。
 例：
-█▓▒░nojima@nightmare░▒▓██▓▒░ 木  1月 17 03:43:59午前 
+
 ~/prog/my-debian-pack/tracef/tracef-0.16/ dpkg-parsechangelog -ldebian/changelog 
 Source: tracef
 Version: 0.16-1
@@ -182,7 +196,7 @@ Changes:
  tracef (0.16-1) unstable; urgency=low
  .
    * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
-█▓▒░nojima@nightmare░▒▓██▓▒░ 木  1月 17 03:44:03午前 
+
 こんな感じ。
 
 ※例えば、debian/changelog満載のtarとかでは、
@@ -201,7 +215,7 @@ Changes:
      no longer used, and xz-utils since it's now priority required,
      closes: #582706, #523494
 
-ということで、最新のchangelogからデータを得ている。
+ということで、changelogから最新のデータを得ている。
 
 main::(/usr/bin/dpkg-gencontrol:186):
 186:	my $src_fields = $control->get_source();
@@ -432,6 +446,13 @@ commands,however tracef can also generate call tree of all functions.',
 
 dpkg-gencontrolでは、パッケージの依存関係の最適化を行っている。
 
+依存関係って？
+debian-policy-manualの
+5.6.10. Package interrelationship fields: `Depends', `Pre-Depends',
+`Recommends', `Suggests', `Breaks', `Conflicts', `Provides', `Replaces',
+`Enhances'
+のヘッダを持つ情報が該当の情報。
+
 --->どう最適化するって？
 
 Dpkg::Arch::read_triplettable(/usr/share/perl5/Dpkg/Arch.pm:223):
@@ -446,7 +467,8 @@ Dpkg::Arch::read_triplettable(/usr/share/perl5/Dpkg/Arch.pm:223):
 依存関係をDpkg::Deps::KnownFactsとかで、virtual packageへの
 依存とかに置き換えたりする。
 
-Dpkg::Control::Fieldsにはおもしろい定義がある。
+Dpkg::Control::Fieldsには各依存関係を示すフィールドの種別について
+定義がある。
 
 dpkg-gencontrolの
 42 # Process dependency fields in a second pass, now that substvars have been
@@ -468,6 +490,10 @@ dpkg-gencontrolの
 258         }
 259     }
 260 }
+
+は、今から作成しようとしているパッケージの提供する、Providesフィールド
+があれば、そこに列挙されているパッケージの情報を追跡するらしい。
+
 261 
 262 my (@seen_deps);
 263 foreach my $field (field_list_pkg_dep()) {
@@ -500,4 +526,98 @@ dpkg-gencontrolの
 290         delete $fields->{$field} unless $fields->{$field}; # Delete empty field
 291     }
 292 }
-にはきっと何か秘密があるにちがいない...
+
+パッケージの依存関係のリストから、
+　　(1) アーキテクチャ
+　　(2) 仮想パッケージであるか
+の観点から、依存関係のリストを単純化しようとする処理らしい。
+ 
+なお、packageの依存関係とはConflictとかも含まれる。
+（Conflict/Depnendsの場合は、orか、andかのルールで最適化が行われる）
+
+
+Dpkg::Dep::KnownFactsなどの説明は、
+perldoc Dpkg::Dep::KnownFactsで参照できる。
+--->一応マニュアルでは、インストールされるパッケージ依存関係の最適化というが、
+実装は本当にそうなのか？　　という内容。
+--->ああ、他のフィールドとかにないですよね？という確認しかしませーん
+
+See. dpkg-1.16.9/debian/changelog
+...中略...
+ -- Guillem Jover <guillem@debian.org>  Tue, 20 Nov 2007 07:15:41 +0200
+
+dpkg (1.14.8) unstable; urgency=low
+
+  [ Raphaël Hertzog ]
+  * Heavy rework of dpkg-shlibdeps:
+...中略...
+      disabled with the option '--ignore-missing-info'. Closes: #10807
+  * Switch perl programs to use the new Dpkg::Deps module. This changes the
+    behaviour of dpkg-gencontrol and dpkg-source which will rewrite and
+    simplify dependencies and build dependencies as possible. Multiple
+    dependencies on the same package are replaced by their intersection.
+    Closes: #178203, #186809, #222652
+
+この最適化が入ってなくてそのものずばりを指摘されてしまった件
+ See. 
+   [DPKG-GENCONTROL] should perhaps prune doubled dependencies after substvars substitution   
+   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=222652
+ということですよ。
+
+ちなみに、バイナリパッケージのDEBIAN/controlファイルはどう使われるんだ?
+
+--->dpkg/src/dpkg.postrmとかみると、/var/lib/dpkgか？
+dpkg-1.16.9/lib/dpkg/Makefile.am:	-DADMINDIR=\"$(admindir)\" \
+
+とかあるので、/var/lib/dpkgっぽいなぁ。
+ってみると、
+　　/var/lib/dpkg/available
+　　/var/lib/dpkg/status
+
+とかにcontrolファイルが連結されているような感じっすなー。
+（内部でも、DB扱いになってるぜ、これらファイル）
+
+dpkg/lib/dpkg/dpkg.h
+#define STATUSFILE        "status"
+ 79 #define AVAILFILE         "available"
+ 80 #define LOCKFILE          "lock"
+ 81 #define DIVERSIONSFILE    "diversions"
+ 82 #define STATOVERRIDEFILE  "statoverride"
+ 83 #define UPDATESDIR        "updates/"
+ 84 #define INFODIR           "info"
+ 85 #define TRIGGERSDIR       "triggers"
+ 86 #define TRIGGERSFILEFILE  "File"
+ 87 #define TRIGGERSDEFERREDFILE "Unincorp"
+
+とかがある。
+
+で、dpkg/lib/dpkg/dbmodify.cでいろいろ操作するらしい。
+
+-----------------まあ、これでdh_gencontrolはおっけーかな-----
+
+
+dh_listpackagesでいこうかな...
+
+debian/controlに記載されているパッケージ一覧を得る。
+
+~/prog/debian/dpkg/dpkg-1.16.9/ dh_listpackages 
+libdpkg-dev
+dpkg
+dpkg-dev
+libdpkg-perl
+dselect
+~/prog/debian/dpkg/dpkg-1.16.9/ egrep '^Package' debian/control
+Package: libdpkg-dev
+Package: dpkg
+Package: dpkg-dev
+Package: libdpkg-perl
+Package: dselect
+
+まあ、こういうことですよ。
+
+いじょっ
+
+
+
+
+
