@@ -76,10 +76,6 @@ sub search_method {
 	if (!defined $request->header('Host')) {
 		return;
 	}
-	if (($request->url =~ /\.mp4/) && ($request->header('Host') !~ /dailymotion\.com$/))   {
-		pcap_close($pcap);
-		download_video_streams($request);
-	}
 	if (($request->header('Host') eq 'content.veoh.com') &&
 		($request->url =~ /^\/flash/)) {
 		pcap_close($pcap);
@@ -116,7 +112,7 @@ sub search_method {
 		download_video_streams($request);
 	}
 	if (($request->header('Host') =~ /dailymotion\.com$/ ) &&
-		($request->url =~ /\.flv\?/)) {
+		(($request->url =~ /\.flv\?/)||($request->url =~ /hq.flv/))) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
@@ -169,6 +165,16 @@ sub search_method {
 	}
 	if (($request->header('Host') =~ /^stream.*\.igrooveshark\.com$/ ) &&
 		($request->url =~ /stream\.php/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
+	if (($request->header('Host') =~ /youtube\.com$/ ) &&
+		($request->url =~ /^\/videoplayback/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
+	if (($request->header('Host') =~ /auengine\.com$/ ) &&
+		($request->url =~ /^\/videos/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
