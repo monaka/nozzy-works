@@ -96,6 +96,7 @@ BASICなやり方
 8. なんかよーわからんが、os.path.append()しても、import構文のサーチパスに反映しない
 とゆー現象が発生して、/usr/games/renpyまでは動かんかった。
 (理由は不明）
+--->execfile()では、素のpythonでも同じ現象で動かんかった。
 
 9. gdbのpython拡張について、各classの説明読みたいなら、次のようにすると読める。
 

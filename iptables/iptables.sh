@@ -34,6 +34,8 @@ iptables -A OUTPUT -p udp --dport 123 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 123 --syn -j ACCEPT
 # for usb0 ethernet for nook color
 iptables -A OUTPUT -p udp --dport 67:68 -o usb0 -j ACCEPT
+# for eth0 ethernet for eth0
+iptables -A OUTPUT -p udp --dport 67:68 -o eth0 -j ACCEPT
 # for gmail
 iptables -A OUTPUT -p tcp --dport 993 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 465 --syn -j ACCEPT
@@ -90,6 +92,8 @@ iptables -A INPUT -p udp --sport 53 -j ACCEPT
 iptables -A INPUT -p udp --sport 123 -j ACCEPT
 # for usb0 ethernet for nook color
 iptables -A INPUT -p udp --dport 67:68 -i usb0 -j ACCEPT
+# for eth0 ethernet for nook color
+iptables -A INPUT -p udp --dport 67:68 -i eth0 -j ACCEPT
 # for skype
 iptables -A OUTPUT -p udp --dport 1900 -j ACCEPT
 # for whois
