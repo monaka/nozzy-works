@@ -7,8 +7,11 @@ debian-newsから
   * 2011.11.7  
   Debian 6.0.3 5.0.9 release
   Debconf12 update
+
+ 
   Debian installer localisation
-   --> 19言語がupdate。
+  ---> 2012/1/23号をみるとこの手の話題は定期的に投稿されるようだ。 
+  --> 19言語がupdate。
        ; eight (Czech, Dutch, French, German, Persian, Portuguese, Russian
 and Swedish) are 100% 
   Emdebian使えよというアナウンス
@@ -89,6 +92,10 @@ companies that have a strategic interest in Debian.
    6 : http://wiki.debian.org/DebianEdu
 
 　だそうな。そもそもDebian Pure Brendってなんだ？ 
+  ---> purebrend http://wiki.debian.org/DebianPureBlends
+   (なんと、Debian GIS, Debian Multimediaもあるらしい...)
+   説明:http://blends.alioth.debian.org/blends/
+   宣言: http://wiki.debian.org/Blends/Manifesto
 
   DPL: お会計アップデートと、Wheezy artworkの募集したらしい。 
 
@@ -140,5 +147,503 @@ Timeline website [16] and the related Debian package [17].
    25 : http://pkg-fonts.alioth.debian.org/
    26 : http://wiki.debian.org/gs-undefoma
 
-　
+ Further interviews　に
+　nd with RaphaelHertzog [29], about the Debian handbook.
+　がpodcastでinterviewうけてた。
+
+  neuroDebian teamという妙なものが...(neuro science用debianだそうな）
+   31 : http://neuro.debian.net/
+   32 : http://incf.org/newsroom/stories/neurodebian-the-value-of-an-integrated-tool-suite
+
+ The web team is pleased to announce that all languages have finished
+their migration to UTF-8 [38], so the Debian website [39] is now
+available for everyone in UTF-8, thanks to all the translators who
+worked on this issue.
+
+   38 : http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=567781　　
+ 
+   (なんとUTF-8へ移行完了したそうな...)
+
+   *20120123
+
+   webサーバーでCentOS抜いた（らしい...)
+      1 : http://w3techs.com/blog/entry/debian_is_now_the_most_popular_linux_distribution_on_web_servers
+
+  chroot環境にて、webアプリケーションを突っ込むのに、
+  webサーバーはchrootの外で動かしたいという要望に答えるべく、
+　いくつかの提案が行われた。そのうち、
+　dummy web serverというパッケージが提案された。
+　  2 : http://lists.debian.org/debian-devel/2012/01/msg00148.html
+   3 : http://packages.debian.org/equivs
+
+　 aptitudeの開発が復活
+　　実に800のbugが放置されていたらしい...
+　　   4 : http://www.perrier.eu.org/weblog/2012/01/14#aptitude-revival
+　   5 : http://lists.alioth.debian.org/cgi-bin/mailman/listinfo/aptitude-devel
+
+   Armh の状況は↓
+　　  12 : http://blog.einval.com/2012/01/09
+   13 : https://buildd.debian.org/status/architecture.php?a=armhf&suite=sid
+
+　　無線LAN経由でとあるIGMPぶち込まれるとこける問題が報告された。
 　　
+   14 : http://womble.decadent.org.uk/blog/igmp-denial-of-service-in-linux-cve-2012-0207.html
+   15 : http://bugs.debian.org/654876
+
+　　これもおもしろいかも？
+Enrico Zini announced that the Debtags web site also works for derivative
+distributions [18]: the site now shows packages from Ubuntu too, and can be
+extended to all Debian derivatives.
+
+   18 : http://www.enricozini.org/2012/debian/debtags-for-derivatives/
+
+   relase critical bugsの一覧は
+　　　http://udd.debian.org/bugs.cgi
+　　　からたどれる
+　　Bug squasher view: Affecting sid and wheezy, not marked as done, not tagged patch; those need to be fixed, probably by a patch+upload
+　　から検索可能。
+
+ボトムアップだと間に合いそうにないので、最新から読み下すぜ。
+
+* 20130121
+
+ Debian Medからmentoring祭りが行われる？
+ Wheezyに突っ込むLinuxカーネルについての見解
+　    4: http://womble.decadent.org.uk/blog/whats-in-the-linux-kernel-for-debian-70-wheezy-part-1.html
+    5: http://womble.decadent.org.uk/blog/whats-in-the-linux-kernel-for-debian-70-wheezy-part-2.html
+    6: http://womble.decadent.org.uk/blog/whats-in-the-linux-kernel-for-debian-70-wheezy-part-3.html
+
+
+ Debian Trademarkについての議論サマリ
+Ian Jackson summarised the ongoing discussion on a trademark policy for
+Debian [9].
+
+    9: http://lists.debian.org/debian-project/2013/01/msg00037.html
+
+*20130107
+ 
+ wiki.debian.org security breach: global passwords reset
+ したそうな。
+ popconにてamd64がi386を抜いた。
+ First release of dput-ng in "unstable"だそうな。
+ lintianにひっかかったパッケージ数とかグラフ化されるようになった。
+　　例→http://lintian.debian.org/tags/package-needs-versioned-debhelper-build-depends.html
+
+　まあ、どうでもよいが、各MLでの発言量がグラフ化されるように...
+Andreas Tille announced that the statistics about selected Debian
+teams [6] have been updated, and now include all of 2012.
+
+    6: http://blends.debian.net/liststats/
+
+ debian-cloudというのができた？
+http://lists.debian.org/debian-devel-announce/2012/12/msg00000.html
+
+* 20121224
+Petter Reinholdtsen blogged about Bitcoin support [10] in Debian.
+
+   10: http://people.skolelinux.org/pere/blog/A_word_on_bitcoin_support_in_Debian.html
+
+　*20121210
+   minidebconfがパリで開かれ、サマリ
+    1: http://fr2012.mini.debconf.org/
+    2: http://fr2012.mini.debconf.org/#schedule
+    3: http://video.debian.net
+    4: http://np237.livejournal.com/33449.html
+    5: http://upsilon.cc/~zack/talks/2012/20121125-minidc-cloud.pdf
+    6: http://www.lucas-nussbaum.net/blog/?p=741
+    7: http://womble.decadent.org.uk/talks/mdcp2012-linux-kernel/
+    8: http://fr2012.mini.debconf.org/slides/re-discovering-d-i.pdf
+    9: http://fr2012.mini.debconf.org/slides/free-soft-20-years-after.pdf
+   10: http://fr2012.mini.debconf.org/slides/socio-meter-for-debian.pdf
+
+ Debian on smartphones:がんがれPaul!
+     11: http://bonedaddy.net/pabs3/log/2012/12/03/debian-mobile/
+   12: http://wiki.debian.org/Mobile
+   13: http://lists.debian.org/debian-mobile/
+
+ AWSにofficial Debian imageができた。
+   14: http://blog.james.rcpt.to/2012/12/06/official-debian-images-on-amazon-web-services-ec2/
+   15: http://wiki.debian.org/Cloud/AmazonEC2Image
+   16: http://lists.debian.org/debian-cloud
+
+　BSPの件でてた。なんと日本からはhenrich先生が
+　http://henrich-on-debian.blogspot.jp/
+
+　Debian womenプロジェクトが
+   women.debian.orgへ移行完了したそうな。
+  22: http://lists.debian.org/debian-women/2012/11/msg00009.html
+   23: http://www.debian.org/women/
+   --->ちとMLみたが、もりあがってないなー
+
+　うほ。debconfのsubtitles付けが...
+     26: https://github.com/za/debconf12
+   27: http://meetings-archive.debian.net/pub/debian-meetings/2012/debconf12/subtitles/
+   28: http://wiki.debconf.org/wiki/Videoteam/Subtitles_for_videos
+
+　*20121126
+
+   debian installerのlocalizationについてもうちょいガンがれリストをPerrierが。
+   1: http://lists.debian.org/debian-i18n/2012/11/msg00036.html
+
+　　Debian Installer 7.0 Beta4 released
+　　ハイライト↓
+    2: http://www.debian.org/devel/debian-installer/News/2012/20121122
+    3: http://www.debian.org/devel/debian-installer/
+
+　　Debianに始めて参加される方の調査
+    4: http://lists.debian.org/debian-publicity/2012/11/msg00014.html
+    5: https://limesurvey.sim.vuw.ac.nz/index.php?sid=65151&lang=en
+    6: http://kevincarillo.org/
+       --->こちらは年齢分布がでておもしろいかも？
+
+ *20121112
+
+    code search engineのアナウンス
+
+    1: http://lists.debian.org/debian-devel-announce/2012/11/msg00001.html
+    2: http://codesearch.debian.net/
+
+　　 debian-cloud mailing listが盛り上がってるらしい
+　　  3: http://lists.debian.org/debian-devel-announce/2012/11/msg00000.html
+    4: https://lists.debian.org/debian-cloud/
+
+　　BSPでガツガツbugが減ってるらしい
+eanwhile, the Release Critical bug count
+is decreasing, thanks also to the great number of Bug Squashing Parties
+held during recent months. More Debian Bug Squashing Parties [7] are
+scheduled for the upcoming weeks: you can help Debian to release sooner
+by participating!
+
+    5: http://lists.debian.org/debian-devel-announce/2012/11/msg00003.html
+    6: http://release.debian.org/wheezy/freeze_policy.html
+    7: http://www.debian.org/News/20121110
+
+　　RCバグの減りっぷりのグラフ↓
+　　    8: http://dug.net.pl/
+    9: http://dug.net.pl/gnuplot/rcbugs/rc_bugs_report_all_en.png
+
+
+*20121029
+
+   D-I 7.0 beta3アナウンス
+　Cyril Brulebois announced the third beta release of the Debian Installer
+7.0 [1]. One of the major improvements in this version of the Debian
+Installer is EFI support for 64-bit PCs, which allows installation in
+EFI mode instead of using the legacy BIOS. This is a first step towards
+full support for UEFI Secure Boot, which is not yet present. Another
+interesting new feature in the installer is full IPv6 support during the
+installation process. You can check the errata [2] for details and a
+full list of known issues.
+
+    1: http://www.debian.org/devel/debian-installer/News/2012/20121018
+    2: http://www.debian.org/devel/debian-installer/errata
+
+Raphael Geissert created a nice map of the Debian mirror network [8].
+
+    8: http://rgeissert.blogspot.it/2012/10/debian-mirrors-map.html
+
+
+　Debian pure blendsサマリ
+Andreas Tille sent some bits from Debian Pure Blends [11], summarising
+the current situation of the various blends.
+
+   11: https://lists.debian.org/debian-devel-announce/2012/10/msg00008.html
+
+*20121015
+
+   FTP Team meeting DebianMaintainer permission/pdiff generation
+   あと、ansgerがFTPMasterになった
+   38 : http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=567781　　
+
+    --->20121001にて、
+　　　Ansgar Burchardt, on behalf of the FTP team, announced some changes to
+　　　the Debian Maintainer upload permissions system [13]. The new interface
+　　　replaces the old DMUA field, which will stop working on
+　　　24 November 2012.
+
+　　　   13 : http://lists.debian.org/debian-devel-announce/2012/09/msg00008.html
+   
+
+　　Perrierがbugレポートのレートにいちゃもんつけた
+    3: http://bugs.debian.org/690000
+    4: http://www.perrier.eu.org/weblog/2012/10/09#690000
+    5: http://www.donarmstrong.com/posts/bug_reporting_rate/
+
+*20121001
+
+   Update for Debian 6.0: 6.0.6 released    
+    1 : http://www.debian.org/News/2012/20120929
+
+   google summer codeの結果
+　　including improvements to mentors.debian.net, the development
+of multi-arch cross-toolchains, and metrics for team activities, to name
+just three. Some of these results have already been included into
+Debian. The Debian project thanks those who took part, including
+especially the students for their contributions, and invites them to
+continue being involved in making Debian better.
+
+    4 : http://lists.debian.org/debian-devel-announce/2012/09/msg00011.html
+
+*20120917
+
+  FTP Teamから
+　　　Debian Personal Package Archives(PPAs)が提案。
+
+  Technical Committee Nominations
+     なんだろう？
+   
+    3 : http://lists.debian.org/msgid-search/20120910223445.GX8318@rzlab.ucr.edu
+    4 : http://lists.debian.org/msgid-search/502808CD.3090508@golden-gryphon.com
+    5 : http://lists.debian.org/msgid-search/20120910223445.GX8318@rzlab.ucr.edu
+
+  D-I 7.0 2nd beta
+    7 : http://www.debian.org/devel/debian-installer/News/2012/20120909
+
+　Debconf12レジメ翻訳：くっそー日本
+
+　　Christian Perrier reported about the state of translations for debconf
+　　　screens [8]: five languages [9] have reached 100% (German, Russian,
+　　　Swedish, French, Portuguese). Many thanks to all the translators!
+
+    8 : http://www.perrier.eu.org/weblog/2012/09/10#wheezy-100-1
+    9 : http://www.perrier.eu.org/weblog/2012/09/14#wheezy-100-2
+
+Mattias Wadenstein published some statistics on the number of accesses
+to the server hosting DebConf12 video recordings [10]: during July and
+August, 3653.8 GiB of data have been downloaded by 7162 unique IP
+addresses.
+
+   10 : http://lists.debconf.org/lurker/message/20120906.123046.3c8e6f1a.en.html
+
+* 120903
+
+  amd64がi386をpopconで抜いた。で、３位はなんとarmel
+    6 : http://popcon.debian.org
+
+　debdelta packageってなんだ？
+　Andrea Mennucci announced that the new GPG key for the debdelta
+package [18] is now available.
+
+   18 : https://lists.debian.org/debian-devel/2012/08/msg00702.html
+
+*120821
+
+ 8/16 Debian celebrates 19歳
+
+　why the name のページできたらしい。
+　  13 : http://wiki.debian.org/WhyTheName
+
+　  * Report from DSA Team Sprint
+  * Using RAM for temporary files?
+  * Control Commands at <submit@bugs.debian.org> time
+  * Debian Maintainer Dashboard
+  * Declaring media (MIME) types with FreeDesktop menu entry files
+ 12 : http://lists.debian.org/debian-devel-announce/2012/08/msg00003.html
+
+*120816
+
+ debianの歴史
+   2 : http://www.debian.org/doc/manuals/project-history/ch-intro.en.html
+
+This has been made possible by the efforts of the strong community
+developed around Debian. Besides more than 1,000 Debian Developers and
+Maintainers from all over the globe, there are in excess of 12,000
+registered accounts for the Alioth collaboration platform [5], and that
+doesn't even include all those people contributing with
+translations [6] or bug reports [7] (and sometimes patches for them)
+and all those users helping others via our mailing lists [8],
+forums [9] and IRC channels [10].
+
+   5 : http://alioth.debian.org/
+   6 : http://i18n.debian.org/
+   7 : http://www.debian.org/Bugs/
+   8 : http://www.debian.org/MailingLists/
+   9 : http://forums.debian.net/
+   10 : http://wiki.debian.org/IRC/
+
+Debian 7.0, codenamed Wheezy, was frozen in July 2012,
+
+*120813
+Debian birtday party↓
+※日本もやった。 
+http://wiki.debian.org/DebianDay/2012#DebianDay.2F2012.2FJapan.2FTokyo.Japan:_Tokyo
+
+*120811
+D-I のtheme "Joy"についてでてるぐらいか...
+
+*120730
+
+Rapsberry Pi用のOSはDebian armhfとなった。
+
+Mike Thompson announced that Raspbian, his port of Debian armhf, focused
+on better support for the Raspberry Pi [5], has just become the official
+recommended Linux distribution for the Raspberry Pi [6]. Raspbian is a
+"complete rebuild of Debian Wheezy armhf for the armv6+vfp CPU on the
+Raspberry Pi", explained Mike. Raspbian is available from the download
+page [7] of the Raspberry Pi website.
+
+   5 : https://lists.debian.org/debian-arm/2012/07/msg00041.html
+    6 : http://www.raspberrypi.org/archives/1605
+    7 : http://www.raspberrypi.org/downloads
+
+*120730
+DebConf13 Logo Contest: final round voting
+
+  3 : https://lists.debian.org/debian-publicity/2012/07/msg00021.html
+  4 : http://wiki.debconf.org/wiki/DebConf13/LogoIdeas#Second_Round
+
+*20120712
+
+ wheezyの話とDebcampぐらいか...
+
+*20120707
+
+Debconfのvideoについてアナウンス
+
+*120706
+
+Debian Dayのアナウンス
+
+*120725
+6/30/2012にwheezyのFreeze宣言がされた。
+
+Debian mirror redirector
+
+Raphael Geissert widely announced a new mirror redirector service [3],
+http.debian.net [4], that aims to reduce the impact of occasionally
+offline or out-of-date mirrors, and to use the worldwide network of
+mirrors more effectively.
+ということだ。
+
+    3 : http://rgeissert.blogspot.fr/2012/06/introducing-httpdebiannet-debians.html
+    4 : http://http.debian.net/
+    5 : http://http.debian.net/
+    6 : geissert@debian.org
+---> apt-lists.confにつっこめ
+
+*120611
+
+Debian archiveをawsにより再構築した
+   1 : http://www.lucas-nussbaum.net/blog/?p=718
+    2 : https://www.grid5000.fr/mediawiki/index.php/Grid5000:Home
+    3 : https://lists.debian.org/debian-qa/2011/10/msg00056.html
+
+Debianは多様性を歓迎
+
+    4 : http://www.debian.org/intro/diversity
+    5 : http://www.debian.org/vote/2012/vote_002
+
+armhf and s390x on their way to Wheezy
+でもarmhfはどうなった？
+
+   6 : https://lists.debian.org/debian-devel-announce/2012/06/msg00003.html
+
+DebConf13 logo contest
+
+    7 : https://lists.debian.org/debian-project/2012/06/msg00004.html
+    8 : http://wiki.debconf.org/wiki/DebConf13/logoIdeas
+    9 : http://wiki.debconf.org/wiki/DebConf13/Vision
+
+上海でもBSP
+
+   10 : https://lists.debian.org/debian-project/2012/05/msg00038.html
+
+
+------------------主観----------------------------
+
+Debian Med地道にがんばってるな...(Newsによく取り上げられる）
+
+NewDebian Contributorsは
+  23 : http://nm.debian.org/public/nmlist#done
+   24 : http://lists.debian.org/debian-project/2012/09/msg00047.html
+   25 : http://udd.debian.org/cgi-bin/new-maintainers.cgi
+このあたりを見ればよいのか？ひょっとして。    
+
+2012 7/7のdebian-news
+About DebConf
+-------------
+
+DebConf is the Debian Project's developer conference. In addition to a
+full schedule of technical, social and policy talks, DebConf provides an
+opportunity for developers, contributors and other interested people to
+meet in person and work together more closely. It has taken place
+annually since 2000 in locations as varied as Scotland, Argentina, and
+Bosnia and Herzegovina. More information about DebConf is available from
+http://debconf.org/.
+
+
+
+-------------------原稿-----------------------------
+
+1. debian lennyの死
+
+   X/X終了ー
+
+2. debian squeeze updateネタ
+
+   [loop]
+   アップデートされた日取り
+　　何が追加された？どうなった？
+
+3. debian wheezy
+
+ ...201209のwheezyのpp31あたりを借用ありかも。...
+
+    X/Xフリーズ
+　　バグを減らせ！
+     - RCバグって？
+　　　-バグ減りの推移
+　　いつ頃でるんだ？
+　参考：BSP開催回数
+   公式（日本だってやった）
+　 非公式(しるか）
+
+4. DD/DM推移
+　　From 前回のOSCから
+
+5. その他
+
+　amd64がi386ぬいた
+
+   webサーバーでCentOS抜いた（らしい...)
+
+   webが全部UTF-8に。
+
+　　Debian Pure blendsネタ
+　
+   Debian on smartphones:がんがれPaul!
+
+　　Debian womenネタ(<-?)
+   ultimate debian databaseについて語るか?
+　　
+　　debian-cloudネタ
+　　-- AWSにofficial Debian imageができた。
+　
+　　code search engineネタ
+
+    各地イベントネタ
+　　   minidebconf/FOSDEM/Debconf12
+　　　　-日本で開催は?
+
+    ミラーサイトがガンガンできる
+      -生めよ増やせよ地に満ちよ
+
+　　さようならsun-java6
+
+    事故：wiki.debian.orgクラック
+
+　　ubuntuから感謝の意
+
+    debianをもっと楽しむには。
+　　　　 debian sidに挑戦しよう
+　　　　　　　---バグレポ書こうよ
+　　　　　　 
+        プログラムだけじゃない
+　　　　　　翻訳
+　　　　　　screenshot
+           debtags
+           
+        勉強会だってやってるぜ
+
+　　　　イベントだってやってるぜ
+
