@@ -80,6 +80,8 @@ iptables -A OUTPUT -p tcp --dport 1935 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 10102 --syn -j ACCEPT
 iptables -A OUTPUT -p udp --dst 125.64.229.144 -j ACCEPT
 iptables -A INPUT -p udp --src 125.64.229.144 -j ACCEPT
+# debug for sg
+iptables -A INPUT -p tcp --src 175.184.35.225 --dport 22 -j ACCEPT
 # downloder
 iptables -A OUTPUT -p tcp --dport 182 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 8080 --syn -j ACCEPT

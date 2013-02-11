@@ -1,4 +1,100 @@
 とりいそぎ、
+debain-devel-announceから
+
+20120205
+
+master.debian.org --> new-master.debian.org
+
+へMLだのなんだの全部うつしたよ
+
+20130125にて
+ Debconfのボランティア募集とDebconf 14/15について意見募集
+
+20130123にて
+Bit from the realase Team
+取り急ぎRCListとして238バグを潰す必要あり。
+multiarchがうまく行ったので、例えばia32-libsとかいう邪悪なものは
+消えた。
+
+20130110にて
+Debian Medのアナウンスあり（←だから、debian-newsにて取り上げられるわけだ）
+
+20130105
+Bit from DPL
+debian.euのDNSがDSAの配下に（←意味分からん）
+
+アマゾンが寄付
+- As they did last year [5], Amazon kindly renewed their offer of AWS
+  credit to be used for Debian related purposes, such as QA rebuilds.
+  This year they offered us 8'000 USD of credit which, according to
+  projections from last year usage, should be enough for QA rebuilds and
+  buildd usage for events like BSP. Many thanks to Lucas Nussbaum and
+  Bill Allombert for reaching out to Amazon contacts and making this
+  possible.
+
+FSFのSecureBoot声明にDebianも参加したらしい↓
+http://www.fsf.org/campaigns/secure-boot-vs-restricted-boot/statement
+※まあ、実際、名前でてるしね。
+
+20121231
+Misc Developer News (#31)
+squeezeにてamd64がpopconで１位 次がi386の47%（でもね、もっと前に１位
+になってるんだよ？）
+
+media-type追加するときにはIANAにも登録をかんがえてくれ！
+で、x.とかやめれ。というアナウンス。ついでに、ianaに
+text/vnd.debian.copyrightが登録されたらしい。
+
+dput-ngがunstableにはいったらしい。
+
+PTSがdebian/watchに突っ込まれてる、upstreamのURLをトラック
+するようになったらしい。
+
+lintian.d.oが警告のいくつかについてグラフだすようになった。
+
+ [7] http://lintian.debian.org/tags/package-needs-versioned-debhelper-build-depends.html
+ [8] http://lintian.debian.org/tags/debhelper-but-no-misc-depends.html
+
+
+121209
+Debian presence at UDS-R- call for paper
+の中身が興味深い...
+https://lists.debian.org/debian-derivatives/2012/11/msg00006.html
+
+
+20121106
+Introducing codesearch.debian.net, a regexp code search engine
+
+20121106
+AWSだけでなく、Azureでもか...
+Debian on public clouds
+
+- sadly, we have found no volunteer admin for the Google Code-In
+  initiative, so we won't participate this year
+
+20121031
+DebConf13のスポンサー募集かかった
+
+20121022
+Debian Pure Blendsの紹介
+
+20121018
+Highlights
+==========
+
+ * Full IPv6 support during the installation process.
+ * UEFI support (see "hardware changes" below).
+ * Most of Gnome fits onto CD#1 again (network-less installation).
+ * LXDE and Xfce now live on separate images.
+
+その他
+delegationというタイトルはzakから移管しますぜという
+アナウンス。
+
+
+
+
+
 debian-newsから
  From: 2011/11からのアップデート
 　但し、wheezyについてはすでに2012/Fallで発表済みのため、
@@ -548,6 +644,120 @@ DebConf13 logo contest
 
    10 : https://lists.debian.org/debian-project/2012/05/msg00038.html
 
+*120528
+
+ Qt3は長いことメンテナが見つからんので、削除の方向で。
+ http://lists.debian.org/debian-devel-announce/2012/06/msg00001.html
+
+ 台湾でminidebconf開いたそうな
+　　→やるなPaul
+
+*120514
+
+ Update for Debian 6.0: 6.0.5 released
+ 1 : http://www.debian.org/News/2012/20120512
+
+ RaphaelのThe Debian Administrator's Handbookがfreeに
+(apt-get install debina-handbookで入るらしい)
+   11 : http://raphaelhertzog.com/2012/05/10/the-debian-administrators-handbook-is-available/
+   12 : http://www.debian.org/social_contract#guidelines
+
+aptitude search debian-handbook
+p   debian-handbook                 - reference book for Debian users and system
+まぢか。入ってるぜ。
+
+
+*120430
+
+ Deploy your own "cloud" with Debian "Wheezy"
+ xen cloud platformをdebianにportした件
+
+ Paulによると2つのDerivativesが終了
+ 
+   20 : http://bonedaddy.net/pabs3/log/2012/04/26/when-a-distro-dies/
+
+
+*120402
+ 
+  OSIの系列にDebianが入った。
+    6: http://www.debian.org/News/2012/20120330
+
+*120320
+
+  1st Squeeze based debian-edu released
+     4 : http://www.debian.org/News/2012/20120311
+
+  Updated Debian 5.0: 5.0.10 released
+  final updateだとさ。
+   http://www.debian.org/News/2012/20120310
+
+  Announcing gobby.debian.orgができた。
+　　http://debblog.philkern.de/2012/02/gobbydebianorg.html
+
+*120305
+
+  Rebuild of the Debian archive with clang
+ http://sylvestre.ledru.info/blog/sylvestre/2012/02/29/rebuild_of_the_debian_archive_with_clang
+   2 : http://clang.debian.net/
+
+  Debian Peru revival
+   3 : http://blog.stone-head.org/debianperu/
+   4 : http://wiki.debian.org/DebianPeru  
+　
+  dev-announceでいろいろアナウンスされたらしい
+   10 : http://lists.debian.org/debian-devel-announce/2012/03/msg00000.html
+
+
+  * New Iceweasel add-on to help looking up developer sites
+  * Realtime collaborative text editing services for Debian
+  * DEP9: Availability of reconf-inetd (replacement for update-inetd)
+  * Security tracker improvements
+  * Derivatives census improvements
+  * mentors.d.n software upgrade
+  * Support for copyright format 1.0 (developed as DEP5)
+
+*120301
+
+  Debconf12もまだ未開催なのに、Debconf13のアナウンスがあった。
+    http://wiki.debconf.org/wiki/DebConf13/Switzerland/Bid
+
+*120220
+
+  Goodby Lenny!
+   1 : http://www.debian.org/News/2012/20120209
+
+  Debian GNU/HurdがWheezyリリースに向けて動いてるらしい
+  2 : http://lists.debian.org/debian-devel-announce/2012/02/msg00002.html
+
+  Samuel wants to thank Richard Braun who provided a new and faster Debian porterbox, immediately accessible to Debian Developers. For more information on
+Debian GNU/Hurd, you can visit the Debian wiki [3].
+
+   3 : http://wiki.debian.org/Debian_GNU/Hurd
+
+  DPLと法務作業
+
+   Debian trademark policyについてSPI法務らと調整してたらしい。
+
+ 　4 : http://lists.debian.org/debian-devel-announce/2012/02/msg00001.html
+   5 : http://www.debian.org/legal/patent
+   6 : http://www.debian.org/News/2012/20120219　　  
+ 
+　おお、ついにMultiarch-ready dpkgが。
+   7 : http://blog.mraw.org/2012/02/01/dpkg_with_multiarch/
+
+ GPL in Debian: a study
+   8 : http://www.itwire.com/business-it-news/open-source/52838-gpl-use-in-debian-on-the-rise-study
+   9 : http://www.eyrie.org/~eagle/journal/2012-02/002.html
+
+*120206
+
+  Update for Debian 6.0: 6.0.4 released
+
+  
+  
+ The Debian website is now also optimised for handheld devices [23].
+   23 : http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=654205
+
 
 ------------------主観----------------------------
 
@@ -570,8 +780,6 @@ meet in person and work together more closely. It has taken place
 annually since 2000 in locations as varied as Scotland, Argentina, and
 Bosnia and Herzegovina. More information about DebConf is available from
 http://debconf.org/.
-
-
 
 -------------------原稿-----------------------------
 
@@ -605,11 +813,11 @@ http://debconf.org/.
 
 　amd64がi386ぬいた
 
-   webサーバーでCentOS抜いた（らしい...)
+  webサーバーでCentOS抜いた（らしい...)
 
-   webが全部UTF-8に。
+  webが全部UTF-8に。ハンドヘルド対応に。
 
-　　Debian Pure blendsネタ
+　Debian Pure blendsネタ
 　
    Debian on smartphones:がんがれPaul!
 
@@ -622,11 +830,14 @@ http://debconf.org/.
 　　code search engineネタ
 
     各地イベントネタ
-　　   minidebconf/FOSDEM/Debconf12
+　　   minidebconf/FOSDEM/Debconf12/Debconf13
 　　　　-日本で開催は?
 
     ミラーサイトがガンガンできる
       -生めよ増やせよ地に満ちよ
+
+　　http.debian.orgネタ
+    -> sakuraも追加したよ？
 
 　　さようならsun-java6
 
