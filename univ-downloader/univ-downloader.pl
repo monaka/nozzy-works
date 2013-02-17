@@ -112,7 +112,7 @@ sub search_method {
 		download_video_streams($request);
 	}
 	if (($request->header('Host') =~ /dailymotion\.com$/ ) &&
-		(($request->url =~ /\.flv\?/)||($request->url =~ /hq.flv/))) {
+		(($request->url =~ /\.flv\?*/)||($request->url =~ /hq.flv/))) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
@@ -175,6 +175,11 @@ sub search_method {
 	}
 	if (($request->header('Host') =~ /auengine\.com$/ ) &&
 		($request->url =~ /^\/videos/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
+	if (($request->header('Host') =~ /yucache\.net$/ ) &&
+		($request->url =~ /\.flv\?/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}

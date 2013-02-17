@@ -1,5 +1,29 @@
 とりいそぎ、
+
+
 debain-devel-announceから
+
+20130210
+
+zakから、任期最後のDPLレポートとのこと。
+zakは、DPLはもうやらんとの意志が示される。他DD考えろよとの事。
+（やたら、mobbingとconvincingの皮肉が書かれているような...)
+
+Google Summer of Code Adminsの移譲呼びかけがある。
+
+DFSGについてのライセンス評価の呼びかけあり。
+https://lists.debian.org/debian-project/2013/01/msg00019.html
+
+20130209
+
+bug #700000はFeb 7thにて突入。で、PERRIERが、bug #800000番と
+#1000000の賭けをアナウンス。もちろん勝ったからってなにかもらえる
+わけではない。
+
+20130208
+
+zakにアポを採るなら秘書を通せPJが2/19に完了を迎えるとのこと。
+次は、Kurt Roeckx経由で向こう１年アポ採れ。
 
 20120205
 
@@ -9,6 +33,7 @@ master.debian.org --> new-master.debian.org
 
 20130125にて
  Debconfのボランティア募集とDebconf 14/15について意見募集
+ ついでにDebconf14の入札(bids)がはじまる。
 
 20130123にて
 Bit from the realase Team
@@ -91,7 +116,232 @@ Highlights
 delegationというタイトルはzakから移管しますぜという
 アナウンス。
 
+20121017
+NMのFrontDeskの面子が変わった（delegationだから任命？）
 
+20121017
+Ftp masterの面子が変わった（というか拝命？）
+
+20121009
+Google Code-Inのボランティア募集。
+
+DebianのロゴがSPIの配下でLGPL3+ / CC-BY-SA 3.0.のデュアルライセンス
+で国際的にライセンスされる見込み。日本だって帰属させようと頑張った。
+
+ftp-masterにcongrats Ansgarを
+front-desk memberを刷新
+debian plicy teamを刷新
+tech-ctteは連日のpythonのもめごとについての調停の最終段階にはいったそうな。
+
+20121005
+
+pythonのもめごとに勧告。みんな仲良くしろよということと、
+comitteはpythonパッケージメンテナの更迭は見送ったとのこと。
+
+20120930
+
+FTPにて新しいDMフラグのUIを用意、一方でDMUAフラグは11/24にて廃止の
+アナウンス。
+
+20120927
+
+google summercode 2012のアナウンス
+* Pluggable Acquire System for APT
+* PyPI to Debian repository converter
+* Clang support for the Debian buildd infrastructure
+* Provide an alternative to libstdc++ with libc++
+* Improving the online package review interface for http://mentors.debian.net 
+by Baptiste Mouterde. Mentored by Nicolas Dandrimont, Arno Töll and Stuart
+Prescott
+* Semantic Package Review Interface for http://mentors.debian.net 
+* Improving Debian Team Activity Metrics 
+* Multiarch Cross-Toolchains
+* Port bootstrap build-ordering tool
+* Bootstrappable Debian
+* Improve Debian-Installer network setup,
+* multi-archive support for dak
+がDebian関連のPJの成果として出た。（15中12が成果）
+
+20120918
+Debian Policy Manualの3.9.4.0がリリース
+で、変更差分のうちでかそうなのは、
+
+     4.9
+          `build-arch' and `build-indep' are now mandatory targets in
+          `debian/rules'.
+
+20120917
+CTTEにて、network-managerがRecommendsとせよとの決議
+※resolutionは決議という意味がある
+
+
+20120910
+technical commiteeのポストの募集がかかった。
+
+20120909
+Debian installler 7.0 beta2リリース
+バグフィックスかな？
+
+20120906
+DPLより
+tech-ctteのメンバが１名辞めた
+
+20120805
+FSFからDebianはFSFでいうところのFreeなDistributionではない
+という事について
+ I've [wrapped up][2] a couple of years of discussions with FSF
+  representatives, proposing a joint working group on FSF' assessment of
+  Debian Free-ness. Some [news coverage][3] ensued. The discussion list
+  that has been set up welcomes participants and, in particular, could
+  use some more DDs, fond of Debian principles but also interested in
+  external review of our free/non-free separation.
+
+[2]: https://lists.debian.org/debian-project/2012/07/msg00016.html
+[3]: https://lwn.net/Articles/506250/
+
+20120712
+CTTE にてnodejsとnodeという名前のどちらがいいかについて決議された。
+※結論はちと流れ見ないとよーわからん。
+
+20120630
+6/30か7/1かしらんが、freezeが宣言された。
+(Subject: 5... 4... 3... 2... 1...)
+
+(6/21のbit from release teamから、6/30のFreeze宣言)
+
+20120621
+http.debian.netのアナウンス
+
+20120609
+debian本家と、multimedia debianの両者について、
+すみわけの調整の議論をしましょーというアナウンス
+http://lists.alioth.debian.org/pipermail/pkg-multimedia-maintainers/2012-May/026678.html
+
+20120607
+armhfとs390xの両方がwheezyの対応アーキテクチャとして扱うことが
+宣言された。
+
+20120607
+/runの使い方について、留意事項が流れた。
+最初にhttp://wiki.debian.org/RelaseGoals/RunDirectory
+を読めってさ。
+
+20120603
+General Resolution: Diversity statement results
+のアナウンスが流れた。
+
+20120602
+デフォルトのRubyインタプリタは1.9に変更とのこと。いちおー、
+下位互換性の為にRuby1.8は搭載するが、次期バージョンの
+JessieではRuby1.8は落とす予定とのこと。
+
+20120513
+debian installer 7.0 alpha1
+mprovements in this release of the installer
+=============================================
+
+Network configuration
+---------------------
+ * Add WPA support to installer (#327309).
+ * Improvements in link detection and DHCP configuration, which
+   should improve reliability for systems with flaky network
+   cards (#496647, #414117, #606515).
+ * Release DHCP lease at the end of the install, to work around
+   problems with non-RFC compliant DHCP servers (#610553).
+ * The requirements for hostnames have been clarified, and the
+   parser tightened up to avoid letting through some really
+   dodgy names (#399071).
+ * Added Spanning Tree Protocol (STP) support.
+
+Linux Specific
+--------------
+ * Kernel version has been updated to 3.2.16.
+ * Default filesystem changed to ext4.
+ * Allow Btrfs /boot partition (GRUB 2 and LILO).
+ * Add support for Network Block Devices (NBD).
+
+kFreeBSD Specific
+-----------------
+ * Kernel updated to version 8.3.
+ * Option to use new 9.0 kernel during install.
+ * Detect LVM devices.
+
+Operating system probing
+------------------------
+ * Add detection for Windows 8, support for BSD systems, MeeGo,
+   Linux From Scratch and Haiku on BeFS partitions.
+ * Improve Windows and MS-DOS detection.
+ * Fix Gentoo detection on OS probing.
+
+Win32-loader
+------------
+ * Add PXE functionality (#607417).
+
+USB stick installs
+------------------
+ * Add choice of ISO image to use when multiple images are found
+   on the installation medium (#564441). This includes a full
+   rewrite of the state machine in the iso-scan component. This
+   work was contributed by Frans Pop and Frédéric Boiteux.
+
+Translations
+------------
+ * New language supported: Uyghur.
+...などなど...
+
+※7.0 installerの中核機能のアナウンスのようだ。
+
+USBとかやっときたか、ちきしょー。
+
+20120506
+zakの功績一覧だろうな...これは。まあ、結果みると。
+Ongoing discussions
+===================
+
+A big topic of last month has been the proposal [1] by Francesca Ciceri
+to publish a diversity statement for the Debian Project. After a lively
+discussion on -project, we reached consensus on a text [2], and I've
+been happy to help with that. To finalize statement publication we now
+...中略...
+
+あとになって山ほど権限移譲を行い、tech-ctteが再起動し、何年も
+決着しなかった問題に終始符を打つようだ...
+
+→この体制がFreeのOSSコミュニティでオープンに構築されていく様はすごい
+
+20120415
+zakによると、debianのトレードマークをSPI配下におく為
+日本の全DDにコンタクトとったらしい...すげえ。
+
+20120415
+選挙の結果、zakにDPLはきまりーっとの事(まあ、２年続投っすね）
+
+20120403
+Bits from the 5th Debian Groupware Meeting
+なんて開かれてるぜ。
+
+20120322
+Apacheもhttpd2.4へ(experimental実験中だけどな）
+
+20120510
+dpkg-1.16.2がdbぶっ壊すかもという重要なアナウンス
+
+20120306
+New nm.debian.org site is up!
+https://nm.debian.org 
+
+20120304
+multi-archがReadyに。tech-commiteeががんばった。
+
+20120301
+結構重要なアナウンス（さすがだPaul)
+ + New Iceweasel add-on to help looking up developer sites
+ + Realtime collaborative text editing services for Debian
+ + DEP9: Availability of reconf-inetd (replacement of update-inetd)
+ + Security tracker improvements
+ + Derivatives census improvements
+ + mentors.d.n software upgrade
+ + Support for the copyright format 1.0 (developed as DEP 5)
 
 
 
@@ -763,6 +1013,9 @@ Debian GNU/Hurd, you can visit the Debian wiki [3].
 
 Debian Med地道にがんばってるな...(Newsによく取り上げられる）
 
+たまにだが、
+Debian Eduも地道にがんばってる...（アナウンスたまに見る）
+
 NewDebian Contributorsは
   23 : http://nm.debian.org/public/nmlist#done
    24 : http://lists.debian.org/debian-project/2012/09/msg00047.html
@@ -780,6 +1033,16 @@ meet in person and work together more closely. It has taken place
 annually since 2000 in locations as varied as Scotland, Argentina, and
 Bosnia and Herzegovina. More information about DebConf is available from
 http://debconf.org/.
+
+backports.debian.orgはどうしよう？
+
+General Resolution: Diversity statement,
+http://www.debian.org/vote/2012/vote_002
+はすごい事だとおもう。つまり、みんなwelcome!さあcontribしようぜ。
+
+
+Debianはオワコンというアプローチで実はWEBサーバーではNo.1に
+使われているという内容でひっくり返すのは楽しいかも。
 
 -------------------原稿-----------------------------
 
