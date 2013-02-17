@@ -343,6 +343,21 @@ multi-archがReadyに。tech-commiteeががんばった。
  + mentors.d.n software upgrade
  + Support for the copyright format 1.0 (developed as DEP 5)
 
+20120301
+wheezyではhardened build flagsを有効にしたとの連絡
+http://wiki.debian.org/Hardening
+http://wiki.debian.org/ReleaseGoals/SecurityHardeningBuildFlags
+http://wiki.debian.org/HardeningWalkthrough
+
+20120224
+copyright format 1.0がreleaseされた。
+http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+
+20120223
+Policy manual 3.9.3をreleaseしたとのこと。
+
+
+
 
 
 debian-newsから
