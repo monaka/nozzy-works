@@ -1,0 +1,141 @@
+%; whizzy paragraph -pdf xpdf -latex ./whizzypdfptex.sh
+%; whizzy-paragraph "^\\\\begin{frame}"
+% latex beamer presentation.
+% platex, latex-beamer でコンパイルすることを想定。 
+
+%     Tokyo Debian Meeting resources
+%     Copyright (C) 2009 Junichi Uekawa
+%     Copyright (C) 2009 Nobuhiro Iwamatsu
+
+%     This program is free software; you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation; either version 2 of the License, or
+%     (at your option) any later version.
+
+%     This program is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warreanty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+
+%     You should have received a copy of the GNU General Public License
+%     along with this program; if not, write to the Free Software
+%     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+\documentclass[cjk,dvipdfm,12pt]{beamer}
+\usetheme{Tokyo}
+\usepackage{monthlypresentation}
+
+%  preview (shell-command (concat "evince " (replace-regexp-in-string "tex$" "pdf"(buffer-file-name)) "&")) 
+%  presentation (shell-command (concat "xpdf -fullscreen " (replace-regexp-in-string "tex$" "pdf"(buffer-file-name)) "&"))
+%  presentation (shell-command (concat "evince " (replace-regexp-in-string "tex$" "pdf"(buffer-file-name)) "&"))
+
+%http://www.naney.org/diki/dk/hyperref.html
+%日本語EUC系環境の時
+\AtBeginDvi{\special{pdf:tounicode EUC-UCS2}}
+%シフトJIS系環境の時
+%\AtBeginDvi{\special{pdf:tounicode 90ms-RKSJ-UCS2}}
+
+\title{OSC 2013 Tokyo/Fall \\東京エリアDebian勉強会}
+\subtitle{第97回 2013年02月度}
+\author{野島 貴英 nozzy@debian.or.jp}
+\date{2013年02月23日}
+\logo{\includegraphics[width=8cm]{image200607/openlogo-light.eps}}
+
+\begin{document}
+
+\frame{\titlepage{}}
+
+%\section{}
+
+\begin{frame}{Agenda}
+ \begin{itemize}
+  \item Debian topic update 
+  \item Debian Wheezy topic update
+  \item Debian関係のイベント
+  \item 質疑応答
+ \end{itemize}
+\end{frame}
+
+\begin{frame}{自己紹介}
+\begin{itemize}
+\item 野島 貴英 (Takahide Nojima)
+\item Twitter: @nozzy123nozzy
+\item Debian JP Project
+\item 主に東京エリアDebian勉強会に出没、開催のお手伝いしてます
+\end{itemize}
+\end{frame}
+
+\emtext{Debian topic update}
+
+\begin{frame}{どこから喋る？}
+\begin{center}
+\LARGE{前回からのDebian topic updateについてお話すると、
+なんと、2011年11月OSC Tokyo/Fallからのお話になってしまいます....}
+\end{center}
+\end{frame}
+
+\begin{frame}{どこから喋る？}
+\begin{center}
+\LARGE　
+取り急ぎ、
+\begin{itemize}
+\item 古い話題については、大きなトピックのみを
+\item 新しい話題については、だんだんと詳しく
+\end{itemize}
+という粒度を変化させて喋ります。
+\end{center}
+\end{frame}
+
+\begin{frame}{Lennyサポート終了}
+
+\begin{center}
+\LARGE{2012/2/6にてLennyのサポートが終了しました\\
+みんな知ってるよね！？}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Lenny→Squeezeへ}
+
+\begin{center}
+\LARGE{「え？まさか、まだアップグレードしてない！？」\\Squeezeへのアップグレードは↓}
+\end{center}
+i386版：
+\url{http://www.debian.org/releases/stable/i386/release-notes/ch-upgrading.ja.html}や、\\
+AMD64版:
+\url{http://www.debian.org/releases/stable/amd64/release-notes/ch-upgrading.ja.html}等々
+\end{frame}
+
+\begin{frame}{ところでSqueeze update}
+
+\begin{itemize}
+\item 2012/1/28 Debian 6.0.4 relased
+\item 2012/5/12 Debian 6.0.5 relased
+\item 2012/9/29 Debian 6.0.6 relased
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{質疑応答}
+\begin{center}
+\Large なにか質問はありますか？
+\end{center}
+\end{frame}
+
+\begin{frame}{今後のイベント}
+\begin{itemize}
+\item 3月 東京エリア Debian勉強会\\
+\item 3月 関西エリア Debian勉強会 \\
+\end{itemize}
+詳細は \url{http://tokyodebian.alioth.debian.org}を参照
+
+\end{frame}
+
+
+\end{document}
+
+;;; Local Variables: ***
+;;; outline-regexp: "\\([ 	]*\\\\\\(documentstyle\\|documentclass\\|emtext\\|section\\|begin{frame}\\)\\*?[ 	]*[[{]\\|[]+\\)" ***
+;;; End: ***

@@ -356,215 +356,64 @@ http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 20120223
 Policy manual 3.9.3をreleaseしたとのこと。
 
+20120221
+ftp masterより、non-free binariesがビルドできないのでなんとかしろよ
+との連絡
 
+20120218
+zakより、project secretary(要は、アポ採るにゃsecretary通せ）みたいな
+プロジェクトがexpireとなる。
+
+20120210
+delegation for the summer of code admins
+のアナウンスが行われる
+
+20120204
+php 5.4のtransitionがアナウンスされる。
+
+20120129
+wheezyにkernel 3.2を突っ込むぞというアナウンス
+
+20120204
+DPLよりDebianのSPIへの商標登録について状況のアナウンス。
+日本は、
+- With the help of Kenshi Muto, Fumitoshi Ukai, Ishikawa Mutsumi, Shuzo
+  Hatta, and Yasuhiro Araki we've started the process to move the Debian
+  trademark in Japan from individuals (who are present or past members
+  of the Debian JP association) to SPI. That would help dealing with
+  these matters, as well as ensure that important Debian assets are held
+  by Debian Trusted Organizations.
+
+ということらしい。
+
+20120123
+Paulより、
+
+In this issue:
+ + Debian Member Porfolio Service
+ + Release goals bugs displayed in the PTS
+ + Transitions displayed in the PTS
+ + dh_linktree helper tool
+ + Patch Tagging Guidelines: DEP-3 moved to ACCEPTED status
+
+のDeveloper Newsが流れる。
+
+20120106
+
+debtagsのアナウンス。webI/F大幅にリニューアルしたそうな。
+ http://debtags.debian.net/
+
+20111223
+ Developer News
+ + Planet Debian Derivatives
+ + win32-loader.exe now eases access to the GNU/Hurd Debian-Installer
+ + Wiki bugstatus extended to Launchpad bugs
+ + dh-exec enters unstable
+ + derivatives patch generation prototype
 
 
 
 debian-newsから
- From: 2011/11からのアップデート
-　但し、wheezyについてはすでに2012/Fallで発表済みのため、
-　それ以外に絞る。
-
-  * 2011.11.7  
-  Debian 6.0.3 5.0.9 release
-  Debconf12 update
-
- 
-  Debian installer localisation
-  ---> 2012/1/23号をみるとこの手の話題は定期的に投稿されるようだ。 
-  --> 19言語がupdate。
-       ; eight (Czech, Dutch, French, German, Persian, Portuguese, Russian
-and Swedish) are 100% 
-  Emdebian使えよというアナウンス
-　  8 : http://www.linux.codehelp.co.uk/serendipity/index.php?/archives/217-Documenting-Emdebian-intro.html
-   9 : http://www.linux.codehelp.co.uk/serendipity/index.php?/archives/230-Uses-of-Emdebian-special-purpose-computers.html
-
-　　 なんかしらんが、Bits from the DPLから、ruby1.9のリリースについて
-　　　いろいろ言及あり。
-　　　http://lists.debian.org/debian-devel/2011/08/msg00685.html
-
-    --> Debian-sprintというのがあるらしい。
-　　　　目的：関係者がf2fで会って会合するみたい。
-    
-    New Member processについてアナウンス
-
- * 2011.12.14
-
-   publicity teamでボランティアよこせ。とのこと。
-   http://lists.debian.org/debian-project/2011/11/msg00055.html
-
-   sun-java6をリポジトリから消去し、OpenJDKを代わりにいれた。
-   （bug #646524)
-   2 : http://bugs.debian.org/646524
-   3 : http://sylvestre.ledru.info/blog/sylvestre/2011/10/25/removal_of_sun_java6_from_debian
-   4 : http://www.carbon-project.org/Removal_of_sun_java6_and_ElsterOnline.html
-   やってくれたな○racle!
-
-   SDLチームが復活。
-　　   5 : http://wiki.debian.org/Teams/DebianSdlGroup
-   6 : http://ddumont.wordpress.com/2011/11/19/sdl-team-revival/
-
-　　そーいや、こんなこともありましたな。
-　　The OSI have invited the Debian Project to their upcoming
-affiliation programme. There is also work in progress to have the Debian
-Project become a member of the forums for ISC software that we distribute.
-Stefano also mentioned his continuing work in creating a discussion forum for
-companies that have a strategic interest in Debian.
-
-   7 : http://lists.debian.org/debian-devel-announce/2011/11/msg00001.html
-   8 : https://lists.debian.org/debian-devel-announce/2011/12/msg00000.html    
-
-　ubuntuから感謝の意
-
-  9 : http://wiki.ubuntu.com/UCADay
-   10 : http://lists.debian.org/debian-devel/2011/11/msg00626.html
-   11 : http://www.jonobacon.org/2011/11/17/welcoming-our-new-horseman-michael-hall/
-
-　India mini-DebConf, Mangalore edition
-　が開かれたそうな。
-　   12 : http://lists.debian.org/20111105184310.GD4138@mykerinos.kheops.frmug.org
-   13 : http://wiki.debian.org/DebianIndia/MiniDebConf2011/MangaloreEdition
-   14 : http://dr.jones.dk/blog/debianasia2011/
-  ぜひ日本でも！
-
-  ルサルバドル（共和国）にdebianのmirrorおいたらしいぞ。
-   15 : http://ftp.sv.debian.org/debian/
-   16 : http://www.salud.gob.sv/
-   17 : http://www.debian.org/mirror/list
-   生めよ増やせよ！
-
-   Debexpoとゆーよくわからん会合への募集がかかった。
-
-   20 : http://wiki.debian.org/Debexpo
-   21 : https://alioth.debian.org/projects/debexpo/
-
-   BSPについても喋ればいいか。（相当数ひらかれてるぜ）
- 
-  Call for talks: FOSDEM 2012
-  の募集がかかった。まあ、FOSDEMは外せんわなー。
-
-  s390はKarlsruhe Institute of Technologyにてbuildd環境ができたそうな。
-
- *20120109
-
-   Edu/skolelinux 6.0.3 beta2のリリースがアナウンス。
-  
-   5 : http://www.skolelinux.org/
-   6 : http://wiki.debian.org/DebianEdu
-
-　だそうな。そもそもDebian Pure Brendってなんだ？ 
-  ---> purebrend http://wiki.debian.org/DebianPureBlends
-   (なんと、Debian GIS, Debian Multimediaもあるらしい...)
-   説明:http://blends.alioth.debian.org/blends/
-   宣言: http://wiki.debian.org/Blends/Manifesto
-
-  DPL: お会計アップデートと、Wheezy artworkの募集したらしい。 
-
-  Xserver relase 1.12のアナウンス
-　XI 2.2パッチって何だ?→multitouch spportだそうな。
-　ついでにIntel sanday bridge new accelerationを突っ込んだらしい。
-   8 : http://blog.mraw.org/2012/01/01/XServer_1.12RC1/
- 
-PNASがdebianについて何かレポートだしたらしい。
-  Michael Hanke noted [9] that the Proceedings of the National Academy of
- Science ("PNAS") of the United States of America has apaper on the
- evolution of software in Debian [10].
-
-   9 : http://lists.debian.org/debian-project/2011/12/msg00000.html
-   10 : http://www.pnas.org/content/early/2011/11/14/1115960108.abstract
-
-If you know other studies about Debian and its software, you can add it
-to our related wiki page [11].
-
-   11 : http://wiki.debian.org/CategoryPublication
-    
-　New Debian Infographic
-　----------------------
-
-Claudio Filho has published a beautiful infographic about Debian [12].
-The main motivation was, as Claudio said [13], "to "draw" for final
-users how Debian can be good for them". Similar efforts have been made
-by StÃ©phane Blondon [14] and Chris Lamb [15], who created the Debian
-Timeline website [16] and the related Debian package [17].
-
-   12 : http://claudiocomputing.wordpress.com/infographic-of-debian/
-   13 : http://lists.debian.org/debian-publicity/2011/12/msg00066.html
-   14 : http://ascendances.files.wordpress.com/2011/10/timeline_debian_1993_20111.png
-   15 : http://chris-lamb.co.uk/2008/03/09/timeline-of-the-debian-project/
-   16 : http://timeline.debian.net/
-   17 : http://packages.debian.org/sid/debian-timeline
-
-　　Debtagもwebサイトをアップデートしたとのことらしい。
-
-   18 : http://lists.debian.org/debian-devel-announce/2012/01/msg00000.html
-   19 : http://debtags.alioth.debian.org/paper-debtags.html
-   20 : http://debtags.debian.net/search/
-   21 : http://debtags.debian.net/statistics/
-   22 : http://debtags.debian.net/getting-started/
-   23 : http://wiki.debian.org/Debtags
-   
- defomaパッケージを完全削除したらしい。
-　  24 : http://bonedaddy.net/pabs3/log/2012/01/07/apt-get-purge-defoma/
-   25 : http://pkg-fonts.alioth.debian.org/
-   26 : http://wiki.debian.org/gs-undefoma
-
- Further interviews　に
-　nd with RaphaelHertzog [29], about the Debian handbook.
-　がpodcastでinterviewうけてた。
-
-  neuroDebian teamという妙なものが...(neuro science用debianだそうな）
-   31 : http://neuro.debian.net/
-   32 : http://incf.org/newsroom/stories/neurodebian-the-value-of-an-integrated-tool-suite
-
- The web team is pleased to announce that all languages have finished
-their migration to UTF-8 [38], so the Debian website [39] is now
-available for everyone in UTF-8, thanks to all the translators who
-worked on this issue.
-
-   38 : http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=567781　　
- 
-   (なんとUTF-8へ移行完了したそうな...)
-
-   *20120123
-
-   webサーバーでCentOS抜いた（らしい...)
-      1 : http://w3techs.com/blog/entry/debian_is_now_the_most_popular_linux_distribution_on_web_servers
-
-  chroot環境にて、webアプリケーションを突っ込むのに、
-  webサーバーはchrootの外で動かしたいという要望に答えるべく、
-　いくつかの提案が行われた。そのうち、
-　dummy web serverというパッケージが提案された。
-　  2 : http://lists.debian.org/debian-devel/2012/01/msg00148.html
-   3 : http://packages.debian.org/equivs
-
-　 aptitudeの開発が復活
-　　実に800のbugが放置されていたらしい...
-　　   4 : http://www.perrier.eu.org/weblog/2012/01/14#aptitude-revival
-　   5 : http://lists.alioth.debian.org/cgi-bin/mailman/listinfo/aptitude-devel
-
-   Armh の状況は↓
-　　  12 : http://blog.einval.com/2012/01/09
-   13 : https://buildd.debian.org/status/architecture.php?a=armhf&suite=sid
-
-　　無線LAN経由でとあるIGMPぶち込まれるとこける問題が報告された。
-　　
-   14 : http://womble.decadent.org.uk/blog/igmp-denial-of-service-in-linux-cve-2012-0207.html
-   15 : http://bugs.debian.org/654876
-
-　　これもおもしろいかも？
-Enrico Zini announced that the Debtags web site also works for derivative
-distributions [18]: the site now shows packages from Ubuntu too, and can be
-extended to all Debian derivatives.
-
-   18 : http://www.enricozini.org/2012/debian/debtags-for-derivatives/
-
-   relase critical bugsの一覧は
-　　　http://udd.debian.org/bugs.cgi
-　　　からたどれる
-　　Bug squasher view: Affecting sid and wheezy, not marked as done, not tagged patch; those need to be fixed, probably by a patch+upload
-　　から検索可能。
-
-ボトムアップだと間に合いそうにないので、最新から読み下すぜ。
 
 * 20130121
 
@@ -1017,12 +866,216 @@ Debian GNU/Hurd, you can visit the Debian wiki [3].
 *120206
 
   Update for Debian 6.0: 6.0.4 released
-
-  
   
  The Debian website is now also optimised for handheld devices [23].
    23 : http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=654205
 
+   *20120123
+
+   webサーバーでCentOS抜いた（らしい...)
+      1 : http://w3techs.com/blog/entry/debian_is_now_the_most_popular_linux_distribution_on_web_servers
+
+  chroot環境にて、webアプリケーションを突っ込むのに、
+  webサーバーはchrootの外で動かしたいという要望に答えるべく、
+　いくつかの提案が行われた。そのうち、
+　dummy web serverというパッケージが提案された。
+　  2 : http://lists.debian.org/debian-devel/2012/01/msg00148.html
+    3 : http://packages.debian.org/equivs
+
+　 aptitudeの開発が復活
+　　実に800のbugが放置されていたらしい...
+　　   4 : http://www.perrier.eu.org/weblog/2012/01/14#aptitude-revival
+　   5 : http://lists.alioth.debian.org/cgi-bin/mailman/listinfo/aptitude-devel
+
+   Armh の状況は↓
+　　  12 : http://blog.einval.com/2012/01/09
+   13 : https://buildd.debian.org/status/architecture.php?a=armhf&suite=sid
+
+　　無線LAN経由でとあるIGMPぶち込まれるとこける問題が報告された。
+　　
+   14 : http://womble.decadent.org.uk/blog/igmp-denial-of-service-in-linux-cve-2012-0207.html
+   15 : http://bugs.debian.org/654876
+
+　　これもおもしろいかも？
+Enrico Zini announced that the Debtags web site also works for derivative
+distributions [18]: the site now shows packages from Ubuntu too, and can be
+extended to all Debian derivatives.
+
+   18 : http://www.enricozini.org/2012/debian/debtags-for-derivatives/
+
+   relase critical bugsの一覧は
+　　　http://udd.debian.org/bugs.cgi
+　　　からたどれる
+　　Bug squasher view: Affecting sid and wheezy, not marked as done, not tagged patch; those need to be fixed, probably by a patch+upload
+　　から検索可能。
+
+ボトムアップだと間に合いそうにないので、最新から読み下すぜ。
+
+
+ *20120109
+
+   Edu/skolelinux 6.0.3 beta2のリリースがアナウンス。
+  
+   5 : http://www.skolelinux.org/
+   6 : http://wiki.debian.org/DebianEdu
+
+　だそうな。そもそもDebian Pure Brendってなんだ？ 
+  ---> purebrend http://wiki.debian.org/DebianPureBlends
+   (なんと、Debian GIS, Debian Multimediaもあるらしい...)
+   説明:http://blends.alioth.debian.org/blends/
+   宣言: http://wiki.debian.org/Blends/Manifesto
+
+  DPL: お会計アップデートと、Wheezy artworkの募集したらしい。 
+
+  Xserver relase 1.12のアナウンス
+　XI 2.2パッチって何だ?→multitouch spportだそうな。
+　ついでにIntel sanday bridge new accelerationを突っ込んだらしい。
+   8 : http://blog.mraw.org/2012/01/01/XServer_1.12RC1/
+ 
+PNASがdebianについて何かレポートだしたらしい。
+  Michael Hanke noted [9] that the Proceedings of the National Academy of
+ Science ("PNAS") of the United States of America has apaper on the
+ evolution of software in Debian [10].
+
+   9 : http://lists.debian.org/debian-project/2011/12/msg00000.html
+   10 : http://www.pnas.org/content/early/2011/11/14/1115960108.abstract
+
+If you know other studies about Debian and its software, you can add it
+to our related wiki page [11].
+
+   11 : http://wiki.debian.org/CategoryPublication
+    
+　New Debian Infographic
+　----------------------
+
+Claudio Filho has published a beautiful infographic about Debian [12].
+The main motivation was, as Claudio said [13], "to "draw" for final
+users how Debian can be good for them". Similar efforts have been made
+by StÃ©phane Blondon [14] and Chris Lamb [15], who created the Debian
+Timeline website [16] and the related Debian package [17].
+
+   12 : http://claudiocomputing.wordpress.com/infographic-of-debian/
+   13 : http://lists.debian.org/debian-publicity/2011/12/msg00066.html
+   14 : http://ascendances.files.wordpress.com/2011/10/timeline_debian_1993_20111.png
+   15 : http://chris-lamb.co.uk/2008/03/09/timeline-of-the-debian-project/
+   16 : http://timeline.debian.net/
+   17 : http://packages.debian.org/sid/debian-timeline
+
+　　Debtagもwebサイトをアップデートしたとのことらしい。
+
+   18 : http://lists.debian.org/debian-devel-announce/2012/01/msg00000.html
+   19 : http://debtags.alioth.debian.org/paper-debtags.html
+   20 : http://debtags.debian.net/search/
+   21 : http://debtags.debian.net/statistics/
+   22 : http://debtags.debian.net/getting-started/
+   23 : http://wiki.debian.org/Debtags
+   
+ defomaパッケージを完全削除したらしい。
+　  24 : http://bonedaddy.net/pabs3/log/2012/01/07/apt-get-purge-defoma/
+   25 : http://pkg-fonts.alioth.debian.org/
+   26 : http://wiki.debian.org/gs-undefoma
+
+ Further interviews　に
+　nd with RaphaelHertzog [29], about the Debian handbook.
+　がpodcastでinterviewうけてた。
+
+  neuroDebian teamという妙なものが...(neuro science用debianだそうな）
+   31 : http://neuro.debian.net/
+   32 : http://incf.org/newsroom/stories/neurodebian-the-value-of-an-integrated-tool-suite
+
+ The web team is pleased to announce that all languages have finished
+their migration to UTF-8 [38], so the Debian website [39] is now
+available for everyone in UTF-8, thanks to all the translators who
+worked on this issue.
+
+   38 : http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=567781　　
+ 
+   (なんとUTF-8へ移行完了したそうな...)
+
+
+ * 2011.12.14
+
+   publicity teamでボランティアよこせ。とのこと。
+   http://lists.debian.org/debian-project/2011/11/msg00055.html
+
+   sun-java6をリポジトリから消去し、OpenJDKを代わりにいれた。
+   （bug #646524)
+   2 : http://bugs.debian.org/646524
+   3 : http://sylvestre.ledru.info/blog/sylvestre/2011/10/25/removal_of_sun_java6_from_debian
+   4 : http://www.carbon-project.org/Removal_of_sun_java6_and_ElsterOnline.html
+   やってくれたな○racle!
+
+   SDLチームが復活。
+　　   5 : http://wiki.debian.org/Teams/DebianSdlGroup
+   6 : http://ddumont.wordpress.com/2011/11/19/sdl-team-revival/
+
+　　そーいや、こんなこともありましたな。
+　　The OSI have invited the Debian Project to their upcoming
+affiliation programme. There is also work in progress to have the Debian
+Project become a member of the forums for ISC software that we distribute.
+Stefano also mentioned his continuing work in creating a discussion forum for
+companies that have a strategic interest in Debian.
+
+   7 : http://lists.debian.org/debian-devel-announce/2011/11/msg00001.html
+   8 : https://lists.debian.org/debian-devel-announce/2011/12/msg00000.html    
+
+　ubuntuから感謝の意
+
+  9 : http://wiki.ubuntu.com/UCADay
+   10 : http://lists.debian.org/debian-devel/2011/11/msg00626.html
+   11 : http://www.jonobacon.org/2011/11/17/welcoming-our-new-horseman-michael-hall/
+
+　India mini-DebConf, Mangalore edition
+　が開かれたそうな。
+　   12 : http://lists.debian.org/20111105184310.GD4138@mykerinos.kheops.frmug.org
+   13 : http://wiki.debian.org/DebianIndia/MiniDebConf2011/MangaloreEdition
+   14 : http://dr.jones.dk/blog/debianasia2011/
+  ぜひ日本でも！
+
+  ルサルバドル（共和国）にdebianのmirrorおいたらしいぞ。
+   15 : http://ftp.sv.debian.org/debian/
+   16 : http://www.salud.gob.sv/
+   17 : http://www.debian.org/mirror/list
+   生めよ増やせよ！
+
+   Debexpoとゆーよくわからん会合への募集がかかった。
+
+   20 : http://wiki.debian.org/Debexpo
+   21 : https://alioth.debian.org/projects/debexpo/
+
+   BSPについても喋ればいいか。（相当数ひらかれてるぜ）
+ 
+  Call for talks: FOSDEM 2012
+  の募集がかかった。まあ、FOSDEMは外せんわなー。
+
+  s390はKarlsruhe Institute of Technologyにてbuildd環境ができたそうな。
+
+ From: 2011/11からのアップデート
+　但し、wheezyについてはすでに2012/Fallで発表済みのため、
+　それ以外に絞る。
+
+  * 2011.11.7  
+  Debian 6.0.3 5.0.9 release
+  Debconf12 update
+
+ 
+  Debian installer localisation
+  ---> 2012/1/23号をみるとこの手の話題は定期的に投稿されるようだ。 
+  --> 19言語がupdate。
+       ; eight (Czech, Dutch, French, German, Persian, Portuguese, Russian
+and Swedish) are 100% 
+  Emdebian使えよというアナウンス
+　  8 : http://www.linux.codehelp.co.uk/serendipity/index.php?/archives/217-Documenting-Emdebian-intro.html
+   9 : http://www.linux.codehelp.co.uk/serendipity/index.php?/archives/230-Uses-of-Emdebian-special-purpose-computers.html
+
+　　 なんかしらんが、Bits from the DPLから、ruby1.9のリリースについて
+　　　いろいろ言及あり。
+　　　http://lists.debian.org/debian-devel/2011/08/msg00685.html
+
+    --> Debian-sprintというのがあるらしい。
+　　　　目的：関係者がf2fで会って会合するみたい。
+    
+    New Member processについてアナウンス
 
 ------------------主観----------------------------
 
@@ -1059,6 +1112,12 @@ http://www.debian.org/vote/2012/vote_002
 Debianはオワコンというアプローチで実はWEBサーバーではNo.1に
 使われているという内容でひっくり返すのは楽しいかも。
 
+岩松さんが書いてるsqueezeの〜個数の何とかと言う奴は、
+WEBページ: http://www.debian.org/News/XXXX/XXXXで
+でてる情報をカウントしただけっぽい。（6.0.3の例だと）
+--->Security個数 dsaでカウント
+--->パッケージ数  1行目〜/Security Updates/までの間をsrc:でgrepした数
+でぴったりだった...orz
 -------------------原稿-----------------------------
 
 1. debian lennyの死
@@ -1095,6 +1154,8 @@ Debianはオワコンというアプローチで実はWEBサーバーではNo.1�
 
   webが全部UTF-8に。ハンドヘルド対応に。
 
+  debianの商標がSPI配下へ
+
 　Debian Pure blendsネタ
 　
    Debian on smartphones:がんがれPaul!
@@ -1115,7 +1176,7 @@ Debianはオワコンというアプローチで実はWEBサーバーではNo.1�
       -生めよ増やせよ地に満ちよ
 
 　　http.debian.orgネタ
-    -> sakuraも追加したよ？
+    -> 似たようなネタとして、Debian JPから、sakuraも追加したよ？
 
 　　さようならsun-java6
 
