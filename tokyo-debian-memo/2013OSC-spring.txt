@@ -415,6 +415,92 @@ debtagsのアナウンス。webI/F大幅にリニューアルしたそうな。
 
 debian-newsから
 
+
+*20130218
+
+Debian Installer 7.0 RC1 released
+---------------------------------
+
+The first release candidate of the installer for Debian Wheezy was
+released on 17 February [1]. Many fixes are included in this release of
+the installer, along with new improvements, including better speech
+synthesis support, various improvements for GNU/kFreeBSD, fixes for the
+grub2 package, new supported hardware, etc.
+
+    1: http://www.debian.org/devel/debian-installer/News/2013/20130217
+
+700,000th bug reported
+----------------------
+
+Christian Perrier won the 700,000th bug contest [6], by betting more
+than two years ago on the date of bug #700000 [7],
+
+   9: http://wiki.debian.org/800000thBugContest
+
+Update on Clang and Debian
+--------------------------
+
+Sylvestre Ledru posted an article on his blog about the results of
+rebuilding the archive using Clang 3.2 [21]. To make the results more
+visible, Paul Wise has integrated them into the Package Tracking
+System [22]. In the meantime, 「Hideki Yamane」 has written a patch to make
+it easier to use Clang instead of gcc when building with pbuilder [23].
+
+----
+Julien Danjou wrote an article about Cloud tools for Debian [26],
+explaining the basics and giving hints about the tools needed to run a
+cloud platform.
+
+   26: http://julien.danjou.info/blog/2013/cloud-init-utils-debian
+
+
+
+* 20130204
+DebConf13 venue and dates
+-------------------------
+
+Moray Allan and Didier Raboud gave some updates on the upcoming
+DebConf13 [1] to be held at Le Camp in Vaumarcus, Switzerland [2].
+
+Automating Debian bootstrapping
+-------------------------------
+
+Johannes Schauer wrote a detailed report of the status of his "Port
+bootstrap build-ordering tool" [5], which was started as a Debian GSoC
+project last year and aims to solve cyclic build dependencies, making it
+possible to automate the bootstrapping of Debian on new architectures.
+  5: http://blog.mister-muffin.de/2013/01/25/bootstrappable-debian---new-milestone/
+
+According to W3Techs, Debian is the most popular Linux distribution for
+webservers [7]. It currently has a market share of 32.9% of all websites
+that use Linux, and growing.
+
+    7: http://w3techs.com/technologies/history_details/os-linux
+
+Ben Hutchings published the fourth part [8] of his "What's in the Linux
+kernel for Debian 7.0 Wheezy" series. Ben also asked for help in testing
+SAS drivers for the next point release of Debian stable [9].
+
+    8: http://womble.decadent.org.uk/blog/whats-in-the-linux-kernel-for-debian-70-wheezy-part-4.html
+    9: http://womble.decadent.org.uk/blog/call-for-testing-sas-driver-update-for-debian-60-squeeze.html
+
+the Release team [10] where he
+reported about the current status of the freeze.
+  10: http://lists.debian.org/debian-devel-announce/2013/01/msg00005.html
+
+Release-Critical bugs statistics for the upcoming release
+---------------------------------------------------------
+
+According to the Bugs Search interface of the Ultimate Debian
+Database [24], the upcoming release, Debian "Wheezy", is currently
+affected by 224 Release-Critical bugs. Ignoring bugs which are easily
+solved or on the way to being solved, roughly speaking, about 92
+Release-Critical bugs remain to be solved for the release to happen.
+
+   24: http://udd.debian.org/bugs.cgi
+   http://wiki.debian.org/ProjectNews/RC-Stats
+
+
 * 20130121
 
  Debian Medからmentoring祭りが行われる？
@@ -1118,6 +1204,10 @@ WEBページ: http://www.debian.org/News/XXXX/XXXXで
 --->Security個数 dsaでカウント
 --->パッケージ数  1行目〜/Security Updates/までの間をsrc:でgrepした数
 でぴったりだった...orz
+
+なんでsqueezeの変更点がカーネルまわりばかりがtopicなのかは、
+backports以外、全部セキュリティアップデートか、バグfixだからさ。
+※だって、セキュリティアップデートは全部バックポートするんだもん...
 -------------------原稿-----------------------------
 
 1. debian lennyの死
@@ -1150,7 +1240,7 @@ WEBページ: http://www.debian.org/News/XXXX/XXXXで
 
 　amd64がi386ぬいた
 
-  webサーバーでCentOS抜いた（らしい...)
+  webサーバーでCentOS抜いた
 
   webが全部UTF-8に。ハンドヘルド対応に。
 
@@ -1183,6 +1273,12 @@ WEBページ: http://www.debian.org/News/XXXX/XXXXで
     事故：wiki.debian.orgクラック
 
 　　ubuntuから感謝の意
+
+　　日本人もがんばった。
+　　　---> debian SPIへ
+　　　---> sakura.mirror
+     --->  debconf 12で
+　　　---> pbuilderのclang拡張
 
     debianをもっと楽しむには。
 　　　　 debian sidに挑戦しよう

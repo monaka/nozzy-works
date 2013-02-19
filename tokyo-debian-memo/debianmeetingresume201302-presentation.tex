@@ -69,21 +69,20 @@
 
 \begin{frame}{どこから喋る？}
 \begin{center}
-\LARGE{前回からのDebian topic updateについてお話すると、
-なんと、2011年11月OSC Tokyo/Fallからのお話になってしまいます....}
+\Large{前回からのDebian topic updateについてお話すると、
+なんと、2011年11月OSC Tokyo/Fallからになってしまいます...}
 \end{center}
 \end{frame}
 
 \begin{frame}{どこから喋る？}
-\begin{center}
-\LARGE　
+\Large
 取り急ぎ、
 \begin{itemize}
-\item 古い話題については、大きなトピックのみを
-\item 新しい話題については、だんだんと詳しく
+\item 古い話題については、大きなトピックのみを\\
+(既にOSCにて発表済みは除く）
+\item 新しい話題については、細かく
 \end{itemize}
-という粒度を変化させて喋ります。
-\end{center}
+喋ります
 \end{frame}
 
 \begin{frame}{Lennyサポート終了}
@@ -92,7 +91,7 @@
 \LARGE{2012/2/6にてLennyのサポートが終了しました\\
 みんな知ってるよね！？}
 \end{center}
-
+\url{http://www.debian.org/News/2012/20120209}
 \end{frame}
 
 \begin{frame}{Lenny→Squeezeへ}
@@ -108,14 +107,156 @@ AMD64版:
 
 \begin{frame}{ところでSqueeze update}
 
-\begin{itemize}
-\item 2012/1/28 Debian 6.0.4 relased
-\item 2012/5/12 Debian 6.0.5 relased
-\item 2012/9/29 Debian 6.0.6 relased
+\begin{itemize}[<+->]
+\item 2012/1/28 Debian 6.0.4 relased \\
+73個のセキュリティ修正と、87個のパッケージを更新。
+(kernel側longtermリリースの変更点と、xenまわりの修正が取り込まれる)
+\item 2012/5/12 Debian 6.0.5 relased \\
+74個のセキュリティ修正と、51個のパッケージを更新。
+(kernel側longtermリリースの変更点が取り込まれる)
+\item 2012/9/29 Debian 6.0.6 relased \\
+86個のセキュリティ修正と、52個のパッケージを更新。
+(direct rendering manager(drm)のkernel側成果のマージ、閏秒対策)
+\end{itemize}
+
+\end{frame}
+% 6.0.4 \small{\url{http://www.debian.org/News/2012/20120128}}
+% 6.0.5 \small{\url{http://www.debian.org/News/2012/20120512}}
+% 6.0.6 \small{\url{http://www.debian.org/News/2012/20120929}}
+% 変更点詳細：\small{\url{http://ftp.debian.org/debian/dists/sqeeze/ChangeLog}}
+
+\begin{frame}
+\begin{center}
+\LARGE{パッケージ数}
+\end{center}
+\end{frame}
+
+\begin{frame}{パッケージ数}
+\begin{itemize}[<+->]
+
+\item squeeze(stable)\\
+バイナリパッケージ数: 28123 {\color{blue}-7}\\
+ソースパッケージ数  : 14609
+
+\item whezzy(testing)\\ 
+バイナリパッケージ数: 33274 {\color{red}+5144}\\
+ソースパッケージ数  : 16333 {\color{red}+1724}
+
+\item sid(unstable)\\ 
+バイナリパッケージ数: 34852 {\color{red}+1578}\\
+ソースパッケージ数  : 17376 {\color{red}+1043}
+\end{itemize}
+\end{frame}
+
+% squeezeパッケージ数は：
+% \small{\url{http://ftp.debian.org/debian/dists/sqeeze/main/binary-i386/Packages.gz}にて行頭にPackagesとある個所をegrepして数数える。なお、ちょうど7パッケージがsqueezeのChangeLogからリリース途中で廃止になったようなので、その分差っ引くと前回の数とぴったり一致。}}
+
+\begin{frame}{バグの総数}
+\begin{itemize}[<+->]
+\item 2011年03月: 約616000
+\item 2011年11月: 約649100
+\item 約9ヶ月で約33000のバグレポート。
+\item 閉じられたバグ: 約30000。
 \end{itemize}
 
 \end{frame}
 
+\begin{frame}
+\begin{center}
+\LARGE{開発者数}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{開発者数}
+\begin{itemize}[<+->]
+\item 2011年03月\\
+Debian Develope 約1440名 \\
+Debian Maintainer 約80名
+
+\item 2011年11月\\
+Debian Develope 約1470名 \\
+Debian Maintainer 約80名
+
+\item 57ヶ国\\
+日本人は 46名（アクティブメンバは33名）
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\LARGE{Debian カンファレンス}
+\end{center}
+\end{frame}
+
+\begin{frame}{Debconf / Debian カンファレンス}
+\begin{itemize}
+\item 今年のDebconf, Debconf11 はボスニアヘルツェゴビナ
+参加者は約400名。日本からは３名参加。
+
+\item 来年のDebconf, Debconf12 はニカラグアで開催。\\
+2012年7月8日 から 14日 まで。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\LARGE{新たに開始された\\サービス/プロジェクト}
+\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{Debian topic update / Linux 20歳}
+\begin{center}
+
+\Large{Linux 20歳。}\\
+\includegraphics[width=0.5\hsize]{image201111/linux_20_years_082511.jpg}
+\end{center}
+\end{frame}
+% cakeの画像は以下からダウンロード
+% http://www.ecualug.org/2006/08/16/galerias_de_imagenes/debian_cake
+
+
+\begin{frame}
+ \frametitle{Debian topic update / Debian 18歳}
+\begin{center}
+
+\Large{2011年8月16日。Debian 18歳。}\\
+\includegraphics[width=0.8\hsize]{image201111/debian-cake.jpg}
+\end{center}
+\end{frame}
+% 画像は以下からダウンロード
+% http://techgage.com/images/news/linux_20_years_082511.jpg
+
+\begin{frame}
+\begin{center}
+\LARGE{その他}
+\end{center}
+\end{frame}
+
+\emtext{Whezzyに向けての作業}
+
+\begin{frame}
+\begin{center}
+\LARGE{インストーラ}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{リリースに向けてのご協力を！}
+\begin{itemize}
+ \item Debian を使ってください。
+ \item squeezeにアップデートしましょう。
+ \item バグ報告してください。些細なことでもなんでもOK。\\
+2ch とか ブログに書くのは勘弁してください.....。\\
+(トラッキングが難しいです)
+ \item ドキュメント作成、翻訳に参加してください。\\
+翻訳からTypoの指摘歓迎！
+ \item パッケージメンテナンス等に興味がある方はサポートします。\\
+そのへんにいる Debian 関係者に声をかけてください。
+\end{itemize}
+\end{frame}
 
 
 \begin{frame}{質疑応答}
