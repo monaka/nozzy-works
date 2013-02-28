@@ -1,0 +1,30 @@
+totemは以下のようにuiを作る
+
+ main()--> gtk_init()
+       --> g_signal(command-line)-->app_command_line-->app_init()(←ここですべてを組み立てる）
+
+app_init()は/usr/share/totem/totem.uiをみてGUIを組み立てる
+
+今回字幕なので-->subtitles-menuの項目--->select-subtitle-->select_subtitle_action_callback
+
+で、
+select_subtitle_action_callback()(src/totem-menu.c 1096)-->
+    totem_playlist_select_subtitle_dialog()(src/totem-playlist.c)
+    
+ここでsubtitle変更を処理。
+playlist->priv->modelのSUBTITLE_URI_COLに登録
+
+どうも、totem_playlist_get_current_mrl()(src/totem-playlist.c 2448)にて
+subtitleのデータをplaylist->priv->modelのSUBTITLE_URI_COLから得るようだ。
+
+で、totem_playlist_get_current_mrl()はsrc/totem-object.c,src/totem-session.c
+からガンガン呼び出される。
+
+src/totem-object.cのadd_to_playlist_and_play_cb()にて、
+それらしい呼び出しがある。
+ 518                 mrl = totem_playlist_get_current_mrl (playlist, &subtitle);
+ 519                 totem_action_set_mrl_and_play (data->totem, mrl, subtitle);
+
+
+
+
