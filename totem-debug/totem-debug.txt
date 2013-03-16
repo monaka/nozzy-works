@@ -24,7 +24,117 @@ src/totem-object.cのadd_to_playlist_and_play_cb()にて、
 それらしい呼び出しがある。
  518                 mrl = totem_playlist_get_current_mrl (playlist, &subtitle);
  519                 totem_action_set_mrl_and_play (data->totem, mrl, subtitle);
+                      --->totem_object_action_play
+                           --->bacon_video_widget_play()
+                               (src/backend/bacon-video-widget-gst-0.10.c)
+が、字幕についての記述がないー
+
+ bacon_video_widget_open()(src/backend/bacon-video-widget-gst-0.10.c)
+にて、
+ g_object_set (bvw->priv->play, "uri", bvw->priv->mrl,
+3874                 "suburi", subtitle_uri, NULL);
+
+とあるので、suburiという名前のbvw上のオブジェクトがどうも字幕のurl格納先らしい。
+また、subtitle-encodingというのがある。
+
+bacon_video_widget_new（）(src/backend/bacon-video-widget-gst-0.10.c)で
+gstreamer用のパイプライン及びbvwオブジェクトを作りまくる
+                      
+totemは起動したら、様々なthreadを作り、メインのthreadはそのまま
+終了してしまう。これらのthreadは協調して動作をする作り。
+
+main->g_application_run
+      -> thread LWP 4379作成
+　　　　　->app_startup->app_command_line->app_init->long_action->video_widget_creat
+                                          -> thread LWP 4380作成
+　　　　　　　　　　　　　　　　　　　　　　　
+いったいどこだ？.srtファイルの判別部分は...
+どうやってもエレガントなみつけだしかたがわからん...
+
+とりあえず、baconから、gstreamerのplaybin2を利用していることはなんとなく
+わかったので、以下の方法でテスト
+
+gst-launch playbin2 uri=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.ogv suburi=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt
+
+無事、
+
+パイプラインを一時停止 (PAUSED) にしています...
+Pipeline is PREROLLING ...
+Missing element: application/x-subrip デコーダー
+WARNING: from element /GstURIDecodeBin:uridecodebin1: タイプ 'application/x-subrip' 用のデコーダーが利用可能ではありません。
+追加のデバッグ情報:
+gsturidecodebin.c(874): unknown_type_cb (): /GstPlayBin2:playbin20/GstURIDecodeBin:uridecodebin1
+WARNING: from element /GstURIDecodeBin:uridecodebin1/GstDecodeBin2:decodebin20: GStreamerはプラグインを見つけることができません
+追加のデバッグ情報:
+gstdecodebin2.c(3576): gst_decode_bin_expose (): /GstPlayBin2:playbin20/GstURIDecodeBin:uridecodebin1/GstDecodeBin2:decodebin20:
+no suitable plugins found
+Pipeline is PREROLLED ...
+パイプラインを再生中 (PLAYING) にしています...
+New clock: GstPulseSinkClock
+^CCaught interrupt -- handling interrupt.
+割り込み: パイプラインを停止しています...
+Execution ended after 19527083155 ns.
+パイプラインを一時停止 (PAUSED) にしています...
+Setting pipeline to READY ...
+Setting pipeline to NULL ...
+Freeing pipeline ...
+
+な感じでx-subripのデコーダが無いとかいわれる。
+
+なんと！gst-launchはgst-run.cだったーっ
+※なんじゃこりゅぁぁぁーっ
+
+というわけで、
+
+$gst-launch --print playbin2 uri=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.ogv suburi=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt
+/usr/bin/gst-launch-0.10 playbin2 uri=file:///home/nojima/???/debconf12/857_Bits_from_the_Release_Team.ogv suburi=file:///home/nojima/???/debconf12/857_Bits_from_the_Release_Team.srt
+
+とのこと。gst-run.cはどうも、正しいバージョンのサフィックスをプログラムにつけて起動
+するだけのラッパーらしい...
+
+だから、gdbでdebugするなら、/usr/bin/gst-launch-0.10を直接やるべき。
+
+で、
+cd ~/prog/my-work/gdb-python/test-function/
+gdb --args gst-launch-0.10 playbin2 uri=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.ogv suburi=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt
+
+(gdb) source test-func.py
+(gdb) prepcalltree
+(gdb) run
+したところ、すごいことに、
+gstreamerは、指定したエレメントがthreadで動き、GstBusめがけて、各エレメント
+がメッセージを送ってくる。で、このメッセージを解釈してイベントハンドリング
+するしくみだったぜ。
+See. gst-launch.c中のevent_loop()の設計
+
+んでもって、x-substrのmissingは、GST_MESSAGE_ELEMENTタイプで
+ぶちこまれるmissing-pluginといわれるメッセージ。
+
+で、気をとりなおして、
+cd ~/prog/debian/gst-plugins-base0.10/gst-plugins-base0.10-0.10.36/ 
+find . -name '*.[ch]'  | xargs fgrep 'srt'
+すると、どうも、
+./gst/subparse/gstsubparse.c
+に中身があるらしい。
+みるとちゃんとsubrip形式のsubtitleをカバーできてるやんけ。
+
+ gst-launch-0.10 -v playbin2 uri=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.ogv suburi=file:///home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt
+
+すれば、実は豊富なdebuging traceがとれるというオチ...
+
+gstreamerのアプリケーションの作り方マニュアルを読むと、なんか
+解析の糸口をつかんだ気がする....
+
+取り急ぎ、
+
+gst-typefind ~/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt 
+/home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt - application/x-subrip
 
 
+といわれるので、mime判定はgst-typefindを調べるとわかるかもしれず...
+と思って調べたら凹むぜ。またもやgst-runだ。
+gst-typefind-0.10  ~/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt
+
+が正しいぜ。
 
 

@@ -708,4 +708,5 @@ Non-debugging symbols:
     ---> が、internal=Trueにすると、抑圧出来る。しかしながら、
 　　info breakにも出てこなくなるので注意。
 
+------ここからは3/15以降
 

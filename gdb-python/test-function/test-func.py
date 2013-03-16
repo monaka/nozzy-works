@@ -101,11 +101,11 @@ class _CallTracerBreakpoint(gdb.Breakpoint):
 			print "uh? cant put finish break on "+self._name
 		return False
 
-class _PrepareCallTracer(gdb.Command):
-	""" prepare call tracer for c """
+class _ReAnalyzeCallTracer(gdb.Command):
+	""" reanalyze symbol for calltracer """
 	def __init__(self):
-		super(_PrepareCallTracer, self).__init__('prepcalltracer',
-							 gdb.COMMAND_OBSCURE)
+		super(_ReAnalyzeCallTracer, self).__init__('reanalyzecalltracer',
+							gdb.COMMAND_OBSCURE)
 		self._stack=[]
 	def _retrive_ptrs(self):
 		info=gdb.execute("info break",False, True)
@@ -117,15 +117,23 @@ class _PrepareCallTracer(gdb.Command):
 				if ptrs.has_key(tokens[4]) == False:
 					ptrs[tokens[4]]=" ".join(tokens[5:])
 		return ptrs
-
 	def invoke(self, arg, from_tty):
-		gdb.execute("rbreak",False, True)
 		break_info=self._retrive_ptrs()
 		gdb.execute("delete",False, True)
 		gdb.execute("set pagination off")
 		for addr,name in break_info.iteritems():
 			_CallTracerBreakpoint(r'*'+addr,
 					      name,self._stack)
+_ReAnalyzeCallTracer()
+
+class _PrepareCallTracer(gdb.Command):
+	""" prepare call tracer for c """
+	def __init__(self):
+		super(_PrepareCallTracer, self).__init__('prepcalltracer',
+							 gdb.COMMAND_OBSCURE)
+	def invoke(self, arg, from_tty):
+		gdb.execute("rbreak",False, True)
+		gdb.execute("reanalyzecalltracer",False, True)
 		print "prepare done!"
 
 _PrepareCallTracer()
