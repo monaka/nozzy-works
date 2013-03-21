@@ -710,3 +710,67 @@ Non-debugging symbols:
 
 ------ここからは3/15以降
 
+実は、dynamic lib loading用に、glibcには、
+dl-debug.cというdebbuger用のローダーへの通信機構が用意されている。
+
+実際には、$(LIBC-SOURCE)/elf/dl-debug.cにあるとおり、
+
+(gdb) b _dl_debug_state
+
+で、ひっかけ、
+
+(gdb) p _r_debug
+
+をあさりまくればいろいろ手に入る。
+
+strcutureの構造は以下の通り。
+
+(gdb) l
+2	#include <sys/types.h>
+3	#include <dirent.h>
+4	
+5	int
+6	main (void)
+7	{
+8	  DIR *dp;
+9	  struct dirent *ep;
+10	
+11	  dp = opendir ("./");
+(gdb) l
+12	  if (dp != NULL) {
+13	      while ((ep = readdir (dp)))
+14	        puts (ep->d_name);
+15	      (void) closedir (dp);
+16	  } else {
+17	    perror ("Couldn't open the directory");
+18	  }
+19	  return 0;
+20	}
+21	
+(gdb) b 12
+Breakpoint 1 at 0x400652: file dirtest.c, line 12.
+(gdb) run
+Starting program: /home/nojima/prog/python-test/ctypes/dirtest 
+
+Breakpoint 1, main () at dirtest.c:12
+12	  if (dp != NULL) {
+(gdb) p *dp
+$1 = {fd = 7, lock = 0, allocation = 32768, size = 0, offset = 0, filepos = 0, 
+  data = 0x601038 ""}
+(gdb) info dp
+Undefined info command: "dp".  Try "help info".
+(gdb) whatis dp
+type = DIR *
+(gdb) ptype dp
+type = struct __dirstream {
+    int fd;
+    __libc_lock_t lock;
+    size_t allocation;
+    size_t size;
+    size_t offset;
+    off_t filepos;
+    char data[];
+} *
+
+という感じで手に入る。
+
