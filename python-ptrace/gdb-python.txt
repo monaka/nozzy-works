@@ -774,3 +774,37 @@ type = struct __dirstream {
 
 という感じで手に入る。
 
+まあ、いろいろ考えたりして結局、約にたちそうなcalltracerは、
+
+  Step1. nm -a object fileした結果を残しておき、
+  Step2. _dl_debug_stateをハンドリングして、
+　　　　　呼ばれる度にinfo sharedlibraryをチェックしてロード
+　　　　　されたライブラリを確認し、
+　Step3. Step1.の情報から、トレースすべき関数をトレーサ用ハンドラを用いてbreak
+  Step4. あとはいつもどおり。
+
+とすべきだろうな。
+
+ -----file format------------
+binary: foo-comand.exe
+間数名1
+間数名2
+間数名3
+...
+
+binary: /usr/x86-64/lib/libxxxx.so
+関数名1
+関数名2
+関数名3
+関数名4
+...
+
+binary: /usr/x86-64/lib/libxxxx.so
+関数名1
+関数名2
+関数名3
+関数名4
+...
+ -----file format------------
+
+
