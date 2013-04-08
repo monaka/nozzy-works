@@ -1,0 +1,43 @@
+あー、もともとgdb+pythonかくちょーで、dynamic link libから
+シンボル引き抜くのにloaderのgdb stubからデータ引き抜く場合、
+pythonにバイナリ解釈させる必要があったので、解析開始。
+
+ctypeのmoduleは$(Python2.7-src)/Modules/_ctypes/_ctypes.c
+中のinit_ctypes()に_ctypesモジュールの初期化コードがある。
+
+pydoc ctypesしたら、
+c_charとかはclass _ctypes._SimpleCDataのサブクラスだった。
+
+で、_ctypesがどこでc_charとかに変貌するのかとオモタら、
+$(Python2.7-src)/Lib/ctypes/__init__.pyで_ctypesから
+継承して作成してた。
+
+で、例えば、c_charとかは、
+class c_char_p(_SimpleCData):
+    _type_ = "z"
+...中略...
+    else:
+        def __repr__(self):
+            return "%s(%s)" % (self.__class__.__name__, cast(self, c_void_p).val
+ue)
+
+とかで_type_ attributeに"z"ぶちこんでた。
+
+POINTERは_ctypesで実装されてるっぽいぜ。しかもモジュール関数だった。
+（classとかではない）
+--->でもいったいどこに定義があるんじゃぁ？
+
+
+pydoc _ctypesとかしたら説明がよめた。
+
+で、__XXXX__とかは、特殊メソッドといわれるらしい。
+（python referncemanualのData Modelに記載あり）
+
+どうでもよいが、組み込み関数とか説明読みたかったら、pythonのhelp('func')すると
+funcのhelp()がよめるらしいぞ。
+
+うーん、ctypesのこういう使い方って...
+http://www.hexacosa.net/documents/python-extending/
+
+
+
