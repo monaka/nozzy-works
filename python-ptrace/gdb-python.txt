@@ -807,4 +807,20 @@ binary: /usr/x86-64/lib/libxxxx.so
 ...
  -----file format------------
 
+info sharedLibraryコマンドは
+$(GDBSRC)/gdb/solib.c中のinfo_sharedlibrary_command()以下に存在。
+
+breakコマンドの心臓部は
+$(GDBSRC)/gdb/breakpoint.cのcreate_breakpoint()がエントリポイント
+
+ここで、b->loc==NULLだとpending扱い
+
+$(GDBSRC)/gdb/breakpoint.c中parse_breakpoint_sals()が例外発生
+でe.error==NOT_FOUND_ERRORだとpending扱い
+
+--->どっかでsymboleテーブルアップデートしてるはず...
+
+linuxのsolib系は$(GDBSRC)/gdb/solib-svr4.cのenable_break()で
+loaderにフックしているように見える?
+
 

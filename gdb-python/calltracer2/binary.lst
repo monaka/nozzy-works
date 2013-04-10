@@ -2794,8 +2794,8 @@ gst_data_queue_set_flushing
 gst_data_queue_set_property
 gst_event_ref
 gst_event_replace
-gst_g_cond_free
-gst_g_mutex_new
+# gst_g_cond_free
+# gst_g_mutex_new
 gst_g_static_rec_mutex_init
 gst_push_src_base_init
 gst_push_src_check_get_range
@@ -2810,8 +2810,8 @@ gst_type_find_helper_for_extension
 gst_type_find_helper_get_range
 gst_type_find_helper_get_range_ext
 handle_stepping
-helper_find_get_length
-helper_find_peek
+# helper_find_get_length
+# helper_find_peek
 helper_find_suggest
 ref_data
 set_step_info
@@ -2828,9 +2828,9 @@ dks_skip_timestamp
 end_sami_element
 feed_textbuf
 fix_invalid_entities
-g_string_append_c_inline
+# g_string_append_c_inline
 get_next_line
-gst_buffer_unref
+# gst_buffer_unref
 gst_convert_to_utf8
 gst_event_unref
 gst_query_unref

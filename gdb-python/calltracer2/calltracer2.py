@@ -125,9 +125,12 @@ class _BreakSetupFromFile(gdb.Command):
         token_state=r'FindOutHeader'
         binary_token_regrex=re.compile(r'^[Bb]inary:\s*([^\s]+)')
         record_sep_regrex=re.compile(r'^\s*$')
+        comment_regrex=re.compile(r'^#')
         with open(filename) as fh:
             for ln in fh.readlines():
                 ln = ln.strip('\r\n')
+                if comment_regrex.search(ln):
+                    continue
                 if token_state == 'FindOutHeader':
                     found=binary_token_regrex.search(ln)
                     if found:
