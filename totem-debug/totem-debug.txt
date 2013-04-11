@@ -138,3 +138,3025 @@ gst-typefind-0.10  ~/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt
 が正しいぜ。
 
 
+gst-typefind-0.10は
+字幕ファイルタイプを算出するのに、gst-plugins-base0.10を利用し、
+gst/subparse/gstsubparse.cにて、
+ plugin_init→ gst_subparse_type_find→ gst_type_find_suggest(tf)にて
+ファイルタイプ可能性を送出
+--->とおもって、gst_subparse_type_findを調べたらgst_type_find_peek()で
+　　早々にabortしてやがった...
+
+typefindというelementのgstreamer pluginは、coreelementsといい、
+ $GST/plugins/elements/gstelements.cにある。
+
+あーもー、ぜんぜんわからん！
+
+------------gst-typefindのトレース-----
+(gdb) run
+Starting program: /usr/bin/gst-typefind-0.10 /home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt
+break in loader
+Loading: /lib64/ld-linux-x86-64.so.2
+break in loader
+Loading: /lib/x86_64-linux-gnu/liblzma.so.5
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+ =>main
+uh? cant put finish break on main
+  =>gst_tools_set_prgname
+  <=gst_tools_set_prgname
+break in loader
+break in loader
+Loading: /lib/x86_64-linux-gnu/libnsl.so.1
+break in loader
+break in loader
+Loading: /lib/x86_64-linux-gnu/libnss_files.so.2
+  =>gst_tools_print_version
+  <=gst_tools_print_version
+  =>typefind_file
+break in loader
+break in loader
+Loading: /usr/lib/x86_64-linux-gnu/libgstbase-0.10.so.0
+Function "GST_READ_DOUBLE_BE" not defined.
+Breakpoint 7 (GST_READ_DOUBLE_BE) pending.
+Function "GST_READ_DOUBLE_LE" not defined.
+Breakpoint 8 (GST_READ_DOUBLE_LE) pending.
+Function "GST_READ_FLOAT_BE" not defined.
+Breakpoint 9 (GST_READ_FLOAT_BE) pending.
+Function "GST_READ_FLOAT_LE" not defined.
+Breakpoint 10 (GST_READ_FLOAT_LE) pending.
+Function "GST_WRITE_DOUBLE_BE" not defined.
+Breakpoint 11 (GST_WRITE_DOUBLE_BE) pending.
+Function "GST_WRITE_DOUBLE_LE" not defined.
+Breakpoint 12 (GST_WRITE_DOUBLE_LE) pending.
+Function "GST_WRITE_FLOAT_BE" not defined.
+Breakpoint 13 (GST_WRITE_FLOAT_BE) pending.
+Function "GST_WRITE_FLOAT_LE" not defined.
+Breakpoint 14 (GST_WRITE_FLOAT_LE) pending.
+Function "_gst_bit_reader_get_bits_uint16_inline" not defined.
+Breakpoint 15 (_gst_bit_reader_get_bits_uint16_inline) pending.
+Function "_gst_bit_reader_get_bits_uint32_inline" not defined.
+Breakpoint 16 (_gst_bit_reader_get_bits_uint32_inline) pending.
+Function "_gst_bit_reader_get_bits_uint64_inline" not defined.
+Breakpoint 17 (_gst_bit_reader_get_bits_uint64_inline) pending.
+Function "_gst_bit_reader_get_bits_uint8_inline" not defined.
+Breakpoint 18 (_gst_bit_reader_get_bits_uint8_inline) pending.
+Function "_gst_bit_reader_get_pos_inline" not defined.
+Breakpoint 19 (_gst_bit_reader_get_pos_inline) pending.
+Function "_gst_bit_reader_get_pos_unchecked" not defined.
+Breakpoint 20 (_gst_bit_reader_get_pos_unchecked) pending.
+Function "_gst_bit_reader_get_remaining_inline" not defined.
+Breakpoint 21 (_gst_bit_reader_get_remaining_inline) pending.
+Function "_gst_bit_reader_get_remaining_unchecked" not defined.
+Breakpoint 22 (_gst_bit_reader_get_remaining_unchecked) pending.
+Function "_gst_bit_reader_get_size_inline" not defined.
+Breakpoint 23 (_gst_bit_reader_get_size_inline) pending.
+Function "_gst_bit_reader_get_size_unchecked" not defined.
+Breakpoint 24 (_gst_bit_reader_get_size_unchecked) pending.
+Function "_gst_bit_reader_peek_bits_uint16_inline" not defined.
+Breakpoint 25 (_gst_bit_reader_peek_bits_uint16_inline) pending.
+Function "_gst_bit_reader_peek_bits_uint32_inline" not defined.
+Breakpoint 26 (_gst_bit_reader_peek_bits_uint32_inline) pending.
+Function "_gst_bit_reader_peek_bits_uint64_inline" not defined.
+Breakpoint 27 (_gst_bit_reader_peek_bits_uint64_inline) pending.
+Function "_gst_bit_reader_peek_bits_uint8_inline" not defined.
+Breakpoint 28 (_gst_bit_reader_peek_bits_uint8_inline) pending.
+Function "_gst_bit_reader_skip_inline" not defined.
+Breakpoint 29 (_gst_bit_reader_skip_inline) pending.
+Function "_gst_bit_reader_skip_to_byte_inline" not defined.
+Breakpoint 30 (_gst_bit_reader_skip_to_byte_inline) pending.
+Function "_gst_byte_reader_dup_data_inline" not defined.
+Breakpoint 31 (_gst_byte_reader_dup_data_inline) pending.
+Function "_gst_byte_reader_get_data_inline" not defined.
+Breakpoint 32 (_gst_byte_reader_get_data_inline) pending.
+Function "_gst_byte_reader_get_float32_be_inline" not defined.
+Breakpoint 33 (_gst_byte_reader_get_float32_be_inline) pending.
+Function "_gst_byte_reader_get_float32_le_inline" not defined.
+Breakpoint 34 (_gst_byte_reader_get_float32_le_inline) pending.
+Function "_gst_byte_reader_get_float64_be_inline" not defined.
+Breakpoint 35 (_gst_byte_reader_get_float64_be_inline) pending.
+Function "_gst_byte_reader_get_float64_le_inline" not defined.
+Breakpoint 36 (_gst_byte_reader_get_float64_le_inline) pending.
+Function "_gst_byte_reader_get_int16_be_inline" not defined.
+Breakpoint 37 (_gst_byte_reader_get_int16_be_inline) pending.
+Function "_gst_byte_reader_get_int16_le_inline" not defined.
+Breakpoint 38 (_gst_byte_reader_get_int16_le_inline) pending.
+Function "_gst_byte_reader_get_int24_be_inline" not defined.
+Breakpoint 39 (_gst_byte_reader_get_int24_be_inline) pending.
+Function "_gst_byte_reader_get_int24_le_inline" not defined.
+Breakpoint 40 (_gst_byte_reader_get_int24_le_inline) pending.
+Function "_gst_byte_reader_get_int32_be_inline" not defined.
+Breakpoint 41 (_gst_byte_reader_get_int32_be_inline) pending.
+Function "_gst_byte_reader_get_int32_le_inline" not defined.
+Breakpoint 42 (_gst_byte_reader_get_int32_le_inline) pending.
+Function "_gst_byte_reader_get_int64_be_inline" not defined.
+Breakpoint 43 (_gst_byte_reader_get_int64_be_inline) pending.
+Function "_gst_byte_reader_get_int64_le_inline" not defined.
+Breakpoint 44 (_gst_byte_reader_get_int64_le_inline) pending.
+Function "_gst_byte_reader_get_int8_inline" not defined.
+Breakpoint 45 (_gst_byte_reader_get_int8_inline) pending.
+Function "_gst_byte_reader_get_pos_inline" not defined.
+Breakpoint 46 (_gst_byte_reader_get_pos_inline) pending.
+Function "_gst_byte_reader_get_pos_unchecked" not defined.
+Breakpoint 47 (_gst_byte_reader_get_pos_unchecked) pending.
+Function "_gst_byte_reader_get_remaining_inline" not defined.
+Breakpoint 48 (_gst_byte_reader_get_remaining_inline) pending.
+Function "_gst_byte_reader_get_remaining_unchecked" not defined.
+Breakpoint 49 (_gst_byte_reader_get_remaining_unchecked) pending.
+Function "_gst_byte_reader_get_size_inline" not defined.
+Breakpoint 50 (_gst_byte_reader_get_size_inline) pending.
+Function "_gst_byte_reader_get_size_unchecked" not defined.
+Breakpoint 51 (_gst_byte_reader_get_size_unchecked) pending.
+Function "_gst_byte_reader_get_uint16_be_inline" not defined.
+Breakpoint 52 (_gst_byte_reader_get_uint16_be_inline) pending.
+Function "_gst_byte_reader_get_uint16_le_inline" not defined.
+Breakpoint 53 (_gst_byte_reader_get_uint16_le_inline) pending.
+Function "_gst_byte_reader_get_uint24_be_inline" not defined.
+Breakpoint 54 (_gst_byte_reader_get_uint24_be_inline) pending.
+Function "_gst_byte_reader_get_uint24_le_inline" not defined.
+Breakpoint 55 (_gst_byte_reader_get_uint24_le_inline) pending.
+Function "_gst_byte_reader_get_uint32_be_inline" not defined.
+Breakpoint 56 (_gst_byte_reader_get_uint32_be_inline) pending.
+Function "_gst_byte_reader_get_uint32_le_inline" not defined.
+Breakpoint 57 (_gst_byte_reader_get_uint32_le_inline) pending.
+Function "_gst_byte_reader_get_uint64_be_inline" not defined.
+Breakpoint 58 (_gst_byte_reader_get_uint64_be_inline) pending.
+Function "_gst_byte_reader_get_uint64_le_inline" not defined.
+Breakpoint 59 (_gst_byte_reader_get_uint64_le_inline) pending.
+Function "_gst_byte_reader_get_uint8_inline" not defined.
+Breakpoint 60 (_gst_byte_reader_get_uint8_inline) pending.
+Function "_gst_byte_reader_peek_data_inline" not defined.
+Breakpoint 61 (_gst_byte_reader_peek_data_inline) pending.
+Function "_gst_byte_reader_peek_float32_be_inline" not defined.
+Breakpoint 62 (_gst_byte_reader_peek_float32_be_inline) pending.
+Function "_gst_byte_reader_peek_float32_le_inline" not defined.
+Breakpoint 63 (_gst_byte_reader_peek_float32_le_inline) pending.
+Function "_gst_byte_reader_peek_float64_be_inline" not defined.
+Breakpoint 64 (_gst_byte_reader_peek_float64_be_inline) pending.
+Function "_gst_byte_reader_peek_float64_le_inline" not defined.
+Breakpoint 65 (_gst_byte_reader_peek_float64_le_inline) pending.
+Function "_gst_byte_reader_peek_int16_be_inline" not defined.
+Breakpoint 66 (_gst_byte_reader_peek_int16_be_inline) pending.
+Function "_gst_byte_reader_peek_int16_le_inline" not defined.
+Breakpoint 67 (_gst_byte_reader_peek_int16_le_inline) pending.
+Function "_gst_byte_reader_peek_int24_be_inline" not defined.
+Breakpoint 68 (_gst_byte_reader_peek_int24_be_inline) pending.
+Function "_gst_byte_reader_peek_int24_le_inline" not defined.
+Breakpoint 69 (_gst_byte_reader_peek_int24_le_inline) pending.
+Function "_gst_byte_reader_peek_int32_be_inline" not defined.
+Breakpoint 70 (_gst_byte_reader_peek_int32_be_inline) pending.
+Function "_gst_byte_reader_peek_int32_le_inline" not defined.
+Breakpoint 71 (_gst_byte_reader_peek_int32_le_inline) pending.
+Function "_gst_byte_reader_peek_int64_be_inline" not defined.
+Breakpoint 72 (_gst_byte_reader_peek_int64_be_inline) pending.
+Function "_gst_byte_reader_peek_int64_le_inline" not defined.
+Breakpoint 73 (_gst_byte_reader_peek_int64_le_inline) pending.
+Function "_gst_byte_reader_peek_int8_inline" not defined.
+Breakpoint 74 (_gst_byte_reader_peek_int8_inline) pending.
+Function "_gst_byte_reader_peek_uint16_be_inline" not defined.
+Breakpoint 75 (_gst_byte_reader_peek_uint16_be_inline) pending.
+Function "_gst_byte_reader_peek_uint16_le_inline" not defined.
+Breakpoint 76 (_gst_byte_reader_peek_uint16_le_inline) pending.
+Function "_gst_byte_reader_peek_uint24_be_inline" not defined.
+Breakpoint 77 (_gst_byte_reader_peek_uint24_be_inline) pending.
+Function "_gst_byte_reader_peek_uint24_le_inline" not defined.
+Breakpoint 78 (_gst_byte_reader_peek_uint24_le_inline) pending.
+Function "_gst_byte_reader_peek_uint32_be_inline" not defined.
+Breakpoint 79 (_gst_byte_reader_peek_uint32_be_inline) pending.
+Function "_gst_byte_reader_peek_uint32_le_inline" not defined.
+Breakpoint 80 (_gst_byte_reader_peek_uint32_le_inline) pending.
+Function "_gst_byte_reader_peek_uint64_be_inline" not defined.
+Breakpoint 81 (_gst_byte_reader_peek_uint64_be_inline) pending.
+Function "_gst_byte_reader_peek_uint64_le_inline" not defined.
+Breakpoint 82 (_gst_byte_reader_peek_uint64_le_inline) pending.
+Function "_gst_byte_reader_peek_uint8_inline" not defined.
+Breakpoint 83 (_gst_byte_reader_peek_uint8_inline) pending.
+Function "_gst_byte_reader_skip_inline" not defined.
+Breakpoint 84 (_gst_byte_reader_skip_inline) pending.
+Function "_gst_byte_writer_ensure_free_space_inline" not defined.
+Breakpoint 85 (_gst_byte_writer_ensure_free_space_inline) pending.
+Function "_gst_byte_writer_fill_inline" not defined.
+Breakpoint 86 (_gst_byte_writer_fill_inline) pending.
+Function "_gst_byte_writer_next_pow2" not defined.
+Breakpoint 87 (_gst_byte_writer_next_pow2) pending.
+Function "_gst_byte_writer_put_data_inline" not defined.
+Breakpoint 88 (_gst_byte_writer_put_data_inline) pending.
+Function "_gst_byte_writer_put_float32_be_inline" not defined.
+Breakpoint 89 (_gst_byte_writer_put_float32_be_inline) pending.
+Function "_gst_byte_writer_put_float32_le_inline" not defined.
+Breakpoint 90 (_gst_byte_writer_put_float32_le_inline) pending.
+Function "_gst_byte_writer_put_float64_be_inline" not defined.
+Breakpoint 91 (_gst_byte_writer_put_float64_be_inline) pending.
+Function "_gst_byte_writer_put_float64_le_inline" not defined.
+Breakpoint 92 (_gst_byte_writer_put_float64_le_inline) pending.
+Function "_gst_byte_writer_put_int16_be_inline" not defined.
+Breakpoint 93 (_gst_byte_writer_put_int16_be_inline) pending.
+Function "_gst_byte_writer_put_int16_le_inline" not defined.
+Breakpoint 94 (_gst_byte_writer_put_int16_le_inline) pending.
+Function "_gst_byte_writer_put_int24_be_inline" not defined.
+Breakpoint 95 (_gst_byte_writer_put_int24_be_inline) pending.
+Function "_gst_byte_writer_put_int24_le_inline" not defined.
+Breakpoint 96 (_gst_byte_writer_put_int24_le_inline) pending.
+Function "_gst_byte_writer_put_int32_be_inline" not defined.
+Breakpoint 97 (_gst_byte_writer_put_int32_be_inline) pending.
+Function "_gst_byte_writer_put_int32_le_inline" not defined.
+Breakpoint 98 (_gst_byte_writer_put_int32_le_inline) pending.
+Function "_gst_byte_writer_put_int64_be_inline" not defined.
+Breakpoint 99 (_gst_byte_writer_put_int64_be_inline) pending.
+Function "_gst_byte_writer_put_int64_le_inline" not defined.
+Breakpoint 100 (_gst_byte_writer_put_int64_le_inline) pending.
+Function "_gst_byte_writer_put_int8_inline" not defined.
+Breakpoint 101 (_gst_byte_writer_put_int8_inline) pending.
+Function "_gst_byte_writer_put_uint16_be_inline" not defined.
+Breakpoint 102 (_gst_byte_writer_put_uint16_be_inline) pending.
+Function "_gst_byte_writer_put_uint16_le_inline" not defined.
+Breakpoint 103 (_gst_byte_writer_put_uint16_le_inline) pending.
+Function "_gst_byte_writer_put_uint24_be_inline" not defined.
+Breakpoint 104 (_gst_byte_writer_put_uint24_be_inline) pending.
+Function "_gst_byte_writer_put_uint24_le_inline" not defined.
+Breakpoint 105 (_gst_byte_writer_put_uint24_le_inline) pending.
+Function "_gst_byte_writer_put_uint32_be_inline" not defined.
+Breakpoint 106 (_gst_byte_writer_put_uint32_be_inline) pending.
+Function "_gst_byte_writer_put_uint32_le_inline" not defined.
+Breakpoint 107 (_gst_byte_writer_put_uint32_le_inline) pending.
+Function "_gst_byte_writer_put_uint64_be_inline" not defined.
+Breakpoint 108 (_gst_byte_writer_put_uint64_be_inline) pending.
+Function "_gst_byte_writer_put_uint64_le_inline" not defined.
+Breakpoint 109 (_gst_byte_writer_put_uint64_le_inline) pending.
+Function "_gst_byte_writer_put_uint8_inline" not defined.
+Breakpoint 110 (_gst_byte_writer_put_uint8_inline) pending.
+Function "buf_helper_find_peek" not defined.
+Breakpoint 111 (buf_helper_find_peek) pending.
+Function "buf_helper_find_suggest" not defined.
+Breakpoint 112 (buf_helper_find_suggest) pending.
+Function "compute_upstream_suggestion" not defined.
+Breakpoint 113 (compute_upstream_suggestion) pending.
+Function "copy_into_unchecked" not defined.
+Breakpoint 114 (copy_into_unchecked) pending.
+Function "default_element_query" not defined.
+Breakpoint 115 (default_element_query) pending.
+Function "default_sink_query" not defined.
+Breakpoint 116 (default_sink_query) pending.
+Function "find_pad" not defined.
+Breakpoint 117 (find_pad) pending.
+Function "get_object_type" not defined.
+Breakpoint 118 (get_object_type) pending.
+Function "gst_adapter_available" not defined.
+Breakpoint 119 (gst_adapter_available) pending.
+Function "gst_adapter_available_fast" not defined.
+Breakpoint 120 (gst_adapter_available_fast) pending.
+Function "gst_adapter_base_init" not defined.
+Breakpoint 121 (gst_adapter_base_init) pending.
+Function "gst_adapter_class_init" not defined.
+Breakpoint 122 (gst_adapter_class_init) pending.
+Function "gst_adapter_class_init_trampoline" not defined.
+Breakpoint 123 (gst_adapter_class_init_trampoline) pending.
+Function "gst_adapter_clear" not defined.
+Breakpoint 124 (gst_adapter_clear) pending.
+Function "gst_adapter_copy" not defined.
+Breakpoint 125 (gst_adapter_copy) pending.
+Function "gst_adapter_dispose" not defined.
+Breakpoint 126 (gst_adapter_dispose) pending.
+Function "gst_adapter_finalize" not defined.
+Breakpoint 127 (gst_adapter_finalize) pending.
+Function "gst_adapter_flush" not defined.
+Breakpoint 128 (gst_adapter_flush) pending.
+Function "gst_adapter_flush_unchecked" not defined.
+Breakpoint 129 (gst_adapter_flush_unchecked) pending.
+Function "gst_adapter_get_type" not defined.
+Breakpoint 130 (gst_adapter_get_type) pending.
+Function "gst_adapter_init" not defined.
+Breakpoint 131 (gst_adapter_init) pending.
+Function "gst_adapter_masked_scan_uint32" not defined.
+Breakpoint 132 (gst_adapter_masked_scan_uint32) pending.
+Function "gst_adapter_masked_scan_uint32_peek" not defined.
+Breakpoint 133 (gst_adapter_masked_scan_uint32_peek) pending.
+Function "gst_adapter_new" not defined.
+Breakpoint 134 (gst_adapter_new) pending.
+Function "gst_adapter_peek" not defined.
+Breakpoint 135 (gst_adapter_peek) pending.
+Function "gst_adapter_prev_timestamp" not defined.
+Breakpoint 136 (gst_adapter_prev_timestamp) pending.
+Function "gst_adapter_push" not defined.
+Breakpoint 137 (gst_adapter_push) pending.
+Function "gst_adapter_take" not defined.
+Breakpoint 138 (gst_adapter_take) pending.
+Function "gst_adapter_take_buffer" not defined.
+Breakpoint 139 (gst_adapter_take_buffer) pending.
+Function "gst_adapter_take_internal" not defined.
+Breakpoint 140 (gst_adapter_take_internal) pending.
+Function "gst_adapter_take_list" not defined.
+Breakpoint 141 (gst_adapter_take_list) pending.
+Function "gst_adapter_try_to_merge_up" not defined.
+Breakpoint 142 (gst_adapter_try_to_merge_up) pending.
+Function "gst_base_parse_activate" not defined.
+Breakpoint 143 (gst_base_parse_activate) pending.
+Function "gst_base_parse_add_index_entry" not defined.
+Breakpoint 144 (gst_base_parse_add_index_entry) pending.
+Function "gst_base_parse_chain" not defined.
+Breakpoint 145 (gst_base_parse_chain) pending.
+Function "gst_base_parse_change_state" not defined.
+Breakpoint 146 (gst_base_parse_change_state) pending.
+Function "gst_base_parse_check_frame" not defined.
+Breakpoint 147 (gst_base_parse_check_frame) pending.
+Function "gst_base_parse_check_media" not defined.
+Breakpoint 148 (gst_base_parse_check_media) pending.
+Function "gst_base_parse_check_seekability" not defined.
+Breakpoint 149 (gst_base_parse_check_seekability) pending.
+Function "gst_base_parse_check_sync" not defined.
+Breakpoint 150 (gst_base_parse_check_sync) pending.
+Function "gst_base_parse_check_upstream" not defined.
+Breakpoint 151 (gst_base_parse_check_upstream) pending.
+Function "gst_base_parse_class_init" not defined.
+Breakpoint 152 (gst_base_parse_class_init) pending.
+Function "gst_base_parse_clear_queues" not defined.
+Breakpoint 153 (gst_base_parse_clear_queues) pending.
+Function "gst_base_parse_convert" not defined.
+Breakpoint 154 (gst_base_parse_convert) pending.
+Function "gst_base_parse_convert_default" not defined.
+Breakpoint 155 (gst_base_parse_convert_default) pending.
+Function "gst_base_parse_drain" not defined.
+Breakpoint 156 (gst_base_parse_drain) pending.
+Function "gst_base_parse_finalize" not defined.
+Breakpoint 157 (gst_base_parse_finalize) pending.
+Function "gst_base_parse_find_frame" not defined.
+Breakpoint 158 (gst_base_parse_find_frame) pending.
+Function "gst_base_parse_find_offset" not defined.
+Breakpoint 159 (gst_base_parse_find_offset) pending.
+Function "gst_base_parse_frame_copy" not defined.
+Breakpoint 160 (gst_base_parse_frame_copy) pending.
+Function "gst_base_parse_frame_free" not defined.
+Breakpoint 161 (gst_base_parse_frame_free) pending.
+Function "gst_base_parse_frame_get_type" not defined.
+Breakpoint 162 (gst_base_parse_frame_get_type) pending.
+Function "gst_base_parse_frame_init" not defined.
+Breakpoint 163 (gst_base_parse_frame_init) pending.
+Function "gst_base_parse_frame_new" not defined.
+Breakpoint 164 (gst_base_parse_frame_new) pending.
+Function "gst_base_parse_frame_update" not defined.
+Breakpoint 165 (gst_base_parse_frame_update) pending.
+Function "gst_base_parse_get_duration" not defined.
+Breakpoint 166 (gst_base_parse_get_duration) pending.
+Function "gst_base_parse_get_index" not defined.
+Breakpoint 167 (gst_base_parse_get_index) pending.
+Function "gst_base_parse_get_querytypes" not defined.
+Breakpoint 168 (gst_base_parse_get_querytypes) pending.
+Function "gst_base_parse_get_type" not defined.
+Breakpoint 169 (gst_base_parse_get_type) pending.
+Function "gst_base_parse_handle_and_push_frame" not defined.
+Breakpoint 170 (gst_base_parse_handle_and_push_frame) pending.
+Function "gst_base_parse_handle_previous_fragment" not defined.
+Breakpoint 171 (gst_base_parse_handle_previous_fragment) pending.
+Function "gst_base_parse_handle_seek" not defined.
+Breakpoint 172 (gst_base_parse_handle_seek) pending.
+Function "gst_base_parse_handle_tag" not defined.
+Breakpoint 173 (gst_base_parse_handle_tag) pending.
+Function "gst_base_parse_init" not defined.
+Breakpoint 174 (gst_base_parse_init) pending.
+Function "gst_base_parse_is_seekable" not defined.
+Breakpoint 175 (gst_base_parse_is_seekable) pending.
+Function "gst_base_parse_locate_time" not defined.
+Breakpoint 176 (gst_base_parse_locate_time) pending.
+Function "gst_base_parse_loop" not defined.
+Breakpoint 177 (gst_base_parse_loop) pending.
+Function "gst_base_parse_parse_frame" not defined.
+Breakpoint 178 (gst_base_parse_parse_frame) pending.
+Function "gst_base_parse_post_bitrates" not defined.
+Breakpoint 179 (gst_base_parse_post_bitrates) pending.
+Function "gst_base_parse_process_fragment" not defined.
+Breakpoint 180 (gst_base_parse_process_fragment) pending.
+Function "gst_base_parse_pull_range" not defined.
+Breakpoint 181 (gst_base_parse_pull_range) pending.
+Function "gst_base_parse_push_frame" not defined.
+Breakpoint 182 (gst_base_parse_push_frame) pending.
+Function "gst_base_parse_query" not defined.
+Breakpoint 183 (gst_base_parse_query) pending.
+Function "gst_base_parse_queue_frame" not defined.
+Breakpoint 184 (gst_base_parse_queue_frame) pending.
+Function "gst_base_parse_reset" not defined.
+Breakpoint 185 (gst_base_parse_reset) pending.
+Function "gst_base_parse_scan_frame" not defined.
+Breakpoint 186 (gst_base_parse_scan_frame) pending.
+Function "gst_base_parse_send_buffers" not defined.
+Breakpoint 187 (gst_base_parse_send_buffers) pending.
+Function "gst_base_parse_set_average_bitrate" not defined.
+Breakpoint 188 (gst_base_parse_set_average_bitrate) pending.
+Function "gst_base_parse_set_duration" not defined.
+Breakpoint 189 (gst_base_parse_set_duration) pending.
+Function "gst_base_parse_set_frame_rate" not defined.
+Breakpoint 190 (gst_base_parse_set_frame_rate) pending.
+Function "gst_base_parse_set_has_timing_info" not defined.
+Breakpoint 191 (gst_base_parse_set_has_timing_info) pending.
+Function "gst_base_parse_set_index" not defined.
+Breakpoint 192 (gst_base_parse_set_index) pending.
+Function "gst_base_parse_set_latency" not defined.
+Breakpoint 193 (gst_base_parse_set_latency) pending.
+Function "gst_base_parse_set_min_frame_size" not defined.
+Breakpoint 194 (gst_base_parse_set_min_frame_size) pending.
+Function "gst_base_parse_set_passthrough" not defined.
+Breakpoint 195 (gst_base_parse_set_passthrough) pending.
+Function "gst_base_parse_set_syncable" not defined.
+Breakpoint 196 (gst_base_parse_set_syncable) pending.
+Function "gst_base_parse_sink_activate" not defined.
+Breakpoint 197 (gst_base_parse_sink_activate) pending.
+Function "gst_base_parse_sink_activate_pull" not defined.
+Breakpoint 198 (gst_base_parse_sink_activate_pull) pending.
+Function "gst_base_parse_sink_activate_push" not defined.
+Breakpoint 199 (gst_base_parse_sink_activate_push) pending.
+Function "gst_base_parse_sink_event" not defined.
+Breakpoint 200 (gst_base_parse_sink_event) pending.
+Function "gst_base_parse_sink_eventfunc" not defined.
+Breakpoint 201 (gst_base_parse_sink_eventfunc) pending.
+Function "gst_base_parse_sink_getcaps" not defined.
+Breakpoint 202 (gst_base_parse_sink_getcaps) pending.
+Function "gst_base_parse_sink_setcaps" not defined.
+Breakpoint 203 (gst_base_parse_sink_setcaps) pending.
+Function "gst_base_parse_src_event" not defined.
+Breakpoint 204 (gst_base_parse_src_event) pending.
+Function "gst_base_parse_src_eventfunc" not defined.
+Breakpoint 205 (gst_base_parse_src_eventfunc) pending.
+Function "gst_base_parse_update_bitrates" not defined.
+Breakpoint 206 (gst_base_parse_update_bitrates) pending.
+Function "gst_base_parse_update_duration" not defined.
+Breakpoint 207 (gst_base_parse_update_duration) pending.
+Function "gst_base_sink_adjust_time" not defined.
+Breakpoint 208 (gst_base_sink_adjust_time) pending.
+Function "gst_base_sink_buffer_alloc" not defined.
+Breakpoint 209 (gst_base_sink_buffer_alloc) pending.
+Function "gst_base_sink_chain" not defined.
+Breakpoint 210 (gst_base_sink_chain) pending.
+Function "gst_base_sink_chain_list" not defined.
+Breakpoint 211 (gst_base_sink_chain_list) pending.
+Function "gst_base_sink_chain_main" not defined.
+Breakpoint 212 (gst_base_sink_chain_main) pending.
+Function "gst_base_sink_chain_unlocked" not defined.
+Breakpoint 213 (gst_base_sink_chain_unlocked) pending.
+Function "gst_base_sink_change_state" not defined.
+Breakpoint 214 (gst_base_sink_change_state) pending.
+Function "gst_base_sink_class_init" not defined.
+Breakpoint 215 (gst_base_sink_class_init) pending.
+Function "gst_base_sink_commit_state" not defined.
+Breakpoint 216 (gst_base_sink_commit_state) pending.
+Function "gst_base_sink_configure_segment" not defined.
+Breakpoint 217 (gst_base_sink_configure_segment) pending.
+Function "gst_base_sink_default_activate_pull" not defined.
+Breakpoint 218 (gst_base_sink_default_activate_pull) pending.
+Function "gst_base_sink_default_do_seek" not defined.
+Breakpoint 219 (gst_base_sink_default_do_seek) pending.
+Function "gst_base_sink_default_prepare_seek_segment" not defined.
+Breakpoint 220 (gst_base_sink_default_prepare_seek_segment) pending.
+Function "gst_base_sink_do_preroll" not defined.
+Breakpoint 221 (gst_base_sink_do_preroll) pending.
+Function "gst_base_sink_do_render_stats" not defined.
+Breakpoint 222 (gst_base_sink_do_render_stats) pending.
+Function "gst_base_sink_do_sync" not defined.
+Breakpoint 223 (gst_base_sink_do_sync) pending.
+Function "gst_base_sink_event" not defined.
+Breakpoint 224 (gst_base_sink_event) pending.
+Function "gst_base_sink_finalize" not defined.
+Breakpoint 225 (gst_base_sink_finalize) pending.
+Function "gst_base_sink_flush_start" not defined.
+Breakpoint 226 (gst_base_sink_flush_start) pending.
+Function "gst_base_sink_flush_stop" not defined.
+Breakpoint 227 (gst_base_sink_flush_stop) pending.
+Function "gst_base_sink_get_blocksize" not defined.
+Breakpoint 228 (gst_base_sink_get_blocksize) pending.
+Function "gst_base_sink_get_caps" not defined.
+Breakpoint 229 (gst_base_sink_get_caps) pending.
+Function "gst_base_sink_get_duration" not defined.
+Breakpoint 230 (gst_base_sink_get_duration) pending.
+Function "gst_base_sink_get_last_buffer" not defined.
+Breakpoint 231 (gst_base_sink_get_last_buffer) pending.
+Function "gst_base_sink_get_latency" not defined.
+Breakpoint 232 (gst_base_sink_get_latency) pending.
+Function "gst_base_sink_get_max_lateness" not defined.
+Breakpoint 233 (gst_base_sink_get_max_lateness) pending.
+Function "gst_base_sink_get_position" not defined.
+Breakpoint 234 (gst_base_sink_get_position) pending.
+Function "gst_base_sink_get_property" not defined.
+Breakpoint 235 (gst_base_sink_get_property) pending.
+Function "gst_base_sink_get_query_types" not defined.
+Breakpoint 236 (gst_base_sink_get_query_types) pending.
+Function "gst_base_sink_get_render_delay" not defined.
+Breakpoint 237 (gst_base_sink_get_render_delay) pending.
+Function "gst_base_sink_get_sync" not defined.
+Breakpoint 238 (gst_base_sink_get_sync) pending.
+Function "gst_base_sink_get_sync_times" not defined.
+Breakpoint 239 (gst_base_sink_get_sync_times) pending.
+Function "gst_base_sink_get_throttle_time" not defined.
+Breakpoint 240 (gst_base_sink_get_throttle_time) pending.
+Function "gst_base_sink_get_times" not defined.
+Breakpoint 241 (gst_base_sink_get_times) pending.
+Function "gst_base_sink_get_ts_offset" not defined.
+Breakpoint 242 (gst_base_sink_get_ts_offset) pending.
+Function "gst_base_sink_get_type" not defined.
+Breakpoint 243 (gst_base_sink_get_type) pending.
+Function "gst_base_sink_init" not defined.
+Breakpoint 244 (gst_base_sink_init) pending.
+Function "gst_base_sink_is_async_enabled" not defined.
+Breakpoint 245 (gst_base_sink_is_async_enabled) pending.
+Function "gst_base_sink_is_last_buffer_enabled" not defined.
+Breakpoint 246 (gst_base_sink_is_last_buffer_enabled) pending.
+Function "gst_base_sink_is_qos_enabled" not defined.
+Breakpoint 247 (gst_base_sink_is_qos_enabled) pending.
+Function "gst_base_sink_is_too_late" not defined.
+Breakpoint 248 (gst_base_sink_is_too_late) pending.
+Function "gst_base_sink_loop" not defined.
+Breakpoint 249 (gst_base_sink_loop) pending.
+Function "gst_base_sink_needs_preroll" not defined.
+Breakpoint 250 (gst_base_sink_needs_preroll) pending.
+Function "gst_base_sink_negotiate_pull" not defined.
+Breakpoint 251 (gst_base_sink_negotiate_pull) pending.
+Function "gst_base_sink_pad_activate" not defined.
+Breakpoint 252 (gst_base_sink_pad_activate) pending.
+Function "gst_base_sink_pad_activate_pull" not defined.
+Breakpoint 253 (gst_base_sink_pad_activate_pull) pending.
+Function "gst_base_sink_pad_activate_push" not defined.
+Breakpoint 254 (gst_base_sink_pad_activate_push) pending.
+Function "gst_base_sink_pad_buffer_alloc" not defined.
+Breakpoint 255 (gst_base_sink_pad_buffer_alloc) pending.
+Function "gst_base_sink_pad_fixate" not defined.
+Breakpoint 256 (gst_base_sink_pad_fixate) pending.
+Function "gst_base_sink_pad_getcaps" not defined.
+Breakpoint 257 (gst_base_sink_pad_getcaps) pending.
+Function "gst_base_sink_pad_setcaps" not defined.
+Breakpoint 258 (gst_base_sink_pad_setcaps) pending.
+Function "gst_base_sink_perform_qos" not defined.
+Breakpoint 259 (gst_base_sink_perform_qos) pending.
+Function "gst_base_sink_perform_seek" not defined.
+Breakpoint 260 (gst_base_sink_perform_seek) pending.
+Function "gst_base_sink_perform_step" not defined.
+Breakpoint 261 (gst_base_sink_perform_step) pending.
+Function "gst_base_sink_preroll_object" not defined.
+Breakpoint 262 (gst_base_sink_preroll_object) pending.
+Function "gst_base_sink_preroll_queue_flush" not defined.
+Breakpoint 263 (gst_base_sink_preroll_queue_flush) pending.
+Function "gst_base_sink_query_latency" not defined.
+Breakpoint 264 (gst_base_sink_query_latency) pending.
+Function "gst_base_sink_queue_object" not defined.
+Breakpoint 265 (gst_base_sink_queue_object) pending.
+Function "gst_base_sink_queue_object_unlocked" not defined.
+Breakpoint 266 (gst_base_sink_queue_object_unlocked) pending.
+Function "gst_base_sink_render_object" not defined.
+Breakpoint 267 (gst_base_sink_render_object) pending.
+Function "gst_base_sink_reset_qos" not defined.
+Breakpoint 268 (gst_base_sink_reset_qos) pending.
+Function "gst_base_sink_send_event" not defined.
+Breakpoint 269 (gst_base_sink_send_event) pending.
+Function "gst_base_sink_send_qos" not defined.
+Breakpoint 270 (gst_base_sink_send_qos) pending.
+Function "gst_base_sink_set_async_enabled" not defined.
+Breakpoint 271 (gst_base_sink_set_async_enabled) pending.
+Function "gst_base_sink_set_blocksize" not defined.
+Breakpoint 272 (gst_base_sink_set_blocksize) pending.
+Function "gst_base_sink_set_caps" not defined.
+Breakpoint 273 (gst_base_sink_set_caps) pending.
+Function "gst_base_sink_set_flushing" not defined.
+Breakpoint 274 (gst_base_sink_set_flushing) pending.
+Function "gst_base_sink_set_last_buffer" not defined.
+Breakpoint 275 (gst_base_sink_set_last_buffer) pending.
+Function "gst_base_sink_set_last_buffer_enabled" not defined.
+Breakpoint 276 (gst_base_sink_set_last_buffer_enabled) pending.
+Function "gst_base_sink_set_last_buffer_unlocked" not defined.
+Breakpoint 277 (gst_base_sink_set_last_buffer_unlocked) pending.
+Function "gst_base_sink_set_max_lateness" not defined.
+Breakpoint 278 (gst_base_sink_set_max_lateness) pending.
+Function "gst_base_sink_set_property" not defined.
+Breakpoint 279 (gst_base_sink_set_property) pending.
+Function "gst_base_sink_set_qos_enabled" not defined.
+Breakpoint 280 (gst_base_sink_set_qos_enabled) pending.
+Function "gst_base_sink_set_render_delay" not defined.
+Breakpoint 281 (gst_base_sink_set_render_delay) pending.
+Function "gst_base_sink_set_sync" not defined.
+Breakpoint 282 (gst_base_sink_set_sync) pending.
+Function "gst_base_sink_set_throttle_time" not defined.
+Breakpoint 283 (gst_base_sink_set_throttle_time) pending.
+Function "gst_base_sink_set_ts_offset" not defined.
+Breakpoint 284 (gst_base_sink_set_ts_offset) pending.
+Function "gst_base_sink_sink_query" not defined.
+Breakpoint 285 (gst_base_sink_sink_query) pending.
+Function "gst_base_sink_wait_clock" not defined.
+Breakpoint 286 (gst_base_sink_wait_clock) pending.
+Function "gst_base_sink_wait_eos" not defined.
+Breakpoint 287 (gst_base_sink_wait_eos) pending.
+Function "gst_base_sink_wait_preroll" not defined.
+Breakpoint 288 (gst_base_sink_wait_preroll) pending.
+Function "gst_base_src_activate_pull" not defined.
+Breakpoint 289 (gst_base_src_activate_pull) pending.
+Function "gst_base_src_activate_push" not defined.
+Breakpoint 290 (gst_base_src_activate_push) pending.
+Function "gst_base_src_base_init" not defined.
+Breakpoint 291 (gst_base_src_base_init) pending.
+Function "gst_base_src_change_state" not defined.
+Breakpoint 292 (gst_base_src_change_state) pending.
+Function "gst_base_src_check_get_range" not defined.
+Breakpoint 293 (gst_base_src_check_get_range) pending.
+Function "gst_base_src_class_init" not defined.
+Breakpoint 294 (gst_base_src_class_init) pending.
+Function "gst_base_src_default_check_get_range" not defined.
+Breakpoint 295 (gst_base_src_default_check_get_range) pending.
+Function "gst_base_src_default_do_seek" not defined.
+Breakpoint 296 (gst_base_src_default_do_seek) pending.
+Function "gst_base_src_default_event" not defined.
+Breakpoint 297 (gst_base_src_default_event) pending.
+Function "gst_base_src_default_negotiate" not defined.
+Breakpoint 298 (gst_base_src_default_negotiate) pending.
+Function "gst_base_src_default_prepare_seek_segment" not defined.
+Breakpoint 299 (gst_base_src_default_prepare_seek_segment) pending.
+Function "gst_base_src_default_query" not defined.
+Breakpoint 300 (gst_base_src_default_query) pending.
+Function "gst_base_src_do_seek" not defined.
+Breakpoint 301 (gst_base_src_do_seek) pending.
+Function "gst_base_src_do_sync" not defined.
+Breakpoint 302 (gst_base_src_do_sync) pending.
+Function "gst_base_src_event_handler" not defined.
+Breakpoint 303 (gst_base_src_event_handler) pending.
+Function "gst_base_src_finalize" not defined.
+Breakpoint 304 (gst_base_src_finalize) pending.
+Function "gst_base_src_fixate" not defined.
+Breakpoint 305 (gst_base_src_fixate) pending.
+Function "gst_base_src_get_blocksize" not defined.
+Breakpoint 306 (gst_base_src_get_blocksize) pending.
+Function "gst_base_src_get_do_timestamp" not defined.
+Breakpoint 307 (gst_base_src_get_do_timestamp) pending.
+Function "gst_base_src_get_property" not defined.
+Breakpoint 308 (gst_base_src_get_property) pending.
+Function "gst_base_src_get_query_types" not defined.
+Breakpoint 309 (gst_base_src_get_query_types) pending.
+Function "gst_base_src_get_range" not defined.
+Breakpoint 310 (gst_base_src_get_range) pending.
+Function "gst_base_src_get_type" not defined.
+Breakpoint 311 (gst_base_src_get_type) pending.
+Function "gst_base_src_getcaps" not defined.
+Breakpoint 312 (gst_base_src_getcaps) pending.
+Function "gst_base_src_init" not defined.
+Breakpoint 313 (gst_base_src_init) pending.
+Function "gst_base_src_is_live" not defined.
+Breakpoint 314 (gst_base_src_is_live) pending.
+Function "gst_base_src_loop" not defined.
+Breakpoint 315 (gst_base_src_loop) pending.
+Function "gst_base_src_negotiate" not defined.
+Breakpoint 316 (gst_base_src_negotiate) pending.
+Function "gst_base_src_new_seamless_segment" not defined.
+Breakpoint 317 (gst_base_src_new_seamless_segment) pending.
+Function "gst_base_src_pad_check_get_range" not defined.
+Breakpoint 318 (gst_base_src_pad_check_get_range) pending.
+Function "gst_base_src_pad_get_range" not defined.
+Breakpoint 319 (gst_base_src_pad_get_range) pending.
+Function "gst_base_src_perform_seek" not defined.
+Breakpoint 320 (gst_base_src_perform_seek) pending.
+Function "gst_base_src_prepare_seek_segment" not defined.
+Breakpoint 321 (gst_base_src_prepare_seek_segment) pending.
+Function "gst_base_src_query" not defined.
+Breakpoint 322 (gst_base_src_query) pending.
+Function "gst_base_src_query_latency" not defined.
+Breakpoint 323 (gst_base_src_query_latency) pending.
+Function "gst_base_src_seekable" not defined.
+Breakpoint 324 (gst_base_src_seekable) pending.
+Function "gst_base_src_send_event" not defined.
+Breakpoint 325 (gst_base_src_send_event) pending.
+Function "gst_base_src_set_blocksize" not defined.
+Breakpoint 326 (gst_base_src_set_blocksize) pending.
+Function "gst_base_src_set_do_timestamp" not defined.
+Breakpoint 327 (gst_base_src_set_do_timestamp) pending.
+Function "gst_base_src_set_dynamic_size" not defined.
+Breakpoint 328 (gst_base_src_set_dynamic_size) pending.
+Function "gst_base_src_set_flushing" not defined.
+Breakpoint 329 (gst_base_src_set_flushing) pending.
+Function "gst_base_src_set_format" not defined.
+Breakpoint 330 (gst_base_src_set_format) pending.
+Function "gst_base_src_set_live" not defined.
+Breakpoint 331 (gst_base_src_set_live) pending.
+Function "gst_base_src_set_playing" not defined.
+Breakpoint 332 (gst_base_src_set_playing) pending.
+Function "gst_base_src_set_property" not defined.
+Breakpoint 333 (gst_base_src_set_property) pending.
+Function "gst_base_src_setcaps" not defined.
+Breakpoint 334 (gst_base_src_setcaps) pending.
+Function "gst_base_src_start" not defined.
+Breakpoint 335 (gst_base_src_start) pending.
+Function "gst_base_src_stop" not defined.
+Breakpoint 336 (gst_base_src_stop) pending.
+Function "gst_base_src_update_length" not defined.
+Breakpoint 337 (gst_base_src_update_length) pending.
+Function "gst_base_src_update_qos" not defined.
+Breakpoint 338 (gst_base_src_update_qos) pending.
+Function "gst_base_src_wait" not defined.
+Breakpoint 339 (gst_base_src_wait) pending.
+Function "gst_base_src_wait_playing" not defined.
+Breakpoint 340 (gst_base_src_wait_playing) pending.
+Function "gst_base_transform_acceptcaps" not defined.
+Breakpoint 341 (gst_base_transform_acceptcaps) pending.
+Function "gst_base_transform_acceptcaps_default" not defined.
+Breakpoint 342 (gst_base_transform_acceptcaps_default) pending.
+Function "gst_base_transform_activate" not defined.
+Breakpoint 343 (gst_base_transform_activate) pending.
+Function "gst_base_transform_buffer_alloc" not defined.
+Breakpoint 344 (gst_base_transform_buffer_alloc) pending.
+Function "gst_base_transform_can_transform" not defined.
+Breakpoint 345 (gst_base_transform_can_transform) pending.
+Function "gst_base_transform_chain" not defined.
+Breakpoint 346 (gst_base_transform_chain) pending.
+Function "gst_base_transform_check_get_range" not defined.
+Breakpoint 347 (gst_base_transform_check_get_range) pending.
+Function "gst_base_transform_class_init" not defined.
+Breakpoint 348 (gst_base_transform_class_init) pending.
+Function "gst_base_transform_clear_transformed_caps_cache" not defined.
+Breakpoint 349 (gst_base_transform_clear_transformed_caps_cache) pending.
+Function "gst_base_transform_configure_caps" not defined.
+Breakpoint 350 (gst_base_transform_configure_caps) pending.
+Function "gst_base_transform_default_query" not defined.
+Breakpoint 351 (gst_base_transform_default_query) pending.
+Function "gst_base_transform_drop_delayed_events" not defined.
+Breakpoint 352 (gst_base_transform_drop_delayed_events) pending.
+Function "gst_base_transform_finalize" not defined.
+Breakpoint 353 (gst_base_transform_finalize) pending.
+Function "gst_base_transform_find_transform" not defined.
+Breakpoint 354 (gst_base_transform_find_transform) pending.
+Function "gst_base_transform_get_property" not defined.
+Breakpoint 355 (gst_base_transform_get_property) pending.
+Function "gst_base_transform_get_type" not defined.
+Breakpoint 356 (gst_base_transform_get_type) pending.
+Function "gst_base_transform_get_unit_size" not defined.
+Breakpoint 357 (gst_base_transform_get_unit_size) pending.
+Function "gst_base_transform_getcaps" not defined.
+Breakpoint 358 (gst_base_transform_getcaps) pending.
+Function "gst_base_transform_getrange" not defined.
+Breakpoint 359 (gst_base_transform_getrange) pending.
+Function "gst_base_transform_handle_buffer" not defined.
+Breakpoint 360 (gst_base_transform_handle_buffer) pending.
+Function "gst_base_transform_init" not defined.
+Breakpoint 361 (gst_base_transform_init) pending.
+Function "gst_base_transform_is_in_place" not defined.
+Breakpoint 362 (gst_base_transform_is_in_place) pending.
+Function "gst_base_transform_is_passthrough" not defined.
+Breakpoint 363 (gst_base_transform_is_passthrough) pending.
+Function "gst_base_transform_is_qos_enabled" not defined.
+Breakpoint 364 (gst_base_transform_is_qos_enabled) pending.
+Function "gst_base_transform_prepare_output_buffer" not defined.
+Breakpoint 365 (gst_base_transform_prepare_output_buffer) pending.
+Function "gst_base_transform_query" not defined.
+Breakpoint 366 (gst_base_transform_query) pending.
+Function "gst_base_transform_query_type" not defined.
+Breakpoint 367 (gst_base_transform_query_type) pending.
+Function "gst_base_transform_reconfigure" not defined.
+Breakpoint 368 (gst_base_transform_reconfigure) pending.
+Function "gst_base_transform_send_delayed_events" not defined.
+Breakpoint 369 (gst_base_transform_send_delayed_events) pending.
+Function "gst_base_transform_set_gap_aware" not defined.
+Breakpoint 370 (gst_base_transform_set_gap_aware) pending.
+Function "gst_base_transform_set_in_place" not defined.
+Breakpoint 371 (gst_base_transform_set_in_place) pending.
+Function "gst_base_transform_set_passthrough" not defined.
+Breakpoint 372 (gst_base_transform_set_passthrough) pending.
+Function "gst_base_transform_set_property" not defined.
+Breakpoint 373 (gst_base_transform_set_property) pending.
+Function "gst_base_transform_set_qos_enabled" not defined.
+Breakpoint 374 (gst_base_transform_set_qos_enabled) pending.
+Function "gst_base_transform_setcaps" not defined.
+Breakpoint 375 (gst_base_transform_setcaps) pending.
+Function "gst_base_transform_sink_activate_push" not defined.
+Breakpoint 376 (gst_base_transform_sink_activate_push) pending.
+Function "gst_base_transform_sink_event" not defined.
+Breakpoint 377 (gst_base_transform_sink_event) pending.
+Function "gst_base_transform_sink_eventfunc" not defined.
+Breakpoint 378 (gst_base_transform_sink_eventfunc) pending.
+Function "gst_base_transform_src_activate_pull" not defined.
+Breakpoint 379 (gst_base_transform_src_activate_pull) pending.
+Function "gst_base_transform_src_event" not defined.
+Breakpoint 380 (gst_base_transform_src_event) pending.
+Function "gst_base_transform_src_eventfunc" not defined.
+Breakpoint 381 (gst_base_transform_src_eventfunc) pending.
+Function "gst_base_transform_suggest" not defined.
+Breakpoint 382 (gst_base_transform_suggest) pending.
+Function "gst_base_transform_transform_caps" not defined.
+Breakpoint 383 (gst_base_transform_transform_caps) pending.
+Function "gst_base_transform_transform_size" not defined.
+Breakpoint 384 (gst_base_transform_transform_size) pending.
+Function "gst_base_transform_update_qos" not defined.
+Breakpoint 385 (gst_base_transform_update_qos) pending.
+Function "gst_bit_reader_free" not defined.
+Breakpoint 386 (gst_bit_reader_free) pending.
+Function "gst_bit_reader_get_bits_uint16" not defined.
+Breakpoint 387 (gst_bit_reader_get_bits_uint16) pending.
+Function "gst_bit_reader_get_bits_uint16_unchecked" not defined.
+Breakpoint 388 (gst_bit_reader_get_bits_uint16_unchecked) pending.
+Function "gst_bit_reader_get_bits_uint32" not defined.
+Breakpoint 389 (gst_bit_reader_get_bits_uint32) pending.
+Function "gst_bit_reader_get_bits_uint32_unchecked" not defined.
+Breakpoint 390 (gst_bit_reader_get_bits_uint32_unchecked) pending.
+Function "gst_bit_reader_get_bits_uint64" not defined.
+Breakpoint 391 (gst_bit_reader_get_bits_uint64) pending.
+Function "gst_bit_reader_get_bits_uint64_unchecked" not defined.
+Breakpoint 392 (gst_bit_reader_get_bits_uint64_unchecked) pending.
+Function "gst_bit_reader_get_bits_uint8" not defined.
+Breakpoint 393 (gst_bit_reader_get_bits_uint8) pending.
+Function "gst_bit_reader_get_bits_uint8_unchecked" not defined.
+Breakpoint 394 (gst_bit_reader_get_bits_uint8_unchecked) pending.
+Function "gst_bit_reader_get_pos" not defined.
+Breakpoint 395 (gst_bit_reader_get_pos) pending.
+Function "gst_bit_reader_get_remaining" not defined.
+Breakpoint 396 (gst_bit_reader_get_remaining) pending.
+Function "gst_bit_reader_get_size" not defined.
+Breakpoint 397 (gst_bit_reader_get_size) pending.
+Function "gst_bit_reader_init" not defined.
+Breakpoint 398 (gst_bit_reader_init) pending.
+Function "gst_bit_reader_init_from_buffer" not defined.
+Breakpoint 399 (gst_bit_reader_init_from_buffer) pending.
+Function "gst_bit_reader_new" not defined.
+Breakpoint 400 (gst_bit_reader_new) pending.
+Function "gst_bit_reader_new_from_buffer" not defined.
+Breakpoint 401 (gst_bit_reader_new_from_buffer) pending.
+Function "gst_bit_reader_peek_bits_uint16" not defined.
+Breakpoint 402 (gst_bit_reader_peek_bits_uint16) pending.
+Function "gst_bit_reader_peek_bits_uint16_unchecked" not defined.
+Breakpoint 403 (gst_bit_reader_peek_bits_uint16_unchecked) pending.
+Function "gst_bit_reader_peek_bits_uint32" not defined.
+Breakpoint 404 (gst_bit_reader_peek_bits_uint32) pending.
+Function "gst_bit_reader_peek_bits_uint32_unchecked" not defined.
+Breakpoint 405 (gst_bit_reader_peek_bits_uint32_unchecked) pending.
+Function "gst_bit_reader_peek_bits_uint64" not defined.
+Breakpoint 406 (gst_bit_reader_peek_bits_uint64) pending.
+Function "gst_bit_reader_peek_bits_uint64_unchecked" not defined.
+Breakpoint 407 (gst_bit_reader_peek_bits_uint64_unchecked) pending.
+Function "gst_bit_reader_peek_bits_uint8" not defined.
+Breakpoint 408 (gst_bit_reader_peek_bits_uint8) pending.
+Function "gst_bit_reader_peek_bits_uint8_unchecked" not defined.
+Breakpoint 409 (gst_bit_reader_peek_bits_uint8_unchecked) pending.
+Function "gst_bit_reader_set_pos" not defined.
+Breakpoint 410 (gst_bit_reader_set_pos) pending.
+Function "gst_bit_reader_skip" not defined.
+Breakpoint 411 (gst_bit_reader_skip) pending.
+Function "gst_bit_reader_skip_to_byte" not defined.
+Breakpoint 412 (gst_bit_reader_skip_to_byte) pending.
+Function "gst_bit_reader_skip_to_byte_unchecked" not defined.
+Breakpoint 413 (gst_bit_reader_skip_to_byte_unchecked) pending.
+Function "gst_bit_reader_skip_unchecked" not defined.
+Breakpoint 414 (gst_bit_reader_skip_unchecked) pending.
+Breakpoint 415 at 0x7ffff7b349e6: file ../gst/gstbufferlist.h, line 161.
+Breakpoint 416 at 0x7ffff7b04c6c: gst_buffer_ref. (2 locations)
+Function "gst_buffer_replace" not defined.
+Breakpoint 417 (gst_buffer_replace) pending.
+Function "gst_byte_reader_dup_data" not defined.
+Breakpoint 418 (gst_byte_reader_dup_data) pending.
+Function "gst_byte_reader_dup_data_unchecked" not defined.
+Breakpoint 419 (gst_byte_reader_dup_data_unchecked) pending.
+Function "gst_byte_reader_dup_string_utf16" not defined.
+Breakpoint 420 (gst_byte_reader_dup_string_utf16) pending.
+Function "gst_byte_reader_dup_string_utf32" not defined.
+Breakpoint 421 (gst_byte_reader_dup_string_utf32) pending.
+Function "gst_byte_reader_dup_string_utf8" not defined.
+Breakpoint 422 (gst_byte_reader_dup_string_utf8) pending.
+Function "gst_byte_reader_free" not defined.
+Breakpoint 423 (gst_byte_reader_free) pending.
+Function "gst_byte_reader_get_data" not defined.
+Breakpoint 424 (gst_byte_reader_get_data) pending.
+Function "gst_byte_reader_get_data_unchecked" not defined.
+Breakpoint 425 (gst_byte_reader_get_data_unchecked) pending.
+Function "gst_byte_reader_get_float32_be" not defined.
+Breakpoint 426 (gst_byte_reader_get_float32_be) pending.
+Function "gst_byte_reader_get_float32_be_unchecked" not defined.
+Breakpoint 427 (gst_byte_reader_get_float32_be_unchecked) pending.
+Function "gst_byte_reader_get_float32_le" not defined.
+Breakpoint 428 (gst_byte_reader_get_float32_le) pending.
+Function "gst_byte_reader_get_float32_le_unchecked" not defined.
+Breakpoint 429 (gst_byte_reader_get_float32_le_unchecked) pending.
+Function "gst_byte_reader_get_float64_be" not defined.
+Breakpoint 430 (gst_byte_reader_get_float64_be) pending.
+Function "gst_byte_reader_get_float64_be_unchecked" not defined.
+Breakpoint 431 (gst_byte_reader_get_float64_be_unchecked) pending.
+Function "gst_byte_reader_get_float64_le" not defined.
+Breakpoint 432 (gst_byte_reader_get_float64_le) pending.
+Function "gst_byte_reader_get_float64_le_unchecked" not defined.
+Breakpoint 433 (gst_byte_reader_get_float64_le_unchecked) pending.
+Function "gst_byte_reader_get_int16_be" not defined.
+Breakpoint 434 (gst_byte_reader_get_int16_be) pending.
+Function "gst_byte_reader_get_int16_be_unchecked" not defined.
+Breakpoint 435 (gst_byte_reader_get_int16_be_unchecked) pending.
+Function "gst_byte_reader_get_int16_le" not defined.
+Breakpoint 436 (gst_byte_reader_get_int16_le) pending.
+Function "gst_byte_reader_get_int16_le_unchecked" not defined.
+Breakpoint 437 (gst_byte_reader_get_int16_le_unchecked) pending.
+Function "gst_byte_reader_get_int24_be" not defined.
+Breakpoint 438 (gst_byte_reader_get_int24_be) pending.
+Function "gst_byte_reader_get_int24_be_unchecked" not defined.
+Breakpoint 439 (gst_byte_reader_get_int24_be_unchecked) pending.
+Function "gst_byte_reader_get_int24_le" not defined.
+Breakpoint 440 (gst_byte_reader_get_int24_le) pending.
+Function "gst_byte_reader_get_int24_le_unchecked" not defined.
+Breakpoint 441 (gst_byte_reader_get_int24_le_unchecked) pending.
+Function "gst_byte_reader_get_int32_be" not defined.
+Breakpoint 442 (gst_byte_reader_get_int32_be) pending.
+Function "gst_byte_reader_get_int32_be_unchecked" not defined.
+Breakpoint 443 (gst_byte_reader_get_int32_be_unchecked) pending.
+Function "gst_byte_reader_get_int32_le" not defined.
+Breakpoint 444 (gst_byte_reader_get_int32_le) pending.
+Function "gst_byte_reader_get_int32_le_unchecked" not defined.
+Breakpoint 445 (gst_byte_reader_get_int32_le_unchecked) pending.
+Function "gst_byte_reader_get_int64_be" not defined.
+Breakpoint 446 (gst_byte_reader_get_int64_be) pending.
+Function "gst_byte_reader_get_int64_be_unchecked" not defined.
+Breakpoint 447 (gst_byte_reader_get_int64_be_unchecked) pending.
+Function "gst_byte_reader_get_int64_le" not defined.
+Breakpoint 448 (gst_byte_reader_get_int64_le) pending.
+Function "gst_byte_reader_get_int64_le_unchecked" not defined.
+Breakpoint 449 (gst_byte_reader_get_int64_le_unchecked) pending.
+Function "gst_byte_reader_get_int8" not defined.
+Breakpoint 450 (gst_byte_reader_get_int8) pending.
+Function "gst_byte_reader_get_int8_unchecked" not defined.
+Breakpoint 451 (gst_byte_reader_get_int8_unchecked) pending.
+Function "gst_byte_reader_get_pos" not defined.
+Breakpoint 452 (gst_byte_reader_get_pos) pending.
+Function "gst_byte_reader_get_remaining" not defined.
+Breakpoint 453 (gst_byte_reader_get_remaining) pending.
+Function "gst_byte_reader_get_size" not defined.
+Breakpoint 454 (gst_byte_reader_get_size) pending.
+Function "gst_byte_reader_get_string_utf8" not defined.
+Breakpoint 455 (gst_byte_reader_get_string_utf8) pending.
+Function "gst_byte_reader_get_uint16_be" not defined.
+Breakpoint 456 (gst_byte_reader_get_uint16_be) pending.
+Function "gst_byte_reader_get_uint16_be_unchecked" not defined.
+Breakpoint 457 (gst_byte_reader_get_uint16_be_unchecked) pending.
+Function "gst_byte_reader_get_uint16_le" not defined.
+Breakpoint 458 (gst_byte_reader_get_uint16_le) pending.
+Function "gst_byte_reader_get_uint16_le_unchecked" not defined.
+Breakpoint 459 (gst_byte_reader_get_uint16_le_unchecked) pending.
+Function "gst_byte_reader_get_uint24_be" not defined.
+Breakpoint 460 (gst_byte_reader_get_uint24_be) pending.
+Function "gst_byte_reader_get_uint24_be_unchecked" not defined.
+Breakpoint 461 (gst_byte_reader_get_uint24_be_unchecked) pending.
+Function "gst_byte_reader_get_uint24_le" not defined.
+Breakpoint 462 (gst_byte_reader_get_uint24_le) pending.
+Function "gst_byte_reader_get_uint24_le_unchecked" not defined.
+Breakpoint 463 (gst_byte_reader_get_uint24_le_unchecked) pending.
+Function "gst_byte_reader_get_uint32_be" not defined.
+Breakpoint 464 (gst_byte_reader_get_uint32_be) pending.
+Function "gst_byte_reader_get_uint32_be_unchecked" not defined.
+Breakpoint 465 (gst_byte_reader_get_uint32_be_unchecked) pending.
+Function "gst_byte_reader_get_uint32_le" not defined.
+Breakpoint 466 (gst_byte_reader_get_uint32_le) pending.
+Function "gst_byte_reader_get_uint32_le_unchecked" not defined.
+Breakpoint 467 (gst_byte_reader_get_uint32_le_unchecked) pending.
+Function "gst_byte_reader_get_uint64_be" not defined.
+Breakpoint 468 (gst_byte_reader_get_uint64_be) pending.
+Function "gst_byte_reader_get_uint64_be_unchecked" not defined.
+Breakpoint 469 (gst_byte_reader_get_uint64_be_unchecked) pending.
+Function "gst_byte_reader_get_uint64_le" not defined.
+Breakpoint 470 (gst_byte_reader_get_uint64_le) pending.
+Function "gst_byte_reader_get_uint64_le_unchecked" not defined.
+Breakpoint 471 (gst_byte_reader_get_uint64_le_unchecked) pending.
+Function "gst_byte_reader_get_uint8" not defined.
+Breakpoint 472 (gst_byte_reader_get_uint8) pending.
+Function "gst_byte_reader_get_uint8_unchecked" not defined.
+Breakpoint 473 (gst_byte_reader_get_uint8_unchecked) pending.
+Function "gst_byte_reader_init" not defined.
+Breakpoint 474 (gst_byte_reader_init) pending.
+Function "gst_byte_reader_init_from_buffer" not defined.
+Breakpoint 475 (gst_byte_reader_init_from_buffer) pending.
+Function "gst_byte_reader_masked_scan_uint32" not defined.
+Breakpoint 476 (gst_byte_reader_masked_scan_uint32) pending.
+Function "gst_byte_reader_new" not defined.
+Breakpoint 477 (gst_byte_reader_new) pending.
+Function "gst_byte_reader_new_from_buffer" not defined.
+Breakpoint 478 (gst_byte_reader_new_from_buffer) pending.
+Function "gst_byte_reader_peek_data" not defined.
+Breakpoint 479 (gst_byte_reader_peek_data) pending.
+Function "gst_byte_reader_peek_data_unchecked" not defined.
+Breakpoint 480 (gst_byte_reader_peek_data_unchecked) pending.
+Function "gst_byte_reader_peek_float32_be" not defined.
+Breakpoint 481 (gst_byte_reader_peek_float32_be) pending.
+Function "gst_byte_reader_peek_float32_be_unchecked" not defined.
+Breakpoint 482 (gst_byte_reader_peek_float32_be_unchecked) pending.
+Function "gst_byte_reader_peek_float32_le" not defined.
+Breakpoint 483 (gst_byte_reader_peek_float32_le) pending.
+Function "gst_byte_reader_peek_float32_le_unchecked" not defined.
+Breakpoint 484 (gst_byte_reader_peek_float32_le_unchecked) pending.
+Function "gst_byte_reader_peek_float64_be" not defined.
+Breakpoint 485 (gst_byte_reader_peek_float64_be) pending.
+Function "gst_byte_reader_peek_float64_be_unchecked" not defined.
+Breakpoint 486 (gst_byte_reader_peek_float64_be_unchecked) pending.
+Function "gst_byte_reader_peek_float64_le" not defined.
+Breakpoint 487 (gst_byte_reader_peek_float64_le) pending.
+Function "gst_byte_reader_peek_float64_le_unchecked" not defined.
+Breakpoint 488 (gst_byte_reader_peek_float64_le_unchecked) pending.
+Function "gst_byte_reader_peek_int16_be" not defined.
+Breakpoint 489 (gst_byte_reader_peek_int16_be) pending.
+Function "gst_byte_reader_peek_int16_be_unchecked" not defined.
+Breakpoint 490 (gst_byte_reader_peek_int16_be_unchecked) pending.
+Function "gst_byte_reader_peek_int16_le" not defined.
+Breakpoint 491 (gst_byte_reader_peek_int16_le) pending.
+Function "gst_byte_reader_peek_int16_le_unchecked" not defined.
+Breakpoint 492 (gst_byte_reader_peek_int16_le_unchecked) pending.
+Function "gst_byte_reader_peek_int24_be" not defined.
+Breakpoint 493 (gst_byte_reader_peek_int24_be) pending.
+Function "gst_byte_reader_peek_int24_be_unchecked" not defined.
+Breakpoint 494 (gst_byte_reader_peek_int24_be_unchecked) pending.
+Function "gst_byte_reader_peek_int24_le" not defined.
+Breakpoint 495 (gst_byte_reader_peek_int24_le) pending.
+Function "gst_byte_reader_peek_int24_le_unchecked" not defined.
+Breakpoint 496 (gst_byte_reader_peek_int24_le_unchecked) pending.
+Function "gst_byte_reader_peek_int32_be" not defined.
+Breakpoint 497 (gst_byte_reader_peek_int32_be) pending.
+Function "gst_byte_reader_peek_int32_be_unchecked" not defined.
+Breakpoint 498 (gst_byte_reader_peek_int32_be_unchecked) pending.
+Function "gst_byte_reader_peek_int32_le" not defined.
+Breakpoint 499 (gst_byte_reader_peek_int32_le) pending.
+Function "gst_byte_reader_peek_int32_le_unchecked" not defined.
+Breakpoint 500 (gst_byte_reader_peek_int32_le_unchecked) pending.
+Function "gst_byte_reader_peek_int64_be" not defined.
+Breakpoint 501 (gst_byte_reader_peek_int64_be) pending.
+Function "gst_byte_reader_peek_int64_be_unchecked" not defined.
+Breakpoint 502 (gst_byte_reader_peek_int64_be_unchecked) pending.
+Function "gst_byte_reader_peek_int64_le" not defined.
+Breakpoint 503 (gst_byte_reader_peek_int64_le) pending.
+Function "gst_byte_reader_peek_int64_le_unchecked" not defined.
+Breakpoint 504 (gst_byte_reader_peek_int64_le_unchecked) pending.
+Function "gst_byte_reader_peek_int8" not defined.
+Breakpoint 505 (gst_byte_reader_peek_int8) pending.
+Function "gst_byte_reader_peek_int8_unchecked" not defined.
+Breakpoint 506 (gst_byte_reader_peek_int8_unchecked) pending.
+Function "gst_byte_reader_peek_string_utf8" not defined.
+Breakpoint 507 (gst_byte_reader_peek_string_utf8) pending.
+Function "gst_byte_reader_peek_uint16_be" not defined.
+Breakpoint 508 (gst_byte_reader_peek_uint16_be) pending.
+Function "gst_byte_reader_peek_uint16_be_unchecked" not defined.
+Breakpoint 509 (gst_byte_reader_peek_uint16_be_unchecked) pending.
+Function "gst_byte_reader_peek_uint16_le" not defined.
+Breakpoint 510 (gst_byte_reader_peek_uint16_le) pending.
+Function "gst_byte_reader_peek_uint16_le_unchecked" not defined.
+Breakpoint 511 (gst_byte_reader_peek_uint16_le_unchecked) pending.
+Function "gst_byte_reader_peek_uint24_be" not defined.
+Breakpoint 512 (gst_byte_reader_peek_uint24_be) pending.
+Function "gst_byte_reader_peek_uint24_be_unchecked" not defined.
+Breakpoint 513 (gst_byte_reader_peek_uint24_be_unchecked) pending.
+Function "gst_byte_reader_peek_uint24_le" not defined.
+Breakpoint 514 (gst_byte_reader_peek_uint24_le) pending.
+Function "gst_byte_reader_peek_uint24_le_unchecked" not defined.
+Breakpoint 515 (gst_byte_reader_peek_uint24_le_unchecked) pending.
+Function "gst_byte_reader_peek_uint32_be" not defined.
+Breakpoint 516 (gst_byte_reader_peek_uint32_be) pending.
+Function "gst_byte_reader_peek_uint32_be_unchecked" not defined.
+Breakpoint 517 (gst_byte_reader_peek_uint32_be_unchecked) pending.
+Function "gst_byte_reader_peek_uint32_le" not defined.
+Breakpoint 518 (gst_byte_reader_peek_uint32_le) pending.
+Function "gst_byte_reader_peek_uint32_le_unchecked" not defined.
+Breakpoint 519 (gst_byte_reader_peek_uint32_le_unchecked) pending.
+Function "gst_byte_reader_peek_uint64_be" not defined.
+Breakpoint 520 (gst_byte_reader_peek_uint64_be) pending.
+Function "gst_byte_reader_peek_uint64_be_unchecked" not defined.
+Breakpoint 521 (gst_byte_reader_peek_uint64_be_unchecked) pending.
+Function "gst_byte_reader_peek_uint64_le" not defined.
+Breakpoint 522 (gst_byte_reader_peek_uint64_le) pending.
+Function "gst_byte_reader_peek_uint64_le_unchecked" not defined.
+Breakpoint 523 (gst_byte_reader_peek_uint64_le_unchecked) pending.
+Function "gst_byte_reader_peek_uint8" not defined.
+Breakpoint 524 (gst_byte_reader_peek_uint8) pending.
+Function "gst_byte_reader_peek_uint8_unchecked" not defined.
+Breakpoint 525 (gst_byte_reader_peek_uint8_unchecked) pending.
+Function "gst_byte_reader_scan_string_utf16" not defined.
+Breakpoint 526 (gst_byte_reader_scan_string_utf16) pending.
+Function "gst_byte_reader_scan_string_utf32" not defined.
+Breakpoint 527 (gst_byte_reader_scan_string_utf32) pending.
+Function "gst_byte_reader_scan_string_utf8" not defined.
+Breakpoint 528 (gst_byte_reader_scan_string_utf8) pending.
+Function "gst_byte_reader_set_pos" not defined.
+Breakpoint 529 (gst_byte_reader_set_pos) pending.
+Function "gst_byte_reader_skip" not defined.
+Breakpoint 530 (gst_byte_reader_skip) pending.
+Function "gst_byte_reader_skip_string_utf16" not defined.
+Breakpoint 531 (gst_byte_reader_skip_string_utf16) pending.
+Function "gst_byte_reader_skip_string_utf32" not defined.
+Breakpoint 532 (gst_byte_reader_skip_string_utf32) pending.
+Function "gst_byte_reader_skip_string_utf8" not defined.
+Breakpoint 533 (gst_byte_reader_skip_string_utf8) pending.
+Function "gst_byte_reader_skip_unchecked" not defined.
+Breakpoint 534 (gst_byte_reader_skip_unchecked) pending.
+Function "gst_byte_writer_ensure_free_space" not defined.
+Breakpoint 535 (gst_byte_writer_ensure_free_space) pending.
+Function "gst_byte_writer_fill" not defined.
+Breakpoint 536 (gst_byte_writer_fill) pending.
+Function "gst_byte_writer_fill_unchecked" not defined.
+Breakpoint 537 (gst_byte_writer_fill_unchecked) pending.
+Function "gst_byte_writer_free" not defined.
+Breakpoint 538 (gst_byte_writer_free) pending.
+Function "gst_byte_writer_free_and_get_buffer" not defined.
+Breakpoint 539 (gst_byte_writer_free_and_get_buffer) pending.
+Function "gst_byte_writer_free_and_get_data" not defined.
+Breakpoint 540 (gst_byte_writer_free_and_get_data) pending.
+Function "gst_byte_writer_get_remaining" not defined.
+Breakpoint 541 (gst_byte_writer_get_remaining) pending.
+Function "gst_byte_writer_init" not defined.
+Breakpoint 542 (gst_byte_writer_init) pending.
+Function "gst_byte_writer_init_with_buffer" not defined.
+Breakpoint 543 (gst_byte_writer_init_with_buffer) pending.
+Function "gst_byte_writer_init_with_data" not defined.
+Breakpoint 544 (gst_byte_writer_init_with_data) pending.
+Function "gst_byte_writer_init_with_size" not defined.
+Breakpoint 545 (gst_byte_writer_init_with_size) pending.
+Function "gst_byte_writer_new" not defined.
+Breakpoint 546 (gst_byte_writer_new) pending.
+Function "gst_byte_writer_new_with_buffer" not defined.
+Breakpoint 547 (gst_byte_writer_new_with_buffer) pending.
+Function "gst_byte_writer_new_with_data" not defined.
+Breakpoint 548 (gst_byte_writer_new_with_data) pending.
+Function "gst_byte_writer_new_with_size" not defined.
+Breakpoint 549 (gst_byte_writer_new_with_size) pending.
+Function "gst_byte_writer_put_data" not defined.
+Breakpoint 550 (gst_byte_writer_put_data) pending.
+Function "gst_byte_writer_put_data_unchecked" not defined.
+Breakpoint 551 (gst_byte_writer_put_data_unchecked) pending.
+Function "gst_byte_writer_put_float32_be" not defined.
+Breakpoint 552 (gst_byte_writer_put_float32_be) pending.
+Function "gst_byte_writer_put_float32_be_unchecked" not defined.
+Breakpoint 553 (gst_byte_writer_put_float32_be_unchecked) pending.
+Function "gst_byte_writer_put_float32_le" not defined.
+Breakpoint 554 (gst_byte_writer_put_float32_le) pending.
+Function "gst_byte_writer_put_float32_le_unchecked" not defined.
+Breakpoint 555 (gst_byte_writer_put_float32_le_unchecked) pending.
+Function "gst_byte_writer_put_float64_be" not defined.
+Breakpoint 556 (gst_byte_writer_put_float64_be) pending.
+Function "gst_byte_writer_put_float64_be_unchecked" not defined.
+Breakpoint 557 (gst_byte_writer_put_float64_be_unchecked) pending.
+Function "gst_byte_writer_put_float64_le" not defined.
+Breakpoint 558 (gst_byte_writer_put_float64_le) pending.
+Function "gst_byte_writer_put_float64_le_unchecked" not defined.
+Breakpoint 559 (gst_byte_writer_put_float64_le_unchecked) pending.
+Function "gst_byte_writer_put_int16_be" not defined.
+Breakpoint 560 (gst_byte_writer_put_int16_be) pending.
+Function "gst_byte_writer_put_int16_be_unchecked" not defined.
+Breakpoint 561 (gst_byte_writer_put_int16_be_unchecked) pending.
+Function "gst_byte_writer_put_int16_le" not defined.
+Breakpoint 562 (gst_byte_writer_put_int16_le) pending.
+Function "gst_byte_writer_put_int16_le_unchecked" not defined.
+Breakpoint 563 (gst_byte_writer_put_int16_le_unchecked) pending.
+Function "gst_byte_writer_put_int24_be" not defined.
+Breakpoint 564 (gst_byte_writer_put_int24_be) pending.
+Function "gst_byte_writer_put_int24_be_unchecked" not defined.
+Breakpoint 565 (gst_byte_writer_put_int24_be_unchecked) pending.
+Function "gst_byte_writer_put_int24_le" not defined.
+Breakpoint 566 (gst_byte_writer_put_int24_le) pending.
+Function "gst_byte_writer_put_int24_le_unchecked" not defined.
+Breakpoint 567 (gst_byte_writer_put_int24_le_unchecked) pending.
+Function "gst_byte_writer_put_int32_be" not defined.
+Breakpoint 568 (gst_byte_writer_put_int32_be) pending.
+Function "gst_byte_writer_put_int32_be_unchecked" not defined.
+Breakpoint 569 (gst_byte_writer_put_int32_be_unchecked) pending.
+Function "gst_byte_writer_put_int32_le" not defined.
+Breakpoint 570 (gst_byte_writer_put_int32_le) pending.
+Function "gst_byte_writer_put_int32_le_unchecked" not defined.
+Breakpoint 571 (gst_byte_writer_put_int32_le_unchecked) pending.
+Function "gst_byte_writer_put_int64_be" not defined.
+Breakpoint 572 (gst_byte_writer_put_int64_be) pending.
+Function "gst_byte_writer_put_int64_be_unchecked" not defined.
+Breakpoint 573 (gst_byte_writer_put_int64_be_unchecked) pending.
+Function "gst_byte_writer_put_int64_le" not defined.
+Breakpoint 574 (gst_byte_writer_put_int64_le) pending.
+Function "gst_byte_writer_put_int64_le_unchecked" not defined.
+Breakpoint 575 (gst_byte_writer_put_int64_le_unchecked) pending.
+Function "gst_byte_writer_put_int8" not defined.
+Breakpoint 576 (gst_byte_writer_put_int8) pending.
+Function "gst_byte_writer_put_int8_unchecked" not defined.
+Breakpoint 577 (gst_byte_writer_put_int8_unchecked) pending.
+Function "gst_byte_writer_put_string_utf16" not defined.
+Breakpoint 578 (gst_byte_writer_put_string_utf16) pending.
+Function "gst_byte_writer_put_string_utf32" not defined.
+Breakpoint 579 (gst_byte_writer_put_string_utf32) pending.
+Function "gst_byte_writer_put_string_utf8" not defined.
+Breakpoint 580 (gst_byte_writer_put_string_utf8) pending.
+Function "gst_byte_writer_put_uint16_be" not defined.
+Breakpoint 581 (gst_byte_writer_put_uint16_be) pending.
+Function "gst_byte_writer_put_uint16_be_unchecked" not defined.
+Breakpoint 582 (gst_byte_writer_put_uint16_be_unchecked) pending.
+Function "gst_byte_writer_put_uint16_le" not defined.
+Breakpoint 583 (gst_byte_writer_put_uint16_le) pending.
+Function "gst_byte_writer_put_uint16_le_unchecked" not defined.
+Breakpoint 584 (gst_byte_writer_put_uint16_le_unchecked) pending.
+Function "gst_byte_writer_put_uint24_be" not defined.
+Breakpoint 585 (gst_byte_writer_put_uint24_be) pending.
+Function "gst_byte_writer_put_uint24_be_unchecked" not defined.
+Breakpoint 586 (gst_byte_writer_put_uint24_be_unchecked) pending.
+Function "gst_byte_writer_put_uint24_le" not defined.
+Breakpoint 587 (gst_byte_writer_put_uint24_le) pending.
+Function "gst_byte_writer_put_uint24_le_unchecked" not defined.
+Breakpoint 588 (gst_byte_writer_put_uint24_le_unchecked) pending.
+Function "gst_byte_writer_put_uint32_be" not defined.
+Breakpoint 589 (gst_byte_writer_put_uint32_be) pending.
+Function "gst_byte_writer_put_uint32_be_unchecked" not defined.
+Breakpoint 590 (gst_byte_writer_put_uint32_be_unchecked) pending.
+Function "gst_byte_writer_put_uint32_le" not defined.
+Breakpoint 591 (gst_byte_writer_put_uint32_le) pending.
+Function "gst_byte_writer_put_uint32_le_unchecked" not defined.
+Breakpoint 592 (gst_byte_writer_put_uint32_le_unchecked) pending.
+Function "gst_byte_writer_put_uint64_be" not defined.
+Breakpoint 593 (gst_byte_writer_put_uint64_be) pending.
+Function "gst_byte_writer_put_uint64_be_unchecked" not defined.
+Breakpoint 594 (gst_byte_writer_put_uint64_be_unchecked) pending.
+Function "gst_byte_writer_put_uint64_le" not defined.
+Breakpoint 595 (gst_byte_writer_put_uint64_le) pending.
+Function "gst_byte_writer_put_uint64_le_unchecked" not defined.
+Breakpoint 596 (gst_byte_writer_put_uint64_le_unchecked) pending.
+Function "gst_byte_writer_put_uint8" not defined.
+Breakpoint 597 (gst_byte_writer_put_uint8) pending.
+Function "gst_byte_writer_put_uint8_unchecked" not defined.
+Breakpoint 598 (gst_byte_writer_put_uint8_unchecked) pending.
+Function "gst_byte_writer_reset" not defined.
+Breakpoint 599 (gst_byte_writer_reset) pending.
+Function "gst_byte_writer_reset_and_get_buffer" not defined.
+Breakpoint 600 (gst_byte_writer_reset_and_get_buffer) pending.
+Function "gst_byte_writer_reset_and_get_data" not defined.
+Breakpoint 601 (gst_byte_writer_reset_and_get_data) pending.
+Function "gst_collect_pads2_add_pad" not defined.
+Breakpoint 602 (gst_collect_pads2_add_pad) pending.
+Function "gst_collect_pads2_add_pad_full" not defined.
+Breakpoint 603 (gst_collect_pads2_add_pad_full) pending.
+Function "gst_collect_pads2_available" not defined.
+Breakpoint 604 (gst_collect_pads2_available) pending.
+Function "gst_collect_pads2_chain" not defined.
+Breakpoint 605 (gst_collect_pads2_chain) pending.
+Function "gst_collect_pads2_check_collected" not defined.
+Breakpoint 606 (gst_collect_pads2_check_collected) pending.
+Function "gst_collect_pads2_check_pads" not defined.
+Breakpoint 607 (gst_collect_pads2_check_pads) pending.
+Function "gst_collect_pads2_class_init" not defined.
+Breakpoint 608 (gst_collect_pads2_class_init) pending.
+Function "gst_collect_pads2_class_intern_init" not defined.
+Breakpoint 609 (gst_collect_pads2_class_intern_init) pending.
+Function "gst_collect_pads2_clear" not defined.
+Breakpoint 610 (gst_collect_pads2_clear) pending.
+Function "gst_collect_pads2_collect" not defined.
+Breakpoint 611 (gst_collect_pads2_collect) pending.
+Function "gst_collect_pads2_collect_range" not defined.
+Breakpoint 612 (gst_collect_pads2_collect_range) pending.
+Function "gst_collect_pads2_default_collected" not defined.
+Breakpoint 613 (gst_collect_pads2_default_collected) pending.
+Function "gst_collect_pads2_default_compare_func" not defined.
+Breakpoint 614 (gst_collect_pads2_default_compare_func) pending.
+Function "gst_collect_pads2_event" not defined.
+Breakpoint 615 (gst_collect_pads2_event) pending.
+Function "gst_collect_pads2_finalize" not defined.
+Breakpoint 616 (gst_collect_pads2_finalize) pending.
+Function "gst_collect_pads2_find_best_pad" not defined.
+Breakpoint 617 (gst_collect_pads2_find_best_pad) pending.
+Function "gst_collect_pads2_flush" not defined.
+Breakpoint 618 (gst_collect_pads2_flush) pending.
+Function "gst_collect_pads2_get_type" not defined.
+Breakpoint 619 (gst_collect_pads2_get_type) pending.
+Function "gst_collect_pads2_init" not defined.
+Breakpoint 620 (gst_collect_pads2_init) pending.
+Function "gst_collect_pads2_is_active" not defined.
+Breakpoint 621 (gst_collect_pads2_is_active) pending.
+Function "gst_collect_pads2_new" not defined.
+Breakpoint 622 (gst_collect_pads2_new) pending.
+Function "gst_collect_pads2_peek" not defined.
+Breakpoint 623 (gst_collect_pads2_peek) pending.
+Function "gst_collect_pads2_pop" not defined.
+Breakpoint 624 (gst_collect_pads2_pop) pending.
+Function "gst_collect_pads2_read" not defined.
+Breakpoint 625 (gst_collect_pads2_read) pending.
+Function "gst_collect_pads2_read_buffer" not defined.
+Breakpoint 626 (gst_collect_pads2_read_buffer) pending.
+Function "gst_collect_pads2_recalculate_full" not defined.
+Breakpoint 627 (gst_collect_pads2_recalculate_full) pending.
+Function "gst_collect_pads2_recalculate_waiting" not defined.
+Breakpoint 628 (gst_collect_pads2_recalculate_waiting) pending.
+Function "gst_collect_pads2_remove_pad" not defined.
+Breakpoint 629 (gst_collect_pads2_remove_pad) pending.
+Function "gst_collect_pads2_set_buffer_function" not defined.
+Breakpoint 630 (gst_collect_pads2_set_buffer_function) pending.
+Function "gst_collect_pads2_set_buffer_function_locked" not defined.
+Breakpoint 631 (gst_collect_pads2_set_buffer_function_locked) pending.
+Function "gst_collect_pads2_set_clip_function" not defined.
+Breakpoint 632 (gst_collect_pads2_set_clip_function) pending.
+Function "gst_collect_pads2_set_compare_function" not defined.
+Breakpoint 633 (gst_collect_pads2_set_compare_function) pending.
+Function "gst_collect_pads2_set_event_function" not defined.
+Breakpoint 634 (gst_collect_pads2_set_event_function) pending.
+Function "gst_collect_pads2_set_flushing" not defined.
+Breakpoint 635 (gst_collect_pads2_set_flushing) pending.
+Function "gst_collect_pads2_set_flushing_unlocked" not defined.
+Breakpoint 636 (gst_collect_pads2_set_flushing_unlocked) pending.
+Function "gst_collect_pads2_set_function" not defined.
+Breakpoint 637 (gst_collect_pads2_set_function) pending.
+Function "gst_collect_pads2_set_waiting" not defined.
+Breakpoint 638 (gst_collect_pads2_set_waiting) pending.
+Function "gst_collect_pads2_start" not defined.
+Breakpoint 639 (gst_collect_pads2_start) pending.
+Function "gst_collect_pads2_stop" not defined.
+Breakpoint 640 (gst_collect_pads2_stop) pending.
+Function "gst_collect_pads2_take_buffer" not defined.
+Breakpoint 641 (gst_collect_pads2_take_buffer) pending.
+Function "gst_collect_pads_add_pad" not defined.
+Breakpoint 642 (gst_collect_pads_add_pad) pending.
+Function "gst_collect_pads_add_pad_full" not defined.
+Breakpoint 643 (gst_collect_pads_add_pad_full) pending.
+Function "gst_collect_pads_available" not defined.
+Breakpoint 644 (gst_collect_pads_available) pending.
+Function "gst_collect_pads_base_init" not defined.
+Breakpoint 645 (gst_collect_pads_base_init) pending.
+Function "gst_collect_pads_chain" not defined.
+Breakpoint 646 (gst_collect_pads_chain) pending.
+Function "gst_collect_pads_check_collected" not defined.
+Breakpoint 647 (gst_collect_pads_check_collected) pending.
+Function "gst_collect_pads_check_pads" not defined.
+Breakpoint 648 (gst_collect_pads_check_pads) pending.
+Function "gst_collect_pads_check_pads_unlocked" not defined.
+Breakpoint 649 (gst_collect_pads_check_pads_unlocked) pending.
+Function "gst_collect_pads_class_init" not defined.
+Breakpoint 650 (gst_collect_pads_class_init) pending.
+Function "gst_collect_pads_class_init_trampoline" not defined.
+Breakpoint 651 (gst_collect_pads_class_init_trampoline) pending.
+Function "gst_collect_pads_clear" not defined.
+Breakpoint 652 (gst_collect_pads_clear) pending.
+Function "gst_collect_pads_collect" not defined.
+Breakpoint 653 (gst_collect_pads_collect) pending.
+Function "gst_collect_pads_collect_range" not defined.
+Breakpoint 654 (gst_collect_pads_collect_range) pending.
+Function "gst_collect_pads_event" not defined.
+Breakpoint 655 (gst_collect_pads_event) pending.
+Function "gst_collect_pads_finalize" not defined.
+Breakpoint 656 (gst_collect_pads_finalize) pending.
+Function "gst_collect_pads_flush" not defined.
+Breakpoint 657 (gst_collect_pads_flush) pending.
+Function "gst_collect_pads_get_type" not defined.
+Breakpoint 658 (gst_collect_pads_get_type) pending.
+Function "gst_collect_pads_init" not defined.
+Breakpoint 659 (gst_collect_pads_init) pending.
+Function "gst_collect_pads_is_active" not defined.
+Breakpoint 660 (gst_collect_pads_is_active) pending.
+Function "gst_collect_pads_is_flushing" not defined.
+Breakpoint 661 (gst_collect_pads_is_flushing) pending.
+Function "gst_collect_pads_new" not defined.
+Breakpoint 662 (gst_collect_pads_new) pending.
+Function "gst_collect_pads_peek" not defined.
+Breakpoint 663 (gst_collect_pads_peek) pending.
+Function "gst_collect_pads_pop" not defined.
+Breakpoint 664 (gst_collect_pads_pop) pending.
+Function "gst_collect_pads_read" not defined.
+Breakpoint 665 (gst_collect_pads_read) pending.
+Function "gst_collect_pads_read_buffer" not defined.
+Breakpoint 666 (gst_collect_pads_read_buffer) pending.
+Function "gst_collect_pads_remove_pad" not defined.
+Breakpoint 667 (gst_collect_pads_remove_pad) pending.
+Function "gst_collect_pads_set_clip_function" not defined.
+Breakpoint 668 (gst_collect_pads_set_clip_function) pending.
+Function "gst_collect_pads_set_flushing" not defined.
+Breakpoint 669 (gst_collect_pads_set_flushing) pending.
+Function "gst_collect_pads_set_flushing_unlocked" not defined.
+Breakpoint 670 (gst_collect_pads_set_flushing_unlocked) pending.
+Function "gst_collect_pads_set_function" not defined.
+Breakpoint 671 (gst_collect_pads_set_function) pending.
+Function "gst_collect_pads_start" not defined.
+Breakpoint 672 (gst_collect_pads_start) pending.
+Function "gst_collect_pads_stop" not defined.
+Breakpoint 673 (gst_collect_pads_stop) pending.
+Function "gst_collect_pads_take_buffer" not defined.
+Breakpoint 674 (gst_collect_pads_take_buffer) pending.
+Function "gst_data_queue_class_init" not defined.
+Breakpoint 675 (gst_data_queue_class_init) pending.
+Function "gst_data_queue_class_intern_init" not defined.
+Breakpoint 676 (gst_data_queue_class_intern_init) pending.
+Function "gst_data_queue_cleanup" not defined.
+Breakpoint 677 (gst_data_queue_cleanup) pending.
+Function "gst_data_queue_drop_head" not defined.
+Breakpoint 678 (gst_data_queue_drop_head) pending.
+Function "gst_data_queue_finalize" not defined.
+Breakpoint 679 (gst_data_queue_finalize) pending.
+Function "gst_data_queue_flush" not defined.
+Breakpoint 680 (gst_data_queue_flush) pending.
+Function "gst_data_queue_get_level" not defined.
+Breakpoint 681 (gst_data_queue_get_level) pending.
+Function "gst_data_queue_get_property" not defined.
+Breakpoint 682 (gst_data_queue_get_property) pending.
+Function "gst_data_queue_get_type" not defined.
+Breakpoint 683 (gst_data_queue_get_type) pending.
+Function "gst_data_queue_init" not defined.
+Breakpoint 684 (gst_data_queue_init) pending.
+Function "gst_data_queue_is_empty" not defined.
+Breakpoint 685 (gst_data_queue_is_empty) pending.
+Function "gst_data_queue_is_full" not defined.
+Breakpoint 686 (gst_data_queue_is_full) pending.
+Function "gst_data_queue_limits_changed" not defined.
+Breakpoint 687 (gst_data_queue_limits_changed) pending.
+Function "gst_data_queue_locked_flush" not defined.
+Breakpoint 688 (gst_data_queue_locked_flush) pending.
+Function "gst_data_queue_locked_is_empty" not defined.
+Breakpoint 689 (gst_data_queue_locked_is_empty) pending.
+Function "gst_data_queue_locked_is_full" not defined.
+Breakpoint 690 (gst_data_queue_locked_is_full) pending.
+Function "gst_data_queue_new" not defined.
+Breakpoint 691 (gst_data_queue_new) pending.
+Function "gst_data_queue_new_full" not defined.
+Breakpoint 692 (gst_data_queue_new_full) pending.
+Function "gst_data_queue_pop" not defined.
+Breakpoint 693 (gst_data_queue_pop) pending.
+Function "gst_data_queue_push" not defined.
+Breakpoint 694 (gst_data_queue_push) pending.
+Function "gst_data_queue_set_flushing" not defined.
+Breakpoint 695 (gst_data_queue_set_flushing) pending.
+Function "gst_data_queue_set_property" not defined.
+Breakpoint 696 (gst_data_queue_set_property) pending.
+Breakpoint 697 at 0x7ffff7afb080: gst_event_ref. (3 locations)
+Function "gst_event_replace" not defined.
+Breakpoint 698 (gst_event_replace) pending.
+Breakpoint 699 at 0x7ffff7af879f: gst_g_static_rec_mutex_init. (3 locations)
+Function "gst_push_src_base_init" not defined.
+Breakpoint 700 (gst_push_src_base_init) pending.
+Function "gst_push_src_check_get_range" not defined.
+Breakpoint 701 (gst_push_src_check_get_range) pending.
+Function "gst_push_src_class_init" not defined.
+Breakpoint 702 (gst_push_src_class_init) pending.
+Function "gst_push_src_class_init_trampoline" not defined.
+Breakpoint 703 (gst_push_src_class_init_trampoline) pending.
+Function "gst_push_src_create" not defined.
+Breakpoint 704 (gst_push_src_create) pending.
+Function "gst_push_src_get_type" not defined.
+Breakpoint 705 (gst_push_src_get_type) pending.
+Function "gst_push_src_init" not defined.
+Breakpoint 706 (gst_push_src_init) pending.
+Function "gst_type_find_helper" not defined.
+Breakpoint 707 (gst_type_find_helper) pending.
+Function "gst_type_find_helper_for_buffer" not defined.
+Breakpoint 708 (gst_type_find_helper_for_buffer) pending.
+Function "gst_type_find_helper_for_extension" not defined.
+Breakpoint 709 (gst_type_find_helper_for_extension) pending.
+Function "gst_type_find_helper_get_range" not defined.
+Breakpoint 710 (gst_type_find_helper_get_range) pending.
+Function "gst_type_find_helper_get_range_ext" not defined.
+Breakpoint 711 (gst_type_find_helper_get_range_ext) pending.
+Function "handle_stepping" not defined.
+Breakpoint 712 (handle_stepping) pending.
+Function "helper_find_suggest" not defined.
+Breakpoint 713 (helper_find_suggest) pending.
+Function "ref_data" not defined.
+Breakpoint 714 (ref_data) pending.
+Function "set_step_info" not defined.
+Breakpoint 715 (set_step_info) pending.
+Function "start_stepping" not defined.
+Breakpoint 716 (start_stepping) pending.
+Function "stop_stepping" not defined.
+Breakpoint 717 (stop_stepping) pending.
+Function "unref_data" not defined.
+Breakpoint 718 (unref_data) pending.
+Function "update_timestamp" not defined.
+Breakpoint 719 (update_timestamp) pending.
+   =>gst_base_transform_get_type
+   <=gst_base_transform_get_type
+   =>gst_base_src_get_type
+   <=gst_base_src_get_type
+   =>gst_base_sink_get_type
+   <=gst_base_sink_get_type
+   =>gst_push_src_get_type
+    =>gst_base_src_get_type
+    <=gst_base_src_get_type
+   <=gst_push_src_get_type
+   =>gst_base_sink_get_type
+   <=gst_base_sink_get_type
+   =>gst_base_src_get_type
+   <=gst_base_src_get_type
+   =>gst_base_transform_get_type
+   <=gst_base_transform_get_type
+   =>gst_base_sink_get_type
+   <=gst_base_sink_get_type
+   =>gst_base_src_base_init
+   <=gst_base_src_base_init
+   =>gst_base_src_class_init
+   <=gst_base_src_class_init
+   =>gst_base_src_base_init
+   <=gst_base_src_base_init
+   =>gst_g_static_rec_mutex_init
+   <=gst_g_static_rec_mutex_init
+   =>gst_base_src_init
+    =>gst_base_src_get_type
+    <=gst_base_src_get_type
+    =>gst_g_static_rec_mutex_init
+    <=gst_g_static_rec_mutex_init
+    =>gst_base_src_set_format
+     =>gst_base_src_get_type
+     <=gst_base_src_get_type
+    <=gst_base_src_set_format
+   <=gst_base_src_init
+   =>gst_g_static_rec_mutex_init
+   <=gst_g_static_rec_mutex_init
+   =>gst_g_static_rec_mutex_init
+   <=gst_g_static_rec_mutex_init
+   =>gst_g_static_rec_mutex_init
+   <=gst_g_static_rec_mutex_init
+   =>gst_base_sink_class_init
+   <=gst_base_sink_class_init
+   =>gst_g_static_rec_mutex_init
+   <=gst_g_static_rec_mutex_init
+   =>gst_base_sink_init
+    =>gst_base_sink_get_type
+    <=gst_base_sink_get_type
+    =>gst_g_static_rec_mutex_init
+    <=gst_g_static_rec_mutex_init
+   <=gst_base_sink_init
+   =>gst_base_sink_set_sync
+    =>gst_base_sink_get_type
+    <=gst_base_sink_get_type
+   <=gst_base_sink_set_sync
+   =>gst_base_sink_set_property
+   <=gst_base_sink_set_property
+   =>gst_base_src_getcaps
+   <=gst_base_src_getcaps
+   =>gst_base_src_getcaps
+   <=gst_base_src_getcaps
+   =>gst_base_sink_pad_getcaps
+    =>gst_base_sink_get_caps
+    <=gst_base_sink_get_caps
+   <=gst_base_sink_pad_getcaps
+   =>gst_base_sink_pad_getcaps
+    =>gst_base_sink_get_caps
+    <=gst_base_sink_get_caps
+   <=gst_base_sink_pad_getcaps
+   =>gst_base_sink_change_state
+   <=gst_base_sink_change_state
+   =>gst_base_src_change_state
+   <=gst_base_src_change_state
+   =>gst_base_sink_change_state
+    =>gst_base_sink_reset_qos
+    <=gst_base_sink_reset_qos
+    =>gst_base_sink_pad_activate
+     =>gst_base_sink_set_flushing
+     <=gst_base_sink_set_flushing
+     =>gst_base_sink_pad_activate_push
+     <=gst_base_sink_pad_activate_push
+    <=gst_base_sink_pad_activate
+   <=gst_base_sink_change_state
+   =>gst_base_src_pad_check_get_range
+    =>gst_base_src_check_get_range
+     =>gst_base_src_default_check_get_range
+      =>gst_base_src_start
+       =>gst_base_src_set_dynamic_size
+        =>gst_base_src_get_type
+        <=gst_base_src_get_type
+       <=gst_base_src_set_dynamic_size
+       =>gst_base_src_seekable
+       <=gst_base_src_seekable
+       =>gst_base_src_negotiate
+        =>gst_base_src_default_negotiate
+         =>gst_base_src_getcaps
+         <=gst_base_src_getcaps
+        <=gst_base_src_default_negotiate
+       <=gst_base_src_negotiate
+      <=gst_base_src_start
+      =>gst_base_src_stop
+      <=gst_base_src_stop
+     <=gst_base_src_default_check_get_range
+    <=gst_base_src_check_get_range
+   <=gst_base_src_pad_check_get_range
+   =>gst_base_src_activate_pull
+    =>gst_base_src_start
+     =>gst_base_src_set_dynamic_size
+      =>gst_base_src_get_type
+      <=gst_base_src_get_type
+     <=gst_base_src_set_dynamic_size
+     =>gst_base_src_seekable
+     <=gst_base_src_seekable
+     =>gst_base_src_negotiate
+      =>gst_base_src_default_negotiate
+       =>gst_base_src_getcaps
+       <=gst_base_src_getcaps
+      <=gst_base_src_default_negotiate
+     <=gst_base_src_negotiate
+    <=gst_base_src_start
+    =>gst_base_src_check_get_range
+     =>gst_base_src_default_check_get_range
+     <=gst_base_src_default_check_get_range
+    <=gst_base_src_check_get_range
+    =>gst_base_src_set_flushing
+    <=gst_base_src_set_flushing
+   <=gst_base_src_activate_pull
+   =>gst_base_src_query
+    =>gst_base_src_default_query
+     =>gst_base_src_update_length
+     <=gst_base_src_update_length
+    <=gst_base_src_default_query
+   <=gst_base_src_query
+   =>gst_base_src_query
+   <=gst_base_src_query
+   =>gst_type_find_helper_get_range_ext
+break in loader
+break in loader
+Loading: /usr/lib/x86_64-linux-gnu/gstreamer-0.10/libgstsubparse.so
+Function "characters_sami" not defined.
+Breakpoint 720 (characters_sami) pending.
+Function "convert_encoding" not defined.
+Breakpoint 721 (convert_encoding) pending.
+Function "detect_encoding" not defined.
+Breakpoint 722 (detect_encoding) pending.
+Function "dks_skip_timestamp" not defined.
+Breakpoint 723 (dks_skip_timestamp) pending.
+Function "end_sami_element" not defined.
+Breakpoint 724 (end_sami_element) pending.
+Function "feed_textbuf" not defined.
+Breakpoint 725 (feed_textbuf) pending.
+Function "fix_invalid_entities" not defined.
+Breakpoint 726 (fix_invalid_entities) pending.
+Function "get_next_line" not defined.
+Breakpoint 727 (get_next_line) pending.
+Function "gst_convert_to_utf8" not defined.
+Breakpoint 728 (gst_convert_to_utf8) pending.
+Breakpoint 729 at 0x7ffff7b1567c: gst_event_unref. (17 locations)
+Breakpoint 730 at 0x7ffff7afb0b4: gst_query_unref. (5 locations)
+Function "gst_ssa_parse_base_init" not defined.
+Breakpoint 731 (gst_ssa_parse_base_init) pending.
+Function "gst_ssa_parse_chain" not defined.
+Breakpoint 732 (gst_ssa_parse_chain) pending.
+Function "gst_ssa_parse_change_state" not defined.
+Breakpoint 733 (gst_ssa_parse_change_state) pending.
+Function "gst_ssa_parse_class_init" not defined.
+Breakpoint 734 (gst_ssa_parse_class_init) pending.
+Function "gst_ssa_parse_class_init_trampoline" not defined.
+Breakpoint 735 (gst_ssa_parse_class_init_trampoline) pending.
+Function "gst_ssa_parse_dispose" not defined.
+Breakpoint 736 (gst_ssa_parse_dispose) pending.
+Function "gst_ssa_parse_get_type" not defined.
+Breakpoint 737 (gst_ssa_parse_get_type) pending.
+Function "gst_ssa_parse_init" not defined.
+Breakpoint 738 (gst_ssa_parse_init) pending.
+Function "gst_ssa_parse_push_line" not defined.
+Breakpoint 739 (gst_ssa_parse_push_line) pending.
+Function "gst_ssa_parse_remove_override_codes" not defined.
+Breakpoint 740 (gst_ssa_parse_remove_override_codes) pending.
+Function "gst_ssa_parse_setcaps" not defined.
+Breakpoint 741 (gst_ssa_parse_setcaps) pending.
+Function "gst_ssa_parse_sink_event" not defined.
+Breakpoint 742 (gst_ssa_parse_sink_event) pending.
+Function "gst_ssa_parse_src_event" not defined.
+Breakpoint 743 (gst_ssa_parse_src_event) pending.
+Function "gst_sub_parse_base_init" not defined.
+Breakpoint 744 (gst_sub_parse_base_init) pending.
+Function "gst_sub_parse_chain" not defined.
+Breakpoint 745 (gst_sub_parse_chain) pending.
+Function "gst_sub_parse_change_state" not defined.
+Breakpoint 746 (gst_sub_parse_change_state) pending.
+Function "gst_sub_parse_class_init" not defined.
+Breakpoint 747 (gst_sub_parse_class_init) pending.
+Function "gst_sub_parse_data_format_autodetect" not defined.
+Breakpoint 748 (gst_sub_parse_data_format_autodetect) pending.
+Function "gst_sub_parse_data_format_autodetect_regex_once" not defined.
+Breakpoint 749 (gst_sub_parse_data_format_autodetect_regex_once) pending.
+Function "gst_sub_parse_dispose" not defined.
+Breakpoint 750 (gst_sub_parse_dispose) pending.
+Function "gst_sub_parse_format_autodetect" not defined.
+Breakpoint 751 (gst_sub_parse_format_autodetect) pending.
+Function "gst_sub_parse_get_format_description" not defined.
+Breakpoint 752 (gst_sub_parse_get_format_description) pending.
+Function "gst_sub_parse_get_property" not defined.
+Breakpoint 753 (gst_sub_parse_get_property) pending.
+Function "gst_sub_parse_get_type" not defined.
+Breakpoint 754 (gst_sub_parse_get_type) pending.
+Function "gst_sub_parse_init" not defined.
+Breakpoint 755 (gst_sub_parse_init) pending.
+Function "gst_sub_parse_set_property" not defined.
+Breakpoint 756 (gst_sub_parse_set_property) pending.
+Function "gst_sub_parse_sink_event" not defined.
+Breakpoint 757 (gst_sub_parse_sink_event) pending.
+Function "gst_sub_parse_src_event" not defined.
+Breakpoint 758 (gst_sub_parse_src_event) pending.
+Function "gst_sub_parse_src_query" not defined.
+Breakpoint 759 (gst_sub_parse_src_query) pending.
+Function "gst_subparse_type_find" not defined.
+Breakpoint 760 (gst_subparse_type_find) pending.
+Function "handle_buffer" not defined.
+Breakpoint 761 (handle_buffer) pending.
+Function "handle_start_font" not defined.
+Breakpoint 762 (handle_start_font) pending.
+Function "handle_start_sync" not defined.
+Breakpoint 763 (handle_start_sync) pending.
+Function "has_tag" not defined.
+Breakpoint 764 (has_tag) pending.
+Function "make_color" not defined.
+Breakpoint 765 (make_color) pending.
+Function "mpl2_parse_line" not defined.
+Breakpoint 766 (mpl2_parse_line) pending.
+Function "parse_dks" not defined.
+Breakpoint 767 (parse_dks) pending.
+Function "parse_mdvdsub" not defined.
+Breakpoint 768 (parse_mdvdsub) pending.
+Function "parse_mpl2" not defined.
+Breakpoint 769 (parse_mpl2) pending.
+Function "parse_mpsub" not defined.
+Breakpoint 770 (parse_mpsub) pending.
+Function "parse_qttext" not defined.
+Breakpoint 771 (parse_qttext) pending.
+Function "parse_sami" not defined.
+Breakpoint 772 (parse_sami) pending.
+Function "parse_subrip" not defined.
+Breakpoint 773 (parse_subrip) pending.
+Function "parse_subrip_time" not defined.
+Breakpoint 774 (parse_subrip_time) pending.
+Function "parse_subviewer" not defined.
+Breakpoint 775 (parse_subviewer) pending.
+Function "parse_tmplayer" not defined.
+Breakpoint 776 (parse_tmplayer) pending.
+Function "parser_state_dispose" not defined.
+Breakpoint 777 (parser_state_dispose) pending.
+Function "parser_state_init" not defined.
+Breakpoint 778 (parser_state_init) pending.
+Breakpoint 779 at 0x7ffff4c46cd8: file gstelements.c, line 82.
+Function "qttext_context_deinit" not defined.
+Breakpoint 780 (qttext_context_deinit) pending.
+Function "qttext_context_init" not defined.
+Breakpoint 781 (qttext_context_init) pending.
+Function "qttext_get_text" not defined.
+Breakpoint 782 (qttext_get_text) pending.
+Function "qttext_open_markup" not defined.
+Breakpoint 783 (qttext_open_markup) pending.
+Function "qttext_parse_tag" not defined.
+Breakpoint 784 (qttext_parse_tag) pending.
+Function "qttext_parse_text" not defined.
+Breakpoint 785 (qttext_parse_text) pending.
+Function "qttext_parse_timestamp" not defined.
+Breakpoint 786 (qttext_parse_timestamp) pending.
+Function "qttext_prepare_text" not defined.
+Breakpoint 787 (qttext_prepare_text) pending.
+Function "read_color" not defined.
+Breakpoint 788 (read_color) pending.
+Function "read_int" not defined.
+Breakpoint 789 (read_int) pending.
+Function "read_str" not defined.
+Breakpoint 790 (read_str) pending.
+Function "sami_context_deinit" not defined.
+Breakpoint 791 (sami_context_deinit) pending.
+Function "sami_context_init" not defined.
+Breakpoint 792 (sami_context_init) pending.
+Function "sami_context_pop_state" not defined.
+Breakpoint 793 (sami_context_pop_state) pending.
+Function "sami_context_push_state" not defined.
+Breakpoint 794 (sami_context_push_state) pending.
+Function "sami_context_reset" not defined.
+Breakpoint 795 (sami_context_reset) pending.
+Function "start_sami_element" not defined.
+Breakpoint 796 (start_sami_element) pending.
+Function "string_match" not defined.
+Breakpoint 797 (string_match) pending.
+Function "strip_trailing_newlines" not defined.
+Breakpoint 798 (strip_trailing_newlines) pending.
+Function "subrip_fix_up_markup" not defined.
+Breakpoint 799 (subrip_fix_up_markup) pending.
+Function "subrip_remove_unhandled_tag" not defined.
+Breakpoint 800 (subrip_remove_unhandled_tag) pending.
+Function "subrip_remove_unhandled_tags" not defined.
+Breakpoint 801 (subrip_remove_unhandled_tags) pending.
+Function "subrip_unescape_formatting" not defined.
+Breakpoint 802 (subrip_unescape_formatting) pending.
+Function "tmplayer_parse_line" not defined.
+Breakpoint 803 (tmplayer_parse_line) pending.
+Function "tmplayer_process_buffer" not defined.
+Breakpoint 804 (tmplayer_process_buffer) pending.
+Function "unescape_newlines_br" not defined.
+Breakpoint 805 (unescape_newlines_br) pending.
+    =>plugin_init
+     =>gst_sub_parse_get_type
+     <=gst_sub_parse_get_type
+     =>gst_ssa_parse_get_type
+     <=gst_ssa_parse_get_type
+    <=plugin_init
+    =>gst_subparse_type_find
+     =>gst_base_src_pad_get_range
+      =>gst_base_src_get_range
+       =>gst_base_src_update_length
+       <=gst_base_src_update_length
+       =>gst_base_src_do_sync
+       <=gst_base_src_do_sync
+      <=gst_base_src_get_range
+     <=gst_base_src_pad_get_range
+    <=gst_subparse_type_find
+break in loader
+break in loader
+Loading: /lib/x86_64-linux-gnu/libresolv.so.2
+    =>plugin_init
+    <=plugin_init
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+break in loader
+break in loader
+Loading: /usr/lib/x86_64-linux-gnu/libgstinterfaces-0.10.so.0
+    =>gst_base_sink_get_type
+    <=gst_base_sink_get_type
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+break in loader
+break in loader
+Loading: /lib/x86_64-linux-gnu/libbz2.so.1.0
+    =>gst_base_transform_get_type
+    <=gst_base_transform_get_type
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>gst_base_src_pad_get_range
+     =>gst_base_src_get_range
+      =>gst_base_src_update_length
+      <=gst_base_src_update_length
+      =>gst_base_src_do_sync
+      <=gst_base_src_do_sync
+     <=gst_base_src_get_range
+    <=gst_base_src_pad_get_range
+    =>helper_find_suggest
+    <=helper_find_suggest
+   <=gst_type_find_helper_get_range_ext
+   =>gst_base_src_activate_pull
+    =>gst_base_src_set_flushing
+    <=gst_base_src_set_flushing
+    =>gst_base_src_stop
+    <=gst_base_src_stop
+   <=gst_base_src_activate_pull
+   =>have_type_handler
+   <=have_type_handler
+   =>gst_base_src_change_state
+    =>gst_base_src_is_live
+     =>gst_base_src_get_type
+     <=gst_base_src_get_type
+    <=gst_base_src_is_live
+    =>gst_base_src_activate_push
+     =>gst_base_src_start
+      =>gst_base_src_set_dynamic_size
+       =>gst_base_src_get_type
+       <=gst_base_src_get_type
+      <=gst_base_src_set_dynamic_size
+      =>gst_base_src_seekable
+      <=gst_base_src_seekable
+      =>gst_base_src_negotiate
+       =>gst_base_src_default_negotiate
+        =>gst_base_src_getcaps
+        <=gst_base_src_getcaps
+       <=gst_base_src_default_negotiate
+      <=gst_base_src_negotiate
+     <=gst_base_src_start
+     =>gst_base_src_set_flushing
+     <=gst_base_src_set_flushing
+     =>gst_base_src_perform_seek
+      =>gst_base_src_set_flushing
+      <=gst_base_src_set_flushing
+      =>gst_base_src_set_flushing
+      <=gst_base_src_set_flushing
+      =>gst_base_src_do_seek
+       =>gst_base_src_default_do_seek
+       <=gst_base_src_default_do_seek
+      <=gst_base_src_do_seek
+[New Thread 0x7ffff204d700 (LWP 18375)]
+      =>gst_base_src_loop
+       =>gst_base_src_get_range
+        =>gst_base_src_update_length
+        <=gst_base_src_perform_seek
+       <=gst_base_src_update_length
+       =>gst_base_src_do_sync
+       <=gst_base_src_do_sync
+      <=gst_base_src_activate_push
+     <=gst_base_src_change_state
+    <=gst_base_src_get_range
+    =>gst_base_sink_event
+     =>gst_base_sink_configure_segment
+     <=gst_base_sink_configure_segment
+     =>gst_base_sink_queue_object_unlocked
+     <=gst_base_sink_queue_object_unlocked
+    <=gst_base_sink_event
+    =>gst_base_sink_pad_setcaps
+     =>gst_base_sink_set_caps
+     <=gst_base_sink_set_caps
+    <=gst_base_sink_pad_setcaps
+    =>gst_base_sink_chain
+     =>gst_base_sink_chain_main
+      =>gst_base_sink_chain_unlocked
+       =>gst_base_sink_get_times
+       <=gst_base_sink_get_times
+       =>gst_base_sink_queue_object_unlocked
+        =>gst_base_sink_preroll_object
+         =>gst_base_sink_set_last_buffer
+          =>gst_base_sink_set_last_buffer_unlocked
+           =>gst_buffer_ref
+           <=gst_buffer_ref
+          <=gst_base_sink_set_last_buffer_unlocked
+         <=gst_base_sink_set_last_buffer
+         =>gst_base_sink_commit_state
+         <=gst_base_sink_commit_state
+/home/nojima/ビデオ/debconf12/857_Bits_from_the_Release_Team.srt - application/x-subrip
+         =>gst_base_sink_change_state
+         <=gst_base_sink_preroll_object
+         =>get_object_type
+         <=get_object_type
+         =>gst_base_sink_render_object
+          =>gst_base_sink_do_sync
+           =>gst_base_sink_get_sync_times
+           <=gst_base_sink_get_sync_times
+           =>gst_base_sink_pad_activate_push
+            =>gst_base_sink_set_flushing
+            <=gst_base_sink_do_sync
+            =>gst_base_sink_configure_segment
+            <=gst_base_sink_configure_segment
+            =>gst_base_sink_perform_qos
+            <=gst_base_sink_perform_qos
+           <=gst_base_sink_render_object
+           =>gst_base_sink_render_object
+            =>gst_base_sink_do_sync
+             =>gst_base_sink_get_sync_times
+              =>gst_base_sink_get_times
+              <=gst_base_sink_get_times
+             <=gst_base_sink_get_sync_times
+             =>gst_base_sink_do_preroll
+              =>get_object_type
+              <=get_object_type
+              =>gst_base_sink_preroll_object
+              <=gst_base_sink_preroll_object
+              =>gst_base_sink_wait_preroll
+               =>gst_base_sink_preroll_queue_flush
+               <=gst_base_sink_preroll_queue_flush
+              <=gst_base_sink_set_flushing
+             <=gst_base_sink_wait_preroll
+            <=gst_base_sink_do_preroll
+           <=gst_base_sink_do_sync
+          <=gst_base_sink_pad_activate_push
+          =>gst_base_sink_perform_qos
+          <=gst_base_sink_perform_qos
+         <=gst_base_sink_render_object
+        <=gst_base_sink_queue_object_unlocked
+       <=gst_base_sink_chain_unlocked
+      <=gst_base_sink_chain_main
+     <=gst_base_sink_chain
+     =>gst_base_sink_set_last_buffer
+     <=gst_base_src_loop
+     =>gst_base_sink_set_last_buffer_unlocked
+     <=gst_base_sink_set_last_buffer_unlocked
+    <=gst_base_sink_set_last_buffer
+   <=gst_base_sink_change_state
+   =>gst_base_src_change_state
+    =>gst_base_src_activate_push
+     =>gst_base_src_set_flushing
+     <=gst_base_src_set_flushing
+     =>gst_base_src_stop
+     <=gst_base_src_stop
+    <=gst_base_src_activate_push
+    =>gst_event_unref
+    <=gst_event_unref
+    =>gst_event_replace
+    <=gst_event_replace
+    =>gst_event_replace
+    <=gst_event_replace
+    =>gst_event_replace
+    <=gst_event_replace
+   <=gst_base_src_change_state
+   =>gst_base_sink_change_state
+    =>gst_base_sink_set_last_buffer
+[Thread 0x7ffff204d700 (LWP 18375) exited]
+     =>gst_base_sink_set_last_buffer_unlocked
+     <=gst_base_sink_set_last_buffer_unlocked
+    <=gst_base_sink_set_last_buffer
+   <=gst_base_sink_change_state
+   =>gst_base_src_change_state
+   <=gst_base_src_change_state
+   =>gst_base_sink_finalize
+   <=gst_base_sink_finalize
+   =>gst_base_src_finalize
+    =>gst_event_replace
+    <=gst_event_replace
+   <=gst_base_src_finalize
+  <=typefind_file
+[Inferior 1 (process 12661) exited normally]
+(gdb) 
+
+
+

@@ -824,3 +824,8 @@ linuxのsolib系は$(GDBSRC)/gdb/solib-svr4.cのenable_break()で
 loaderにフックしているように見える?
 
 
+くっそー、直前のloaderイベントが、ld-linux-linux-x86-64.so.2だと、
+lddで見える奴を一気にロードするようだ。なので、info sharedLibraryの
+結果は全部比較して差分がでた分を処理しなければならない。
+
+

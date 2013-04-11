@@ -20,14 +20,14 @@ _gst_buffer_list_copy
 _gst_buffer_list_initialize
 _gst_caps_free
 _gst_clock_id_free
-_gst_debug_bin_to_dot_file
-_gst_debug_bin_to_dot_file_with_ts
-_gst_debug_category_new
-_gst_debug_dump_mem
-_gst_debug_get_category
-_gst_debug_init
-_gst_debug_nameof_funcptr
-_gst_debug_register_funcptr
+# _gst_debug_bin_to_dot_file
+# _gst_debug_bin_to_dot_file_with_ts
+# _gst_debug_category_new
+# _gst_debug_dump_mem
+# _gst_debug_get_category
+# _gst_debug_init
+# _gst_debug_nameof_funcptr
+# _gst_debug_register_funcptr
 _gst_do_pass_data_accumulator
 _gst_element_error_printf
 _gst_element_request_pad
@@ -71,7 +71,7 @@ _priv_gst_registry_chunks_save_plugin
 _priv_gst_registry_cleanup
 _priv_plugin_deps_env_vars_changed
 _priv_plugin_deps_files_changed
-_strnlen
+# _strnlen
 activate_pads
 add_path_func
 add_to_free_list
@@ -451,44 +451,44 @@ gst_date_time_new_now_local_time
 gst_date_time_new_now_utc
 gst_date_time_ref
 gst_date_time_unref
-gst_debug_add_log_function
-gst_debug_category_free
-gst_debug_category_get_color
-gst_debug_category_get_description
-gst_debug_category_get_name
-gst_debug_category_get_threshold
-gst_debug_category_reset_threshold
-gst_debug_category_set_threshold
-gst_debug_color_flags_get_type
-gst_debug_compare_log_function_by_data
-gst_debug_compare_log_function_by_func
-gst_debug_construct_term_color
-gst_debug_construct_win_color
-gst_debug_get_all_categories
-gst_debug_get_default_threshold
-gst_debug_graph_details_get_type
-gst_debug_help
-gst_debug_is_active
-gst_debug_is_colored
-gst_debug_level_get_name
-gst_debug_level_get_type
-gst_debug_log
-gst_debug_log_default
-gst_debug_log_valist
-gst_debug_message_get
-gst_debug_print_object
-gst_debug_print_segment
-gst_debug_print_stack_trace
-gst_debug_remove_log_function
-gst_debug_remove_log_function_by_data
-gst_debug_remove_with_compare_func
-gst_debug_reset_all_thresholds
-gst_debug_reset_threshold
-gst_debug_set_active
-gst_debug_set_colored
-gst_debug_set_default_threshold
-gst_debug_set_threshold_for_name
-gst_debug_unset_threshold_for_name
+# gst_debug_add_log_function
+# gst_debug_category_free
+# gst_debug_category_get_color
+# gst_debug_category_get_description
+# gst_debug_category_get_name
+# gst_debug_category_get_threshold
+# gst_debug_category_reset_threshold
+# gst_debug_category_set_threshold
+# gst_debug_color_flags_get_type
+# gst_debug_compare_log_function_by_data
+# gst_debug_compare_log_function_by_func
+# gst_debug_construct_term_color
+# gst_debug_construct_win_color
+# gst_debug_get_all_categories
+# gst_debug_get_default_threshold
+# gst_debug_graph_details_get_type
+# gst_debug_help
+# gst_debug_is_active
+# gst_debug_is_colored
+# gst_debug_level_get_name
+# gst_debug_level_get_type
+# gst_debug_log
+# gst_debug_log_default
+# gst_debug_log_valist
+# gst_debug_message_get
+# gst_debug_print_object
+# gst_debug_print_segment
+# gst_debug_print_stack_trace
+# gst_debug_remove_log_function
+# gst_debug_remove_log_function_by_data
+# gst_debug_remove_with_compare_func
+# gst_debug_reset_all_thresholds
+# gst_debug_reset_threshold
+# gst_debug_set_active
+# gst_debug_set_colored
+# gst_debug_set_default_threshold
+# gst_debug_set_threshold_for_name
+# gst_debug_unset_threshold_for_name
 gst_default_registry_check_feature_version
 gst_deinit
 gst_double_range_get_type

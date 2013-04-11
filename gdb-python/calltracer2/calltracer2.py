@@ -85,30 +85,35 @@ class _CallTracerLoadBinaryBreakpoint(gdb.Breakpoint):
                                                     gdb.BP_BREAKPOINT,
                                                     internal = False)
         self.silent=True
-        self._last_loaded=""
         self._record_regrex=re.compile(r'^0x[^/]+(.+)$')
         self._binary_info=binary_info
         self._stack=stack
+        self._prev_loaded_assoc={}
 
     def _retrive_loaded_binary(self):
         info=gdb.execute("info sharedLibrary",False, True)
         info_lines=info.splitlines()
-        for idx in range(len(info_lines)-1,0,-1):
+        newly_loaded=[]
+        for idx in range(len(info_lines)):
             loaded_binary=self._record_regrex.search(
                 info_lines[idx].strip('\r\n'))
             if loaded_binary:
-                break
-        return loaded_binary.group(1)
+                loaded_binary_name=loaded_binary.group(1)
+                if self._prev_loaded_assoc.has_key(loaded_binary_name) == False:
+                    self._prev_loaded_assoc[loaded_binary_name]=1
+                    newly_loaded.append(loaded_binary_name)
+        
+        return newly_loaded
 
     def stop(self):
         print "break in loader"
-        loaded_candidate=self._retrive_loaded_binary()
-        if loaded_candidate != self._last_loaded:
-            self._last_loaded = loaded_candidate
-            print "Loading: %s" % self._last_loaded
-            if self._binary_info.has_key(self._last_loaded) == True:
-                for func_spec in self._binary_info[self._last_loaded]:
-                    _CallTracerBreakpoint(func_spec,func_spec,self._stack)
+        loaded_candidates=self._retrive_loaded_binary()
+        if len(loaded_candidates) != 0:
+            for idx in range(len(loaded_candidates)):
+                print "Loading: %s" % loaded_candidates[idx]
+                if self._binary_info.has_key(loaded_candidates[idx]) == True:
+                    for func_spec in self._binary_info[loaded_candidates[idx]]:
+                        _CallTracerBreakpoint(func_spec,func_spec,self._stack)
 
         return False
 
