@@ -163,6 +163,11 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
+	if (($request->header('Host') =~ /cdn\.anitu\.be$/ ) &&
+		($request->url =~ /\.flv/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
 	if (($request->header('Host') =~ /^stream.*\.igrooveshark\.com$/ ) &&
 		($request->url =~ /stream\.php/)) {
 		pcap_close($pcap);
@@ -179,11 +184,6 @@ sub search_method {
 		download_video_streams($request);
 	}
 	if (($request->header('Host') =~ /yucache\.net$/ ) &&
-		($request->url =~ /\.flv\?/)) {
-		pcap_close($pcap);
-		download_video_streams($request);
-	}
-	if (($request->header('Host') =~ /anitube.com.br$/ ) &&
 		($request->url =~ /\.flv\?/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
