@@ -399,6 +399,8 @@ aptitude install *-dbg
 set substitute-path /tmp/buildd/glib2.0-2.33.12+really2.32.4/ /home/nojima/prog/debian/libglib/glib2.0-2.33.12+really2.32.4/
 としておくと、そのままソースコードデバッグが可能。
 
+んー、gtype.cの中身って、dynamic loadingのサポート系か？
+g_type_class_refとか、なんとなく...
 
 
 
