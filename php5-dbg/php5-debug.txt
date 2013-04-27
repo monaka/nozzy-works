@@ -1,0 +1,155 @@
+デバッガでphp5-cliおいかけると、
+
+compilerは $(PHP5SRC)/Zend/zend.c
+ zend_execute_scripts()
+    --> zend_compile_file()=phar_compile_file()($(PHP5SRC)/ext/phar/phar.c)
+    
+     
+
+
+executerは 
+ $(PHP5SRC)/Zend/zend_vm_execute.h中の
+  342 ZEND_API void execute(zend_op_array *op_array TSRMLS_DC)
+
+だったー。
+
+ で、compile済みopcodeを使い、
+   410			if ((ret = OPLINE->handler(execute_data TSRMLS_CC)) > 0) {
+
+ を実行
+  --> 
+ $(SRC)/Zend/zend_vm_execute.h
+ 2359 static int ZEND_FASTCALL  ZEND_SEND_VAL_SPEC_CONST_HANDLER(ZEND_OPCODE_HAN      DLER_ARGS)      
+
+へGo。
+
+php5でデバッガってどうしてんのか？とおもったら、
+例えばxdebugとかだと、
+
+ 560         /* Redirect compile and execute functions to our own */
+ 561         old_compile_file = zend_compile_file;
+ 562         zend_compile_file = xdebug_compile_file;
+ 563 
+ 564         xdebug_old_execute = zend_execute;
+ 565         zend_execute = xdebug_execute;
+ 566 
+ 567         xdebug_old_execute_internal = zend_execute_internal;
+ 568         zend_execute_internal = xdebug_execute_internal;
+ 
+こんなことしてやがりました。ただ、xdebug_compile_fileは
+
+1532 /* {{{ zend_op_array srm_compile_file (file_handle, type)
+1533  *    This function provides a hook for the execution of bananas */
+1534 zend_op_array *xdebug_compile_file(zend_file_handle *file_handle, int type      TSRMLS_DC)
+1535 {
+1536         zend_op_array *op_array;
+1537 
+1538         op_array = old_compile_file(file_handle, type TSRMLS_CC);
+1539 
+1540         if (op_array) {
+1541                 if (XG(do_code_coverage) && XG(code_coverage_unused && XDEB     UG_PASS_TWO_DONE)) {
+1542                         xdebug_prefill_code_coverage(op_array TSRMLS_CC);
+1543                 }
+1544         }
+1545         return op_array;
+1546 }
+1547 /* }}} */
+
+として、まあ、zend_compile_file()を呼んではいる。
+
+xdebugによれば、current_execute_dataに現在実行中のステートメントに
+対する中間コードなどが入ってる。
+
+xdebugはexecuterでブレークポイントなどを制御。また、そりゃもう
+カスタムの情報収集用コードを詰め込んでいろいろ記録。
+
+現在実行中の行の情報は、xdebugの場合、
+xdebug_execute()->xdebug_add_stack_frame()で得てる
+
+current_execute_data->op_array->filename ---> 現在実行中のファイル名
+
+(See. xdebug_build_fname()in xdebug_stack.c)
+current_execute_data->function_state.function->common.function_name--->
+現在実行中の間数名
+NULLの場合は、
+(PHP>5.0.3.99の場合)
+current_execute_data->opline->exntended_valueにて、
+ZEND_EVAL-->eval
+ZEND_INCLUDE --> include
+ZEND_REQUIRE --> require
+ZEND_INCLUDE_ONCE --> include_once
+ZEND_REQUIRE_ONCE ---> require_once
+となる。なお、これ以外はFUNC_UNKONWNという扱いになり、
+基本的にmain()の中である事を示唆する。
+
+
+
+current_execute_data->function_state.function->common.scope --> class
+(なお、__autoloadはNULL)
+
+current_execute_data->function_state.function->common.scope->name --> static member名このあたりNULLだとclassに所属しない関数
+
+current_execute_data->function_state.function->common.function_name == "{closure}"だと、closure.なお、このとき、
+current_execute_data->function_state.function->op_array.filename,
+current_execute_data->function_state.function->op_array.line_start,
+current_execute_data->function_state.function->op_array.line_end
+に情報がある。
+
+また、
+current_execute_data->opline!=NULLなら、
+current_execute_data->opline->linenoが実行時の行数
+current_execute_data->opline==NULLで、
+current_execute_data->prev_execute_data->oplineがあれば、
+current_execute_data->prev_execute_data->opline->linenoが実行時の行数
+
+current_execute_data->opline ==NULLだったり、
+current_execute_data->opline->opcode == ZEND_DO_FCALL_BY_NAME
+だったりしたら、
+current_execute_data->function_state.argumentsに引数の個数が入ってる。
+
+そうじゃなかったら、p=zend_vm_stack_top(TSRMLS_C)-1して
+とってきた*pにulongで引数の個数が入ってる。
+
+で、op_arrayには、
+op_array->arg_info[i].nameに引数の名前がある。
+
+
+ちなみに、各関数へ渡す引数に
+TSRMLS_XXとかある場合は、$(PHP5SRC)/TSRM/TSRM.hに定義がある。
+
+TSRMLS_C-->tsrm_ls
+のことらしい
+
+EG(X)とは、いわゆるPHP本体についてはグローバル変数
+しかしながら、threadとかでは独自の空間にグローバルもたないと
+面倒なので、わざわざ(zend_executor_globals *)(*((void ***)tsrm_ls))[executor_globals_id-1])->Xして管理。
+
+EX(X)とは、execute_data->Xの意味
+
+で、取り急ぎphp5-cliでは、
+
+(gdb) bt
+#0  execute (op_array=0x7ffff7e5e360)
+    at /tmp/buildd/php5-5.4.4/Zend/zend_vm_execute.h:410
+#1  0x00000000006a028e in zend_execute_scripts (type=8, retval=0x7ffff7e5e318, 
+    file_count=3) at /tmp/buildd/php5-5.4.4/Zend/zend.c:1279
+#2  0x000000000063f863 in php_execute_script (primary_file=0x0)
+    at /tmp/buildd/php5-5.4.4/main/main.c:2473
+#3  0x00000000007491b3 in do_cli (argc=0, argv=0x7fffffffe979)
+    at /tmp/buildd/php5-5.4.4/sapi/cli/php_cli.c:988
+#4  0x000000000043110a in main (argc=32767, argv=0xdb9210)
+    at /tmp/buildd/php5-5.4.4/sapi/cli/php_cli.c:1361
+
+となっているので、TSRMLS_Cとかはからっぽ。
+※ define ZTSしてると有効になる。
+
+(gdb) p executor_globals.argument_stack->top
+$14 = (void **) 0x7ffff7e2a110
+
+というわけで、php5-cliでは、
+EG(X)は、executor_globals.Xである。
+
+取り急ぎ、これらのことをするようにpythonスクリプトを組んでみる...
+
+しまった、pythonからgdbつかって解析するには、OPCODE->handlerの呼び出し
+直前で対応の必要があった...
