@@ -153,3 +153,51 @@ EG(X)は、executor_globals.Xである。
 
 しまった、pythonからgdbつかって解析するには、OPCODE->handlerの呼び出し
 直前で対応の必要があった...
+
+ところで、xdebugのデバッグ能力低すぎ...
+
+まず、
+
+　　前提：
+
+　　　　1)とにかくリモートデバッグ
+　　    2) web経由であれば、とにかくXDEBUG_SESSION_START=1をぶちこんで
+　　　　　debuggerモードを機能させる事が必要
+       3) 特権もたずにどうやってデバッグするんだ？
+
+おっと、XDEBUG_CONFIG=1で、php5-cliはいける?
+
+まあ、いずれにしても、xdebugの喋るDBGpのまともなclientはなぜかvimぐらい
+しかない。
+
+vim.orgがmysql絡みで死んでいるので、DBGpのクライアントは
+
+git clone https://github.com/vim-scripts/DBGp-client
+
+で落とす。
+
+XDEBUG_CONFIG="idekey=DBGP" \
+XDEBUG_SESSION_START=DBGP \
+/usr/bin/php hoge.php
+でいけるそうな。
+
+が、なんと！debian sid付属のvimでは、pythonがenableになってないので、
+debugger.pyとかのpythonベースのpluginが利用できないやんけ...
+※なので、残念なことに、vim php5拡張がつかえんなぁ...
+で、vim-pythonというパッケージがあったので、
+aptitude install vim-pythonとかしたら、
+
+~/ sudo aptitude install vim-python
+"vim-python" は、以下のパッケージから提供されている仮想パッケージです:
+  vim-nox vim-gtk vim-gnome vim-athena 
+インストールするものを一つ選んでください。
+インストール・削除・更新されるパッケージがありません。
+更新: 0 個、新規インストール: 0 個、削除: 0 個、保留: 98 個。
+0  バイトのアーカイブを取得する必要があります。展開後に 0  バイトのディスク領域が新たに消費されます。
+
+とかだった....で、vim.noxとか入れたら、<F5>で無事debugger.pyがうごいたよ。
+
+
+
+
+

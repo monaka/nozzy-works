@@ -18,7 +18,9 @@ class _Php5ExecuterHook(gdb.Breakpoint):
 
         #check what function within
         whereis=gdb.parse_and_eval("execute_data->function_state.function->common.function_name")
-        if ( str(whereis) == "0x0" ):
+        if ( str(whereis) != "0x0" ):
+            
+
             whereis=gdb.parse_and_eval("execute_data->opline->extended_value")
 
         print "%s:%s in %s" % (filename,lineno,whereis)
