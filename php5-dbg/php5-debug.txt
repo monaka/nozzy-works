@@ -197,7 +197,12 @@ aptitude install vim-pythonとかしたら、
 
 とかだった....で、vim.noxとか入れたら、<F5>で無事debugger.pyがうごいたよ。
 
+取り急ぎちょっと複雑そうなphp欲しかってので、学習負荷の少なそうなcakephp
+を選んでみた。
 
-
-
+aptitude install cakephp
+mkdir public_html
+cd public_html
+php /usr/share/php/cake/console/cake.php bake `pwd`/blogtest
+とかしてあとは質問に答えるとスケルトンが出来上がり。
 
