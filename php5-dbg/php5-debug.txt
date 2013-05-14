@@ -1,3 +1,7 @@
+デバッガでphp5をデバッグできるとよいこと
+ ---> 要は、php5レベルで暴走してたりするとどこで暴走したのかがわかるとか...
+
+
 デバッガでphp5-cliおいかけると、
 
 compilerは $(PHP5SRC)/Zend/zend.c
@@ -205,4 +209,146 @@ mkdir public_html
 cd public_html
 php /usr/share/php/cake/console/cake.php bake `pwd`/blogtest
 とかしてあとは質問に答えるとスケルトンが出来上がり。
+
+
+取り急ぎ、cakephpでapacheの奴がうまく動いてくれんので、
+
+ sudo aptitude install apache2-dbg入れて、
+ /etc/apache2/apache2.conf
+にて、
+
+<IfModule mpm_prefork_module>
+    StartServers          1
+    MinSpareServers       1
+    MaxSpareServers       1
+    MaxClients            1
+
+に設定して再起動し、
+ sudo gdb /usr/sbin/apache2 PID
+
+してデバッグ中....
+
+ apacheのモジュール起動は、$(APACHE_SRC)/server/connection.c:190にて
+ap_run_process_connection()の呼び出しによりかたっぱしからモジュールの
+XXX_init()が起動されるようだ。
+
+$(APACHE_SRC)/server/connection.c:40の
+AP_IMPLEMENT_HOOK_RUN_FIRST(conn_rec *,create_connection,
+ 41                             (apr_pool_t *p, server_rec *server, apr_socket_t     *csd, long conn_id, void *sbh, apr_bucket_alloc_t *alloc),
+がap_run_connectionの実体。
+
+まあ、
+AP_IMPLEMENT_HOOK_RUN_FIRST
+により、ガツガツコードが生成されて実行されるみたい。
+
+デバッガでおっかけると
+$(APACHE_SRC)/modules/http/http_core.cの
+ ap_run_process_connection()-->
+    $(APACHE_SRC)/modules/http/http_core.cの
+   ap_process_http_connection()
+
+でリクエストが処理される。でここからさらにおっかけると、
+$(APACHE_SRC)/server/config.cの
+ap_invoke_handler()が呼び出され、
+ 377     result = ap_run_handler(r);
+がどうもディスパッチャーのようだ。で、ap_run_handler()は
+	AP_IMPLEMENT_HOOK_RUN_FIRST(int, handler, (request_rec *r),
+159	                            (r), DECLINED)
+をマクロ展開した内容のようである。
+マクロ展開されている部分なので、展開前のソースしかおいかけられないため、
+disasする。
+
+(gdb) disas
+Dump of assembler code for function ap_run_handler:
+=> 0x00007faa93cfbb20 <+0>:	mov    0x230ec1(%rip),%rax        # 0x7faa93f2c9e8 <_hooks+40>
+   0x00007faa93cfbb27 <+7>:	test   %rax,%rax
+   0x00007faa93cfbb2a <+10>:	je     0x7faa93cfbb7a <ap_run_handler+90>
+   0x00007faa93cfbb2c <+12>:	push   %r12
+   0x00007faa93cfbb2e <+14>:	push   %rbp
+   0x00007faa93cfbb2f <+15>:	push   %rbx
+   ...中略...
+    0x00007faa93cfbb5e <+62>:	callq  *(%rbx)
+
+
+で、みてのとおり、0x00007faa93cfbb5eが心臓部なので、
+b *0x00007faa93cfbb5e
+して、siしてみると、
+
+ handle_autoindex(mod_autoindex.c)-->cgi_handler(mod_cgi.c)-->
+  handle_map_file(mod_negotiation.c)-->php_handler(php)
+   -->handler_redirect(mod_rewrite.c)
+
+で、再度
+
+ handle_autoindex(mod_autoindex.c)-->cgi_handler(mod_cgi.c)-->
+  handle_map_file(mod_negotiation.c)-->php_handler(php)
+   -->handler_redirect(mod_rewrite.c)-->status_handler(mod_statuc.c)
+   ---> default_handler(core.c)
+
+btとると、handler_redirect(mod_rewrite)-->ap_internal_redirect(http_request.c)
+ -->ap_invoke_handler(config.c)-->ap_run_handler(config.c)
+
+となっている。
+
+結論としては、symlinkされている場所で、mod_rewrite()すると、
+redirectされた先の実体がsymlinkとかだと、正しくsymlinkを扱えないようだ。
+でもこれはphpが悪さしているのか？
+
+で、php_handler()のデバッグを試みたが、これがdebugシンボルと
+実際のソースの対応がぐちゃぐちゃになってしまう。
+
+--->なんじゃこりゃ...
+
+なんとまあ、apache2では、user_directory使えるものの
+mod_rewriteと組み合わせるには、rewrite先を/~nojima/blogtest/webxxxとか
+の絶対pathにする必要あり。
+
+例：
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteRule    ^$    /~nojima/blogtest/webroot/    [L]
+    RewriteRule    (.*) /~nojima/blogtest/webroot/$1    [L]
+ </IfModule>
+こんな感じ。
+
+でも、今度は...phpがうごかん...
+
+でphpがuser_dirの組み合わせでうごかん理由はわかった。
+
+/etc/apache2/mods-enable/php5.conf中にて
+#<IfModule mod_userdir.c>
+#    <Directory /home/*/public_html>
+#        php_admin_value engine Off
+#    </Directory>
+#</IfModule>
+の部分のようにコメントアウトが必要。
+
+※実はphp_admin_value engine onにしても、何しても動かんかった...
+
+cakephpは、$(APP)/tmp/logsなどにログを吐く
+
+とりあえず、apacheにgdb attachして、
+ set substitute-path /tmp/buildd/ /home/nojima/prog/debian/php5/
+をぶちこみ、b executeすると、executorで実行停止する。
+
+で、php-cliでは使えたcurrent_execute_dataが今回はGlobalエリアで
+個別管理されるようになる（EG()が有効）のため、
+execute_dataで情報を得てみる。
+
+
+debianのdbgファイルっていろいろあって、
+
+ 1. apache2のように、objcopyで、デバッグシンボル付きの実行ファイル群を
+　　　objcopy --only-keep-debug BINARY DBG-BINARY
+　　として、わざわざ/usr/lib/debug/bin/以下とかに置き、
+    BINARYにstripかけてから、
+　　 objcopy --add-gnu-debuglink=DBG-BINARY BINARY
+
+    として、debug情報のリンクのみ埋め込むという手を使うか、
+
+ 2. gstreamerのように、dh_strip --debug-pkg=XXXX-dbgとかして
+　　対応するか
+
+の２系統があるようだ。
+
 
