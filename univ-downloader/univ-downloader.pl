@@ -192,6 +192,11 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
+	if (($request->header('Host') =~ /videofun\.me$/ ) &&
+		($request->url =~ /\.flv\?/)) {
+		pcap_close($pcap);
+		download_video_streams($request);
+	}
 #	print "Host=".($request->header('Host'))." url=".($request->url)."\n";
 }
 sub download_video_streams {
