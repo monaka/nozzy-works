@@ -11,22 +11,28 @@ use NetPacket::IP;
 use NetPacket::TCP;
 use Readonly;
 Readonly my $ppp0 => 'ppp0';
+Readonly my $wlan0 => 'wlan0';
 Readonly my $buffer_size => 65535; # set maxium buffer size
 Readonly my $infinite => -1;
 Readonly my $filter_cmd => 
 	'port 80 and ( tcp[tcpflags] & (tcp-push|tcp-ack) !=0)';
 my $err='';
 my %devinfo;
+my $found_if=$ppp0;
 my @dev=pcap_findalldevs(\%devinfo,\$err);
 check_err($err);
 if (!defined $devinfo{$ppp0}) {
-	die "not priviledge, or not activated ppp0 interface,abort\n";
+	warn "not priviledge, or not activated ppp0 interface try wlan\n";
+	if (!defined $devinfo{$wlan0}) {
+		die "uh? wlan0 also doesn't exsist,abort\n";
+	}
+	$found_if=$wlan0;
 }
 my ($net,$mask);
-pcap_lookupnet($ppp0,\$net,\$mask,\$err);
+pcap_lookupnet($found_if,\$net,\$mask,\$err);
 check_err($err);
 my $hostaddr=inet_ntoa(pack("N",$net));
-my $pcap = pcap_open_live($ppp0,$buffer_size,1,0,\$err);
+my $pcap = pcap_open_live($found_if,$buffer_size,1,0,\$err);
 check_err($err);
 my $filter;
 my $filter_str="src net $hostaddr and ".$filter_cmd;
@@ -64,10 +70,10 @@ sub search_method {
 		sprintf "uh? protocol is not 0x06 value=%02X\n",$ip_obj->{proto} );
 	}
 	my $tcp_obj=NetPacket::TCP->decode($ip_obj->{data});
-#	print $ip_obj->{src_ip}.":".$tcp_obj->{src_port}."->"
-#		.$ip_obj->{dest_ip}.":".$tcp_obj->{dest_port}."\n";
+	print $ip_obj->{src_ip}.":".$tcp_obj->{src_port}."->"
+		.$ip_obj->{dest_ip}.":".$tcp_obj->{dest_port}."\n";
 	my $payload=$tcp_obj->{data};
-#    print "payload=".$payload."\n";
+        print "payload=".$payload."\n";
 	if ($payload !~ /^(GET|POST)/i) {
 		# abort
 		return;
