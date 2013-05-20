@@ -31,12 +31,10 @@ if (!defined $devinfo{$ppp0}) {
 my ($net,$mask);
 pcap_lookupnet($found_if,\$net,\$mask,\$err);
 check_err($err);
-my $hostaddr=inet_ntoa(pack("N",$net));
 my $pcap = pcap_open_live($found_if,$buffer_size,1,0,\$err);
 check_err($err);
 my $filter;
-my $filter_str="src net $hostaddr and ".$filter_cmd;
-pcap_compile($pcap,\$filter,$filter_str,1,$mask);
+pcap_compile($pcap,\$filter,$filter_cmd,1,$mask);
 check_err($err);
 pcap_setfilter($pcap,$filter);
 my $link_type_name=pcap_datalink_val_to_name(pcap_datalink($pcap));
@@ -70,10 +68,10 @@ sub search_method {
 		sprintf "uh? protocol is not 0x06 value=%02X\n",$ip_obj->{proto} );
 	}
 	my $tcp_obj=NetPacket::TCP->decode($ip_obj->{data});
-	print $ip_obj->{src_ip}.":".$tcp_obj->{src_port}."->"
-		.$ip_obj->{dest_ip}.":".$tcp_obj->{dest_port}."\n";
+#	print $ip_obj->{src_ip}.":".$tcp_obj->{src_port}."->"
+#		.$ip_obj->{dest_ip}.":".$tcp_obj->{dest_port}."\n";
 	my $payload=$tcp_obj->{data};
-        print "payload=".$payload."\n";
+#        print "payload=".$payload."\n";
 	if ($payload !~ /^(GET|POST)/i) {
 		# abort
 		return;
@@ -170,7 +168,7 @@ sub search_method {
 		download_video_streams($request);
 	}
 	if (($request->header('Host') =~ /cdn\.anitu\.be$/ ) &&
-		($request->url =~ /\.flv/)) {
+		($request->url =~ /\.(flv|mp4)/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
