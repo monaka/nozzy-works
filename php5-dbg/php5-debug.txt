@@ -7,9 +7,6 @@
 compilerは $(PHP5SRC)/Zend/zend.c
  zend_execute_scripts()
     --> zend_compile_file()=phar_compile_file()($(PHP5SRC)/ext/phar/phar.c)
-    
-     
-
 
 executerは 
  $(PHP5SRC)/Zend/zend_vm_execute.h中の
@@ -128,6 +125,10 @@ EG(X)とは、いわゆるPHP本体についてはグローバル変数
 しかしながら、threadとかでは独自の空間にグローバルもたないと
 面倒なので、わざわざ(zend_executor_globals *)(*((void ***)tsrm_ls))[executor_globals_id-1])->Xして管理。
 
+あー、一応、apacheのlibphp5程度だと、ZTSはONじゃないらしいので、
+EG(X)-->executor_globas.Xになるようです。はい。（よかったね！）
+
+
 EX(X)とは、execute_data->Xの意味
 
 で、取り急ぎphp5-cliでは、
@@ -157,6 +158,8 @@ EG(X)は、executor_globals.Xである。
 
 しまった、pythonからgdbつかって解析するには、OPCODE->handlerの呼び出し
 直前で対応の必要があった...
+--->あー、ダウト。ここでハンドラしかけるとまぢで構文１個に対する
+　　OPCODEごとにハンドラが呼ばれてしまい...超遅い...
 
 ところで、xdebugのデバッグ能力低すぎ...
 
@@ -335,6 +338,26 @@ cakephpは、$(APP)/tmp/logsなどにログを吐く
 個別管理されるようになる（EG()が有効）のため、
 execute_dataで情報を得てみる。
 
+-->実は後でこれが厄介な問題を...
+  execute_dataはgccのoptimizerにより中途では存在しない扱い
+になってしまう。
+　たまたま、
+402         while (1) {
+  403         int ret;
+  404 #ifdef ZEND_WIN32
+  405                 if (EG(timed_out)) {
+  406                         zend_timeout(0);
+  407                 }
+  408 #endif
+  409 
+  410                 if ((ret = OPLINE->handler(execute_data TSRMLS_CC)) > 0) {
+
+のl.410にて明示的にexecute_dataと等価のデータを参照する必要があるので、
+l.410のみexecute_dataをgdb上から参照できるが、それより前では、
+存在自体がかき消される（あくまで想像だが、EG(current_execute_data)を
+直接仲介したコードになってしまうようだ）やるなオプティマイザめ！
+
+
 
 debianのdbgファイルっていろいろあって、
 
@@ -350,7 +373,7 @@ debianのdbgファイルっていろいろあって、
 　　対応するか
 
 の２系統があるようだ。
-
+---> compat何番か？に依存
 
 dh_stripの処理の大半が、dbgパッケージ作りだった...
 
@@ -507,52 +530,167 @@ php5のdbgパッケージ突っ込むと、line-no情報がフルパスではい
 ので、gdb上から、substitute-pathでソースパスの変更が可能で便利であるが、
 一方で、apacheのように絶対pathが入ってないdbg情報もある。
 
-参考までに、
+理由→
+　　1) apache2は、gccにファイルパス渡すときに
+　　　 cd xxxxx && gcc -g -c file.c
+      とやっているため、ディレクトリ情報が消えてしまう。
 
- readelf -x .debug_line /usr/lib/debug/usr/bin/php5として確認すると、
+　　2) php5は、逆にgccにファイルパス渡すときに
+　　　 gcc -g -c `pwd`/file.c
+       とわざわざやっているため、ディレクトリ情報が含まれる。
 
-セクション '.debug_line' の 十六進数ダンプ:
-  0x00000000 66240000 02005004 00000101 fb0e0d00 f$....P.........
-  0x00000010 01010101 00000001 0000012f 746d702f .........../tmp/
-  0x00000020 6275696c 64642f70 6870352d 352e342e buildd/php5-5.4.
-  0x00000030 31352f65 78742f64 61746500 2f757372 15/ext/date./usr
-  0x00000040 2f696e63 6c756465 2f783836 5f36342d /include/x86_64-
-  0x00000050 6c696e75 782d676e 752f6269 7473002f linux-gnu/bits./
-  0x00000060 746d702f 6275696c 64642f70 6870352d tmp/buildd/php5-
-  0x00000070 352e342e 31352f5a 656e6400 2f757372 5.4.15/Zend./usr
-  0x00000080 2f6c6962 2f676363 2f783836 5f36342d /lib/gcc/x86_64-
-  0x00000090 6c696e75 782d676e 752f342e 372f696e linux-gnu/4.7/in
-  0x000000a0 636c7564 65002f75 73722f69 6e636c75 clude./usr/inclu
-  0x000000b0 6465002f 7573722f 696e636c 7564652f de./usr/include/
-  0x000000c0 7838365f 36342d6c 696e7578 2d676e75 x86_64-linux-gnu
-  0x000000d0 2f737973 002f7573 722f696e 636c7564 /sys./usr/includ
-  0x000000e0 652f7838 365f3634 2d6c696e 75782d67 e/x86_64-linux-g
-  0x000000f0 6e75002f 746d702f 6275696c 64642f70 nu./tmp/buildd/p
-  0x00000100 6870352d 352e342e 31352f65 78742f73 hp5-5.4.15/ext/s
-  0x00000110 74616e64 61726400 2f746d70 2f627569 tandard./tmp/bui
-  0x00000120 6c64642f 70687035 2d352e34 2e31352f ldd/php5-5.4.15/
-  0x00000130 6578742f 64617465 2f6c6962 002f746d ext/date/lib./tm
-  0x00000140 702f6275 696c6464 2f706870 352d352e p/buildd/php5-5.
-  0x00000150 342e3135 2f6d6169 6e000070 68705f64 4.15/main..php_d
-  0x00000160 6174652e 63000100 00737472 696e6733 ate.c....string3
+　(dpkg-buildpackageで、apache2/php5をそれぞれbuildするとわかる)
 
-のようにほぼフルパスで情報が埋め込まれている。
+取り急ぎ、現在実行中のphp5上のソース位置と、現在どこの関数スコープにいるのか？
+について表示するpythonスクリプトを書いて実行してみたが...遅っせー
 
-apacheのソース対応ができんのは、 
-readelf -x .debug_line /usr/lib/debug/usr/lib/apach2/mpm-prefork/apache2-mpm-prefork
-してみるとわかるが、
+---> どうもexecute()は何度も呼ばれるみたいで、
+     execute() l.410の場所でブレークすると細かいOPコード
+　　　ごとにブレークかかるので超遅いみたいだ。
+　　　（もちろん、gdb.parse_and_evalが超絶に重いという話もあるが)
 
-  0x00000090 6e636c75 64652f61 70722d31 2e30002f nclude/apr-1.0./
-  0x000000a0 6275696c 642f6275 696c6464 2d617061 build/buildd-apa
-  0x000000b0 63686532 5f322e32 2e32322d 31332d61 che2_2.2.22-13-a
-  0x000000c0 6d643634 2d4a4557 5a71392f 61706163 md64-JEWZq9/apac
-  0x000000d0 6865322d 322e322e 32322f64 65626961 he2-2.2.22/debia
-  0x000000e0 6e2f6275 696c642d 74726565 2f707265 n/build-tree/pre
-  0x000000f0 666f726b 2f696e63 6c756465 00007479 fork/include..ty
 
-というかんじで、
+php5上の変数は
 
-/build/buildd-apache2_2.2.22-13-amd64-JEWZq9/apache2-2.2.22/debian/build-tree/prefork/include
+while(i<op_array->last){
+     op_array->opcodes[i].op1.var ;<-なんか入ってるばあいがある。
+     op_array->opcodes[i].op2.var ;<-なんか入っているばあいがある
+     i++
+}
 
-という感じでビルド中のディレクトリにならったソースが必要。そのため、
+でみれるか？
 
+おお、そういや、gdb上からは、python　XXXXXで、XXXXを実際に
+評価できるので、かたっぱしから試行錯誤してスクリプトも起こせますな。
+ということです。
+
+(gdb)python data=gdb.parse_and_eval("executor_globals.current_execute_data")
+(gdb) python print data.address
+0x7f941fc1f400
+(gdb) python print data.type
+struct _zend_execute_data *
+
+また、gdb.Valueのヘルプみたかったら、
+(gdb) help(gdb.Value)とかするとみれるぞ。
+
+どうも、execute()に渡されるop_array->filenameは、最初に呼び出されたプログラム
+名っぽいな...
+--->いっちょ引き抜いてみるかー。
+で、EG(current_execute_data)->op_array->filename
+は現在実行されているところのop_arrayと、ファイル名。
+EG(current_execute_data)->prev_execute_dataは前回のcurrent_execute_dataか？
+
+EG(opline_ptr)という不思議なものがあり、
+(*EG(opline_ptr))->linenoに実行中の行番号がはいる時がある。
+（EG(opline_ptr)==0x0などあるので注意）
+
+1) EG(current_execute_data)==0x0の時はとにかく'{main}'の中。
+   XFUNC_NORMALをxdebugではfunction.typeとして指定
+
+2) EG(current_execute_data)==0x0の場合、行番号は必ず0で。
+
+3) EG(current_execute_data)!=0x0の場合、いろいろパターンがある。
+
+あー、gdbでバイナリに干渉するのは、gdb.parse_and_eval()がめちゃめちゃ
+重たいので、大量の変数を参照する時には効率わるいので注意がいる。
+
+ しらなかったが、
+
+(gdb) python edata=gdb.parse_and_eval("executor_globals.current_execute_data")
+(gdb) python print edata
+0x7fffae7ef4f0
+
+のときに、
+(gdb) python print edata.dereference()
+とすると、
+{opline = 0x0, function_state = {function = 0x7fa7f27264c8, arguments = 0x7fa7faa3a108}, fbc = 0x7fa7f26b8938, called_scope = 0x7fa7f2721190, op_array = 0x0, object = 0x7fa7f26c4ec8, Ts = 0x7fa7faa39500, CVs = 0x7fa7faa39490, symbol_table = 0x7fa7f2721670, prev_execute_data = 0x7fa7faa39400, old_error_reporting = 0x0, nested = 1 '\001', original_return_value = 0x0, current_scope = 0x7fa7f272d1c0, current_called_scope = 0x7fa7f272d1c0, current_this = 0x7fa7f271fa28, current_object = 0x0}
+のように中身が一応でてくる。(gdb.Valueが新たに作成される）
+で、このdereference()は超強力で、
+    gdb_test "python fp2 = fp2.dereference()" ""
+    gdb_test "python result2 = fp2(10,20)" ""
+    gdb_test "python print result2" "30"
+みたいな芸当が可能。
+
+また、*をひとつづつつけていく場合---> edata.referenced_value()
+     一気に*をつけまくって全部解除---> edata.dereference()
+という違いがある。
+
+で、今回の件だと、以下のような便利ことが可能。
+(gdb.Value強力だぜー）
+
+(gdb) python curr_exec=edata.dereference()
+(gdb) python print cur_exec['opline']
+0x0
+(gdb) print print cur_exec['function_state']['function']
+0x7fa7f27264c8
+(gdb) python print (cur_exec['function_state']['function']).dereference()
+{type = 2 '\002', common = {type = 2 '\002', function_name = 0x7fa7f2725ef8 "handleError", scope = 0x7fa7f2721190, fn_flags = 134283520, prototype = 0x0, num_args = 5, required_num_args = 2, arg_info = 0x7fa7f272f468}, op_array = {type = 2 '\002', function_name = 0x7fa7f2725ef8 "handleError", scope = 0x7fa7f2721190, fn_flags = 134283520, prototype = 0x0, num_args = 5, required_num_args = 2, arg_info = 0x7fa7f272f468, refcount = 0x7fa7f2725840, opcodes = 0x7fa7f26a9c20, last = 161, vars = 0x7fa7f2729e08, last_var = 16, T = 53, brk_cont_array = 0x7fa7f2725880, last_brk_cont = 1, try_catch_array = 0x0, last_try_catch = 0, static_variables = 0x0, this_var = 4294967295, filename = 0x7fa7f27206d0 "/usr/share/php/cake/libs/debugger.php", line_start = 247, line_end = 318, doc_comment = 0x7fa7f2729ca0 "/**\n * Overrides PHP's default error handling.\n *\n * @param integer $code Code of error\n * @param string $description Error description\n * @param string $file File on which error occurred\n * @param in"..., doc_comment_len = 341, early_binding = 4294967295, literals = 0x7fa7f26acc30, last_literal = 96, run_time_cache = 0x0, last_cache_slot = 28, reserved = {0x0, 0x0, 0x0, 0x0}}, internal_function = {type = 2 '\002', function_name = 0x7fa7f2725ef8 "handleError", scope = 0x7fa7f2721190, fn_flags = 134283520, prototype = 0x0, num_args = 5, required_num_args = 2, arg_info = 0x7fa7f272f468, handler = 0x7fa7f2725840, module = 0x7fa7f26a9c20}}
+
+なんて芸当が可能。これを応用して、current_execute_dataから、
+prev_execute_data引き抜いてさらにop_arrayの中を覗いてみる。
+(gdb) python print (((cur_exec['prev_execute_data'].dereference())['op_array']).dereference())['filename']
+0x7fa7f27756b0 "/usr/share/php/cake/libs/configure.php"
+
+まぢかー。
+さらにマヂカーと言う例：
+(gdb) python print cur_exec['prev_execute_data']['op_array']['filename']
+0x7fa7f27756b0 "/usr/share/php/cake/libs/configure.php"
+
+すごすぎ。
+
+で、わざと、未初期化ポインタに触ってみる
+(gdb) python print cur_exec['op_array']['filename']
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+gdb.MemoryError: Cannot access memory at address 0x90
+Error while executing Python code.
+とのことで、0x90に触ろうと思ったら、exception発生。
+
+ありゃ、しまった、連想配列呼び出しで自動的にdereference()されるので、
+python edata['prev_execute_data']['op_array']['filename']
+0x7fa7f27756b0 "/usr/share/php/cake/libs/configure.php"
+
+一発だった。
+
+---------------資料-----------
+
+なんでgdb+python
+
+debianのdbgパッケージ
+
+php5をデバッグしてみる
+  ---> xdebug+vim+debugger.pyじゃだめなのか
+　---> んじゃいっちょやってみる
+
+仕組み
+  --->
+
+おわりに
+
+----------------プレゼン項目------
+
+ なんでgdb+python
+
+ php5にゃ便利なデバッガが
+ -> apache+ xdebug + vim+ debugger.py plugin
+
+ 便利じゃん→だが断る！
+　（メモリに常駐しちゃったり、突然暴走ぶっこいてるプロセスデバッグしたくない？）
+
+ ここで、debianのデバッグシンボルの話
+
+　--->仕組みおさらい
+
+　debianのdebugの仕方
+
+　---> dbgパッケージにはシンボルにはいってるパス定義が2系統あるぜよ。
+  ---> だったら、それにあわせてのtips
+
+
+ 諸君！私はデバッグが好きだ
+  ---> 
+
+　
+　
+
+ 

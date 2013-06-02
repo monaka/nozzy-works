@@ -6,9 +6,12 @@ class _Php5ExecuterHook(gdb.Breakpoint):
         super(_Php5ExecuterHook, self).__init__(spec,
                                                gdb.BP_BREAKPOINT,
                                                internal=False)
-        
+        self._extended_value_dic={1: 'Zend_EVAL', 2: 'Zend_INCLUDE',
+                                  4: 'Zend_INCLUDE_ONCE',
+                                  8: 'Zend_REQUIRE',
+                                  16: 'Zend_REQUIRE_ONCE'}
+
     def stop(self):
-        current_frame = gdb.selected_frame()
         # check filename
         filename=(str(gdb.parse_and_eval("execute_data->op_array->filename")).split())[1]
         # check lineno
@@ -18,10 +21,12 @@ class _Php5ExecuterHook(gdb.Breakpoint):
 
         #check what function within
         whereis=gdb.parse_and_eval("execute_data->function_state.function->common.function_name")
-        if ( str(whereis) != "0x0" ):
-            
-
+        if ( str(whereis) == "0x0" ):
             whereis=gdb.parse_and_eval("execute_data->opline->extended_value")
+            if (self._extended_value_dic.has_key(whereis) == False):
+                whereis = "{main}"
+            else:
+                whereis = _self._extended_value_dic[whereis]
 
         print "%s:%s in %s" % (filename,lineno,whereis)
         return False
