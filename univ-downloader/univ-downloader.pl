@@ -177,11 +177,6 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
-	if (($request->header('Host') =~ /youtube\.com$/ ) &&
-		($request->url =~ /^\/videoplayback/)) {
-		pcap_close($pcap);
-		download_video_streams($request);
-	}
 	if (($request->header('Host') =~ /auengine\.com$/ ) &&
 		($request->url =~ /^\/videos/)) {
 		pcap_close($pcap);
