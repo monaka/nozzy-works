@@ -1,3 +1,5 @@
+--------さてここからが、php 5.4 ---------------------
+
 デバッガでphp5をデバッグできるとよいこと
  ---> 要は、php5レベルで暴走してたりするとどこで暴走したのかがわかるとか...
 
@@ -651,6 +653,52 @@ python edata['prev_execute_data']['op_array']['filename']
 0x7fa7f27756b0 "/usr/share/php/cake/libs/configure.php"
 
 一発だった。
+--------さてここまでが、php 5.4 ---------------------
+
+うぎゃー、sidでupgradeしたら、phpは5.5.0になり、内部構造ががらり
+とかわってるうぅぅぅー。
+
+まず、execute()が居なくなった。代わりに複数のexecute関数がいるようだ。
+-->実際には、zend_execute_internalと、zend_execute_exに変わった。
+　　（zend_execute()はzend_execute_exのラッパー）
+
+executorの類は全部、Zend/zend_execute_API.cにあるようだ。
+
+また、APIが充実したようで、
+　　Zend/zend_execute_API.c:  const char *get_active_class_name(const char **space TSRMLS_DC)
+　　nite,
+　　　で現在のクラス名、（引数のspaceは、つなぎが"::"か、""かをかえす）
+   Zend/zend_execute_API.c: const char* get_active_function_name()
+    で、EG(current_excute_data)から現在の関数名を得る事ができ、
+   Zend/zend_execute_API.c: const char* zend＿get_executed_filename()
+    で、EG(active_op_array)から現在実行中のファイル名を、
+   Zend/zend_execute_API.c: uint zend_get_executed_lineno()
+    で、linenoを、
+   Zend/zend_execute_API.c: zend_bool zend_is_executing()
+    で現在実行中か（EG(in_execution)の値）を
+ GETできる。
+
+うはー、これらの情報を抜くのに参考になるのが、$(PHP5SRC)/main/main.cの
+php_verror()だったりする...
+(eval/include/include_once/require/require_once/Unknownとか作成してる...)
+また、main/outoput.cのphp_output_header()にて、linenoと、filenameの
+両者を抜いていた...
+※他は大抵exceptionハンドリングで利用されるらしい。
+
+なんか、上の関数群をもとにソースgrepすると、Zend/zend_dtrace.cという
+dtrace意識したコードが入ってるぜ。
+---->見ると、これ全部enableにしてくれよーというピンポイントな
+　　 DTrace用関数群が...
+    char *dtrace_get_exected_filename()とか、
+
+↑デバッガ作りに超参考になるなる...
+
+   
+
+
+php5.5では、zend_execute_internal(),zend_execute_ex()になってた。
+
+
 
 ---------------資料-----------
 
@@ -689,8 +737,3 @@ php5をデバッグしてみる
 
  諸君！私はデバッグが好きだ
   ---> 
-
-　
-　
-
- 

@@ -43,6 +43,7 @@ iptables -A OUTPUT -p tcp --dport 587 --syn -j ACCEPT
 # for armitage radio station in finland
 iptables -A OUTPUT -p tcp --dst 143.51.142.148 --dport 8040 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dst 216.59.35.34 --dport 8004 --syn -j ACCEPT
+iptables -A OUTPUT -p tcp --dst 91.121.66.35 --dport 8004 --syn -j ACCEPT
 # for animaze radio station
 iptables -A OUTPUT -p tcp --dst 72.233.93.160 --dport 10007 --syn -j ACCEPT
 # Netraji
@@ -100,6 +101,8 @@ iptables -A INPUT -p udp --dport 67:68 -i eth0 -j ACCEPT
 iptables -A OUTPUT -p udp --dport 1900 -j ACCEPT
 # for whois
 iptables -A OUTPUT -p tcp --dport 43 -j ACCEPT
+# for hange
+iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
 iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input]'
 iptables -A OUTPUT -p tcp -j LOG --log-prefix '[Drop output]'
