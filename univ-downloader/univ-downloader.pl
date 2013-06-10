@@ -164,17 +164,12 @@ sub search_method {
 		download_video_streams($request);
 	}
 	if (($request->header('Host') =~ /cdn\.anitu\.be$/ ) &&
-		($request->url =~ /\.flv/)) {
+		($request->url =~ /\.(flv|mp4)/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
 	if (($request->header('Host') =~ /^stream.*\.igrooveshark\.com$/ ) &&
 		($request->url =~ /stream\.php/)) {
-		pcap_close($pcap);
-		download_video_streams($request);
-	}
-	if (($request->header('Host') =~ /youtube\.com$/ ) &&
-		($request->url =~ /^\/videoplayback/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
