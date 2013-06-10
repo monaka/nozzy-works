@@ -693,9 +693,6 @@ dtrace意識したコードが入ってるぜ。
 
 ↑デバッガ作りに超参考になるなる...
 
-   
-
-
 php5.5では、zend_execute_internal(),zend_execute_ex()になってた。
 
 
