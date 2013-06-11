@@ -24,7 +24,7 @@
 %
 %% $B$3$3$+$i%X%C%@3+;O!#(B%
 \documentclass[a4paper]{jsarticle}
-\usepackage{gum2013}
+\usepackage{gum2013-sid}
 
 \begin{document}
 
@@ -35,7 +35,27 @@
 $B:#2s$NH/I=$G$O!"(Bdebian$B$KMQ0U$5$l$F$$$k5!G=$r%U%k3hMQ$7$F!"(Bphp5$B$N%=!<%9%G%P%C%0$r(B
 gdb+python$B$r$D$+$C$F$d$C$F$_$k;v$K$D$$$F=R$Y$^$9!#(B
 
-\subsection{gdb$B$N(Bpython$B3HD%$*$5$i$$(B}
+\subsection{$B:#2sH/I=$N(Bdebian$B4D6-$K$D$$$F(B}
+
+ $B:#2sH/I=$N(Bdebian$B4D6-$OFC$KCG$j$,$J$$8B$j!"(Bdebian sid$B4D6-$H$J$j$^$9!#(B
+$BI=(B\ref{tab:debian-sid-version}$B$KK\H/I=$GMxMQ$7$?(Bdebian sid$B4D6-$K4^$^$l$k(B
+$B<g$J%=%U%H%&%'%"$N%P!<%8%g%s$r5-:\$7$^$9!#(B
+
+\begin{table}[hb!]
+  \centering
+  \begin{tabular}{l|l|l|l}
+    \hline
+    $B9`HV(B1 & $B%3%^%s%IL>(B & $B%P!<%8%g%s(B & $BHw9M(B \\ \hline
+    1 & gdb & 7.6 & \\
+    2 & php & 5.5.0RC3 & \\
+    3 & apache & 2.4.4 & \\
+    \hline
+  \end{tabular}
+  \caption{$B:#2sH/I=$N(Bdebian sid$B4D6-$G$N%=%U%H%&%'%"$N%P!<%8%g%s(B}
+  \label{tab:debian-sid-version}
+\end{table}
+
+\subsection{gdb+python$B3HD%:#$^$G$N$*$5$i$$(B}
 
  $B!!(Bgdb$B$O!"%P%$%J%j7A<0$N<B9T%U%!%$%k$r%G%P%C%0$9$k$N$K!"6K$a$F6/NO$J(B
 $B%7%s%\%j%C%/%G%P%C%,$G$9!#(B
@@ -45,51 +65,78 @@ gdb+python$B$r$D$+$C$F$d$C$F$_$k;v$K$D$$$F=R$Y$^$9!#(B
 $B!!$3$3$G%G%P%C%,$r%9%/%j%W%H$+$iA`$l$k$H!"$h$j8zN(E*$J%G%P%C%0$,2DG=$K$J$j$^$9!#(B
 gdb$B$O8E$/$+$i!"(Bgdb$B%3%^%s%I$H4JC1$J@)8f9=J8$r5-:\$7$?%9%/%j%W%H%U%!%$%k$r(B
 $BMQ0U$9$l$P6/NO$J%G%P%C%0$,2DG=$G$9!#Nc$($P!"(Bapache$B$N%=!<%9%3!<%I$K$O!"0JA0$+$i(B
-apache$BMQ$N(Bgdb$B$K$h$k%G%P%C%0$N$?$a$K(B.gdbinit$B$,IUB0$7$F$*$j!"Cf$r8+$F$$$?$@$1$l$P(B
-$BJ,$+$k$H$*$j!"(Bapache$B$NFbItJQ?t$rJXMx$K;2>H$9$k$?$a$N%3%^%s%I$,<BAu$5$l$F$$$^$9!#(B
+apache$BMQ$N(Bgdb$B$K$h$k%G%P%C%0$N$?$a$K(B.gdbinit$B%9%/%j%W%H$,IUB0$7$F$*$j!"(B
+$BCf$r8+$F$$$?$@$1$l$PJ,$+$k$H$*$j!"(Bapache$B$NFbItJQ?t$rJXMx$K;2>H$9$k$?$a$N(B
+$B%3%^%s%I$,<BAu$5$l$F$$$^$9!#(B
 
 $B!!$3$3$G!"(Bgdb$B$O(Bversion 7.0$B$+$i!"(Bpython$B$rFbB!$7$F(Bpython$B%9%/%j%W%H$+$i(Bgdb$B$rA`$k;v$,(B
 $B$G$-$k$h$&$K$J$j$^$7$?!#$3$l$G$h$j0lAX!"6/NO$+$D=@Fp$J%G%P%C%0$,2DG=$K$J$j$^$9!#(B
 debian$B$G$O(Bsqueeze$B$N;~$+$i%G%U%)%k%H$G(Bpython$B%9%/%j%W%H$,;H$($k$h$&$K$J$C$F$$$^$9!#(B
 
-$B!!El5~%(%j%"(Bdebian$BJY6/2q$N(B3$B7n$G$b(Bgdb v7.4(wheezy$BEk:\$N(Bgdb)$B$rMQ$$$F!"(B
-$B%G%P%C%0%7%s%\%kIU$-$N(BC$B%W%m%0%i%`$N4X?t%H%l!<%9$r$d$C$F$_$^$7$?!#(B
-\footnote{\url{http://tokyodebian.alioth.debian.org/2013-03.html}$B$K7G:\$NJY6/2q;qNA;2>H(B}
+$B!!El5~%(%j%"(Bdebian$BJY6/2q$N(B3$B7n(B\footnote{\url{http://tokyodebian.alioth.debian.org/2013-03.html}$B$K7G:\$NJY6/2q;qNA7G:\(B}$B$G$O!"(Bgdb v7.4(wheezy$BEk:\$N(Bgdb)$B$rMQ$$$F!"(B
 
-\subsection{$B$5$F:#2s$O(B}
+  \begin{itemize}
+    \item gdb+python$B3HD%5!G=$NFbIt9=B$(B
+    \item gdb$B%/%i%9$N(Bclass$B?^(B(gdb v7.4$BMQ(B)
+    \item gdb.Command$B%/%i%9!"(Bgdb.BreakPoint$B%/%i%9!"(Bgdb.FinishPoint$B%/%i%9(B
+    \item python$B3HD%5!G=$r<B:]$K;H$C$F%G%P%C%0%7%s%\%kIU$-$N(BC$B%W%m%0%i%`$N4X?t$N<B9T%H%l!<%9$r$9$k(B
+$B!!(B\end{itemize}
 
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
+$B$NH/I=$r9T$$$^$7$?!#(B
 
-\subsubsection{$B%5%V%5%V%;%/%7%g%s(B}
+ $B:#2s$OEl5~%(%j%"(Bdebian$BJY6/2q$N(B2013$BG/(B3$B7n$NFbMF$rH/E8$5$;$F!"(B
+ \begin{itemize}
+   \item debian$B$N(B*-dbg$B%Q%C%1!<%8$r;H$$!"(B
+   \item php5$B$N(Bphp$B%=!<%9%3!<%I%l%Y%k%G%P%C%0$r$7$F$_$k(B
+ \end{itemize}
+$B;v$K$D$$$F=R$Y$^$9!#(B
 
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
-$B$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#$>$&$NMq$O$*$$$7$$$>$&!#(B
+\subsection{debian$B$N(B*-dbg$B%Q%C%1!<%8(B}
 
+ debian$B$K$O!"%P%$%J%j%Q%C%1!<%8$N%G%P%C%0MQ%7%s%\%k>pJs$@$1$r=8$a$?(B
+*-dbg$B%Q%C%1!<%872$,Ds6!$5$l$F$$$^$9!#(B
+
+ $BMxMQ$N;EJ}$O4JC1$G!"%G%P%C%0$7$?$$%P%$%J%j%Q%C%1!<%8$NL>A0$K(B-dbg$B$HIU$$$?(B
+$B%Q%C%1!<%8$rF3F~$7!"(Bgdb$B$rF0$+$9$@$1$G$9!#(B
 
 \begin{commandline}
-$B%3%^%s%I%i%$%s$H$+!#(B
-% COLUMNS=400 dpkg -l | grep ^rc | awk '{print $2}' | xargs sudo aptitude purge -y
+# $B"-!!(B*-dbg$B%Q%C%1!<%8$N0lMw$r8+$F$_$k(B
+% aptitude search '.*-dbg' 
+p   0ad-dbg                         - Real-time strategy game of ancient warfare
+p   389-ds-base-dbg                 - 389 Directory Server suite - server debugg
+p   389-ds-base-libs-dbg            - 389 Directory Server suite - library debug
+p   7kaa-dbg                        - Seven Kingdoms Ancient Adversaries - debug
+...$BCfN,(B...
+# $B"-(B  $B;n$7$K(B php5-dbg$B$rF3F~$7$F$_$k!#(B
+% sudo aptitude install 'php5-dbg'
+# $B"-(B $B%=!<%9%3!<%I$b%+%l%s%H%G%#%l%/%H%j$KE83+$7$F$_$k!#(B
+% apt-get source php5
+# $B"-(B /usr/bin/php5$B$K$D$$$F;H$C$F$_$k(B
+% gdb --args /usr/bin/php5 -r 'phpinfo();'
+(gdb) !ls ($B"+(B $B%=!<%9%3!<%I$NF3F~>u67$r3NG'$7$F$_$k(B)
+php5-5.5.0~rc3+dfsg		     php5_5.5.0~rc3+dfsg-1.dsc
+php5_5.5.0~rc3+dfsg-1.debian.tar.gz  php5_5.5.0~rc3+dfsg.orig.tar.xz
+(gdb) !pwd ($B"+(B $B%=!<%9%3!<%I$NF3F~>l=j$N3NG'(B)
+/home/xxxx/src/php5/
+(gdb) b main
+Breakpoint 1 at 0x4640a0: file /tmp/buildd/php5-5.5.0~rc3+dfsg/sapi/cli/php_cli.c, line 1200.
+(gdb) set substitute-path /tmp/buildd/ /home/xxxx/src/php5/ ($B"+%=!<%9%3!<%I$N0LCV$N;XDj(B)
+(gdb) run
+Starting program: /usr/bin/php5 -r phpinfo\(\)\;
+...$BCfN,(B...
+Breakpoint 1, main (argc=3, argv=0x7fffffffe668)
+    at /tmp/buildd/php5-5.5.0~rc3+dfsg/sapi/cli/php_cli.c:1200
+1200	{
+(gdb) l ($B"+8=:_<B9TCf$N%=!<%9%3!<%I$r1\Mw(B)
+1195	#ifdef PHP_CLI_WIN32_NO_CONSOLE
+1196	int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+1197	#else
+1198	int main(int argc, char *argv[])
+1199	#endif
+1200	{
+1201	#ifdef ZTS
+...$BCfN,(B...
+
 \end{commandline}
 
 
@@ -102,14 +149,6 @@ debian$B$G$O(Bsqueeze$B$N;~$+$i%G%U%)%k%H$G(Bpython$B%9%/%j%W%H$,;H$($k$h$&
   \label{fig:image01}
 \end{figure}
 
-$B%U%C%H%N!<%H(B\footnote{$B%U%C%H%N!<%H$G$9!#(B}
-
-\begin{itemize}
-\item $B%j%9%H(B1
-\item $B%j%9%H(B2
-\end{itemize}
-
-
 \begin{enumerate}
 \item $BHV9fIU$-%j%9%H(B1
 \item $BHV9fIU$-%j%9%H(B2
@@ -121,19 +160,5 @@ debian$B$G$O(Bsqueeze$B$N;~$+$i%G%U%)%k%H$G(Bpython$B%9%/%j%W%H$,;H$($k$h$&
 \item[$BDj5A(B2] $BDj5AJ8(B2
 \end{description}
 
-\begin{table}[hb!]
-  \centering
-  \begin{tabular}{l|l}
-    \hline
-    $BI=$NCf?H(B1 & $BI=$NCf?H(B2 \\
-    \hline
-    $BI=$NCf?H(B1 & $BI=$NCf?H(B2 \\
-    $BI=$NCf?H(B1 & $BI=$NCf?H(B2 \\
-    $BI=$NCf?H(B1 & $BI=$NCf?H(B2 \\
-    \hline
-  \end{tabular}
-  \caption{$BI=$H$+(B.}
-  \label{tab:table01}
-\end{table}
 
 \end{document}
