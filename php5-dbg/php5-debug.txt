@@ -697,6 +697,16 @@ php5.5では、zend_execute_internal(),zend_execute_ex()になってた。
 
 
 
+-----文章書きにつかった件------
+
+squeezeのgdb-7.0.1-2+b1にて、内臓バイナリを調べると、
+amd64版では、libpython2.6.so.1.0がdynamicリンクされていたため、
+--with-python扱いとおもわれ。同様にi386版もpythonがリンク
+されていた。
+
+debian-sid ではgdb は7.6-3となる。
+wheezyだとgdbは7.4.1となる。
+
 ---------------資料-----------
 
 なんでgdb+python
