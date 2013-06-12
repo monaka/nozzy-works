@@ -24,7 +24,7 @@
 %
 %% ここからヘッダ開始。%
 \documentclass[a4paper]{jsarticle}
-\usepackage{gum2013-sid}
+\usepackage{gum2013}
 
 \begin{document}
 
@@ -107,7 +107,7 @@ p   389-ds-base-dbg                 - 389 Directory Server suite - server debugg
 p   389-ds-base-libs-dbg            - 389 Directory Server suite - library debug
 p   7kaa-dbg                        - Seven Kingdoms Ancient Adversaries - debug
 ...中略...
-# ↓  試しに php5-dbgを導入してみる。
+# ↓  試しに php5のデバッグのために、php5-dbgを導入してみる。
 % sudo aptitude install 'php5-dbg'
 # ↓ ソースコードもカレントディレクトリに展開してみる。
 % apt-get source php5
@@ -139,6 +139,33 @@ Breakpoint 1, main (argc=3, argv=0x7fffffffe668)
 
 \end{commandline}
 
+（なお、上の例ではソースコード指定に''set substitution-path''を利用しましたが、
+必ずしもこれでうまく行くわけではないことを後に述べます。）
+
+\subsection{*-dbgパッケージについてちょっとだけ}
+
+ *-dbgパッケージに関しての現状と詳細は2012年の大統一Debian勉強会の岩松さんの発表「debug.debian.net」\footnote{\url{http://gum.debian.or.jp/2012/}に掲載されています}に詳しいため、ここでは、そこで触れられていなかった件をいくつか載せておきます。
+
+\subsubsection{ソースコードのパスの指定について}
+
+ *-dbgパッケージを利用してgdbからソースコードを指定するための指定方法は、
+以下の２種類の方法を適宜選んで指定します。
+
+ \begin{itemize} 
+   \item gdbの''set substitute-path''で指定する方法\\
+ これは、パッケージがビルドされる際、gccに対してソースがフルパスで指定されているときに使える方法となります。先ほどのphp5の例のように、一つの''set substitute-path''を指定するだけで、upstream側のソースのサブディレクトリに配置されているソースコードも自動でgdbが追跡してくれますので、デバッグ時のソース閲覧に非常に都合が良いです。
+   \item gdbの''dir''でソースの位置を複数指定する方法\\
+ これは、パッケージがビルドされる際、gccに対してファイル名のみ指定されてコンパイルされている場合に使います。こちらの場合、*-dbgパッケージのシンボルにソースのパスを示す情報が欠落している為、ソースの位置は''dir''コマンドでヒントとして指定することになります。gdbはユーザが''dir''コマンドで指定したソースの存在するパス全部を記憶しており、このパスに同名のファイルがあるかを調べ、最初に合致したものを表示します。つまり、完全に同名のファイルが複数のサブディレクトリに配置されていたものをビルド及びリンクした場合は、gdbは自動では正しいソースファイル上での位置を表示できない為、注意が必要です。
+\end{itemize}
+
+\subsubsection{COMPATIBILITY LEVEL 9から搭載されたデバッグシンボルファイルの形式について}
+
+　パッケージ構築の際、debhelperのCOMPATIBILITY LEVEL 9から、導入されたデバッグシンボルファイルのファイル名は、パッケージの実行ファイルのバイナリに埋め込まれているハッシュ値を元につけられています。
+
+　この為、バージョンがわずかに異なったパッケージでも、正確に対応した*-dbgパッケージが利用されるため、COMPATIBILITY LEVEL 9未満の形式の元に作成された*-dbgパッケージのように
+うっかりシンボルファイルとバイナリ本体のバージョンが合わずにデバッグが意図せず困難になるという事故を防ぐ事ができるようになりました。
+
+　wheezyはまだ、
 
 図 \ref{fig:image01} として画像を入れる場合。
 \begin{figure}[ht!]
