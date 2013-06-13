@@ -24,7 +24,7 @@
 %
 %% ここからヘッダ開始。%
 \documentclass[a4paper]{jsarticle}
-\usepackage{gum2013}
+\usepackage{gum2013-sid}
 
 \begin{document}
 
@@ -32,28 +32,11 @@
 \label{sec:gdb-python-php}
 
  debian付属のgdbはすでにpython拡張が有効になっている状態でパッケージ化されています。
-今回の発表では、debianに用意されている機能をフル活用して、php5のソースデバッグを
-gdb+pythonをつかってやってみる事について述べます。
+今回の発表では、debianに用意されている機能をフル活用して、php5のphp言語レベルの
+ソースデバッグをgdb+pythonをつかってやってみる事について述べます。
 
-\subsection{今回発表のdebian環境について}
-
- 今回発表のdebian環境は特に断りがない限り、debian sid環境となります。
-表\ref{tab:debian-sid-version}に本発表で利用したdebian sid環境に含まれる
-主なソフトウェアのバージョンを記載します。
-
-\begin{table}[hb!]
-  \centering
-  \begin{tabular}{l|l|l|l}
-    \hline
-    項番1 & コマンド名 & バージョン & 備考 \\ \hline
-    1 & gdb & 7.6 & \\
-    2 & php & 5.5.0RC3 & \\
-    3 & apache & 2.4.4 & \\
-    \hline
-  \end{tabular}
-  \caption{今回発表のdebian sid環境でのソフトウェアのバージョン}
-  \label{tab:debian-sid-version}
-\end{table}
+ なお、ここでは、debian sidを用い、gdb 7.6,php 5.5.0rc3, apache 2.4.4を利用
+しています。
 
 \subsection{gdb+python拡張今までのおさらい}
 
@@ -62,34 +45,18 @@ gdb+pythonをつかってやってみる事について述べます。
 
 　gdbのアップストリームはGNU Project\footnote{\url{http://www.gnu.org/}}であり、gccとならんで、プログラム開発には欠かせないツールとなります。
 
-　ここでデバッガをスクリプトから操れると、より効率的なデバッグが可能になります。
-gdbは古くから、gdbコマンドと簡単な制御構文を記載したスクリプトファイルを
-用意すれば強力なデバッグが可能です。例えば、apacheのソースコードには、以前から
-apache用のgdbによるデバッグのために.gdbinitスクリプトが付属しており、
-中を見ていただければ分かるとおり、apacheの内部変数を便利に参照するための
-コマンドが実装されています。
-
 　ここで、gdbはversion 7.0から、pythonを内臓してpythonスクリプトからgdbを操る事が
-できるようになりました。これでより一層、強力かつ柔軟なデバッグが可能になります。
+できるようになっています。これでより一層、強力かつ柔軟なデバッグが可能になります。
 debianではsqueezeの時からデフォルトでpythonスクリプトが使えるようになっています。
-
-　東京エリアdebian勉強会の3月\footnote{\url{http://tokyodebian.alioth.debian.org/2013-03.html}に掲載の勉強会資料掲載}では、gdb v7.4(wheezy搭載のgdb)を用いて、
-
-  \begin{itemize}
-    \item gdb+python拡張機能の内部構造
-    \item gdbクラスのclass図(gdb v7.4用)
-    \item gdb.Commandクラス、gdb.BreakPointクラス、gdb.FinishPointクラス
-    \item python拡張機能を実際に使ってデバッグシンボル付きのCプログラムの関数の実行トレースをする
-　\end{itemize}
-
-の発表を行いました。
+東京エリアdebian勉強会の2013年3月にては、gdb+python拡張を使い、gdb.Command/gdb.Breakpoint/gdb.FinishBreakpointを使い、C言語による実行ファイルの関数トレースを取るところまで紹介しました。\footnote{\url{http://tokyodebian.alioth.debian.org/2013-03.html}に資料掲載。}
 
  今回は東京エリアdebian勉強会の2013年3月の内容を発展させて、
  \begin{itemize}
    \item debianの*-dbgパッケージを使い、
-   \item php5のphpソースコードレベルデバッグをしてみる
+　 \item gdb.Valueクラスの応用を行い、
+   \item php5のphpレベルのソースコードレベルデバッグをしてみる
  \end{itemize}
-事について述べます。
+　事について述べます。
 
 \subsection{debianの*-dbgパッケージ}
 
@@ -107,11 +74,11 @@ p   389-ds-base-dbg                 - 389 Directory Server suite - server debugg
 p   389-ds-base-libs-dbg            - 389 Directory Server suite - library debug
 p   7kaa-dbg                        - Seven Kingdoms Ancient Adversaries - debug
 ...中略...
-# ↓  試しに php5のデバッグのために、php5-dbgを導入してみる。
+# ↓  試しに php5のバイナリデバッグのために、php5-dbgを導入してみる。
 % sudo aptitude install 'php5-dbg'
-# ↓ ソースコードもカレントディレクトリに展開してみる。
+# ↓ ソースコードをカレントディレクトリに展開してみる。
 % apt-get source php5
-# ↓ /usr/bin/php5について使ってみる
+# ↓ /usr/bin/php5についてgdbを使ってみる
 % gdb --args /usr/bin/php5 -r 'phpinfo();'
 (gdb) !ls (← ソースコードの導入状況を確認してみる)
 php5-5.5.0~rc3+dfsg		     php5_5.5.0~rc3+dfsg-1.dsc
@@ -140,7 +107,7 @@ Breakpoint 1, main (argc=3, argv=0x7fffffffe668)
 \end{commandline}
 
 （なお、上の例ではソースコード指定に''set substitution-path''を利用しましたが、
-必ずしもこれでうまく行くわけではないことを後に述べます。）
+現状では必ずしもこれでうまく行くものばかりではない事を後に述べます。）
 
 \subsection{*-dbgパッケージについてちょっとだけ}
 
@@ -153,19 +120,62 @@ Breakpoint 1, main (argc=3, argv=0x7fffffffe668)
 
  \begin{itemize} 
    \item gdbの''set substitute-path''で指定する方法\\
- これは、パッケージがビルドされる際、gccに対してソースがフルパスで指定されているときに使える方法となります。先ほどのphp5の例のように、一つの''set substitute-path''を指定するだけで、upstream側のソースのサブディレクトリに配置されているソースコードも自動でgdbが追跡してくれますので、デバッグ時のソース閲覧に非常に都合が良いです。
+ これは、パッケージがビルドされる際、gccに対してソースがフルパスで指定されているときに使える方法となります。先ほどのphp5の例のように、一つの''set substitute-path''を指定するだけで、ソースのサブディレクトリに配置されているソースコードも正確に自動でgdbが追跡してくれますので、デバッグ時のソース閲覧に大変都合が良いです。
    \item gdbの''dir''でソースの位置を複数指定する方法\\
  これは、パッケージがビルドされる際、gccに対してファイル名のみ指定されてコンパイルされている場合に使います。こちらの場合、*-dbgパッケージのシンボルにソースのパスを示す情報が欠落している為、ソースの位置は''dir''コマンドでヒントとして指定することになります。gdbはユーザが''dir''コマンドで指定したソースの存在するパス全部を記憶しており、このパスに同名のファイルがあるかを調べ、最初に合致したものを表示します。つまり、完全に同名のファイルが複数のサブディレクトリに配置されていたものをビルド及びリンクした場合は、gdbは自動では正しいソースファイル上での位置を表示できない為、注意が必要です。
 \end{itemize}
 
-\subsubsection{COMPATIBILITY LEVEL 9から搭載されたデバッグシンボルファイルの形式について}
+\subsubsection{debhelperのCOMPATIBILITY LEVEL 9から搭載されたデバッグシンボルファイルの形式について}
 
-　パッケージ構築の際、debhelperのCOMPATIBILITY LEVEL 9から、導入されたデバッグシンボルファイルのファイル名は、パッケージの実行ファイルのバイナリに埋め込まれているハッシュ値を元につけられています。
+　パッケージ構築の際、debhelperのCOMPATIBILITY LEVEL 9から、導入されたデバッグ用シンボルファイルのファイル名は、パッケージの実行ファイルのバイナリに埋め込まれているBuildID
+\footnote{BuildID解説：\url{http://fedoraproject.org/wiki/RolandMcGrath/BuildID}、binutilsのld用パッチ: \url{http://sourceware.org/ml/binutils/2007-07/msg00012.html}}というハッシュ値を元につけられています。以前の形式では、実行バイナリの名前がそのままデバッグ用シンボルファイルとなっています。
 
-　この為、バージョンがわずかに異なったパッケージでも、正確に対応した*-dbgパッケージが利用されるため、COMPATIBILITY LEVEL 9未満の形式の元に作成された*-dbgパッケージのように
-うっかりシンボルファイルとバイナリ本体のバージョンが合わずにデバッグが意図せず困難になるという事故を防ぐ事ができるようになりました。
+\begin{commandline}
+#↓ COMPATIBILITY LEVEL 9形式の場合
+$ file /usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0.30.0
+/usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0.30.0: ELF 64-bit LSB  
+shared object, x86-64, version 1 (SYSV), dynamically linked, 
+BuildID[sha1]=44ff321f11ffd750f8c351ffa3f5d20028d2f6a6, stripped 
+# 表示されたBuildIDの、上２桁及び残りの桁をもちいて
+# /usr/lib/debug/.build-id/上2桁/残りの桁.debugとなるファイルが
+#デバッグ用シンボルファイルとなる。
+$ ls /usr/lib/debug/.build-id/44/ff321f11ffd750f8c351ffa3f5d20028d2f6a6.debug
+/usr/lib/debug/.build-id/44/ff321f11ffd750f8c351ffa3f5d20028d2f6a6.debug
+# 試しにCOMPATIBILITY LEVEL 9形式で作成されたバイナリをgdbでロードしてみる
+# gdb起動メッセージに含まれるReading symbols from 以下のファイル名のとおり、
+# BuildIDで決まるシンボルファイルを読みにいく。
+$ gdb /usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0.30.0
+GNU gdb (GDB) 7.6-debian
+...中略...
+Reading symbols from /usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0.30.0...
+Reading symbols from /usr/lib/debug/.build-id/44/ff321f11ffd750f8c351ffa3f5
+d20028d2f6a6.debug...done.
+(gdb) quit
+#↓ COMPATIBILITY LEVEL 9形式未満の場合
+# シンボルファイルは"/usr/lib/debug/"+"デバッグ対象の実行ファイルの絶対パス名"に格納
+$ ls -l /usr/lib/debug/usr/bin/php5
+-rw-r--r-- 1 root root 22036903  6月  2 01:44 /usr/lib/debug/usr/bin/php5
+\end{commandline}
 
-　wheezyはまだ、
+　デバッグ用シンボルファイルを扱うソフトウェアとしては、BuildIDさえ分かれば、正しいデバッグ用シンボルファイルを特定できるので都合がよかったりします。ところで、現在のdebian sidでは未だCOMPATIBILITY LEVELは様々なLEVELのものが混在している状況であるため、別のバイナリパッケージでは従来の/usr/lib/debug/"+"デバッグ対象の実行ファイルの絶対パス名"も未だ存在しています。
+
+\subsubsection{php5.5のphpレベルのソースデバッグしてみる}
+
+ php5系のphpレベルでのソースデバッグは、すでにかなり強力なものが存在しており、例えば
+xdebugモジュールを利用し、vim-nox+debugger plugin/netbean/eclipse等の
+DBGpをサポートできるエディタプラグイン/統合環境を使うことにより、簡単で、かなり強力な
+デバッグ環境を使う事ができます。しかしながら、ここでは、それでは困るような
+状況で、どうしてもgdbからphp5のphpのソースコードデバッグをせざるを得ない
+\footnote{例：うっかりphp5でDaemon作ったら不具合出ちゃったので、なんとかgdbにて動いているプロセスにattachしてphp5ソースデバッグしたいとか、あるいは、phpプログラムの特定の場所でphp5がSEGVするのを検証したい(笑)、あるいは、責任取って納品後のphpシステムで誰にも知られずにこっそりデバッグしてこいよ！と先輩から言われた！(涙)とか....}時にどうするかを検討してみます。
+
+\subsubsection{gdb.Valueクラス}
+
+ gdbを使ってphp5で実行中のphpのソース上の情報を知る必要があるため、php5の内部変数にアクセスする必要があります。gdbのpython拡張ではこういうときに便利なgdb.Valueクラスが用意されています。php5.5を利用してちょっと試してみます。
+
+
+
+
+
 
 図 \ref{fig:image01} として画像を入れる場合。
 \begin{figure}[ht!]
