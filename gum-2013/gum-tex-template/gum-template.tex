@@ -35,30 +35,16 @@
 $B:#2s$NH/I=$G$O!"(Bdebian$B$KMQ0U$5$l$F$$$k5!G=$r%U%k3hMQ$7$F!"(Bphp5$B$N(Bphp$B8@8l%l%Y%k$N(B
 $B%=!<%9%G%P%C%0$r(Bgdb+python$B$r$D$+$C$F$d$C$F$_$k;v$K$D$$$F=R$Y$^$9!#(B
 
- $B$J$*!"$3$3$G$O!"(Bdebian sid$B$rMQ$$!"(Bgdb 7.6,php 5.5.0rc3, apache 2.4.4$B$rMxMQ(B
-$B$7$F$$$^$9!#(B
+ $B$J$*!"$3$3$G$O!"(Bdebian sid(jessie/sid)$B$rMQ$$!"%Q%C%1!<%8$+$iF3F~$7$?(Bgdb 7.6,php 5.5.0rc3$B$rMxMQ$7$F$$$^$9!#(B
 
 \subsection{gdb+python$B3HD%:#$^$G$N$*$5$i$$(B}
 
  $B!!(Bgdb$B$O!"%P%$%J%j7A<0$N<B9T%U%!%$%k$r%G%P%C%0$9$k$N$K!"6K$a$F6/NO$J(B
-$B%7%s%\%j%C%/%G%P%C%,$G$9!#(B
+$B%7%s%\%j%C%/%G%P%C%,$G$9!#(Bgdb$B$O(Bpython$B$rFbB!$9$k$3$H$K$h$j!"$5$i$K6/NO$J%G%P%C%0$,2DG=$K$J$C$F$$$^$9!#(Bdebian$B$G$O(Bsqueeze$B$+$iM-8z$K$J$C$F$$$^$9!#(B
 
-$B!!(Bgdb$B$N%"%C%W%9%H%j!<%`$O(BGNU Project\footnote{\url{http://www.gnu.org/}}$B$G$"$j!"(Bgcc$B$H$J$i$s$G!"%W%m%0%i%`3+H/$K$O7g$+$;$J$$%D!<%k$H$J$j$^$9!#(B
+$B!!El5~%(%j%"(Bdebian$BJY6/2q$N(B2013$BG/(B3$B7n$K$F$O!"(Bgdb+python$B3HD%$KEk:\$5$l$F$$$k(Bgdb.Command/ gdb.Breakpoint/ gdb.FinishBreakpoint$B$r;H$$!"(BC$B8@8l$K$h$k<B9T%U%!%$%k$N4X?t%H%l!<%9$r<h$k$H$3$m$^$G>R2p$7$^$7$?!#(B\cite{tokyo-debian-march}
 
-$B!!$3$3$G!"(Bgdb$B$O(Bversion 7.0$B$+$i!"(Bpython$B$rFbB!$7$F(Bpython$B%9%/%j%W%H$+$i(Bgdb$B$rA`$k;v$,(B
-$B$G$-$k$h$&$K$J$C$F$$$^$9!#$3$l$G$h$j0lAX!"6/NO$+$D=@Fp$J%G%P%C%0$,2DG=$K$J$j$^$9!#(B
-debian$B$G$O(Bsqueeze$B$N;~$+$i%G%U%)%k%H$G(Bpython$B%9%/%j%W%H$,;H$($k$h$&$K$J$C$F$$$^$9!#(B
-$BEl5~%(%j%"(Bdebian$BJY6/2q$N(B2013$BG/(B3$B7n$K$F$O!"(Bgdb+python$B3HD%$r;H$$!"(Bgdb.Command/gdb.Breakpoint/gdb.FinishBreakpoint$B$r;H$$!"(BC$B8@8l$K$h$k<B9T%U%!%$%k$N4X?t%H%l!<%9$r<h$k$H$3$m$^$G>R2p$7$^$7$?!#(B\footnote{\url{http://tokyodebian.alioth.debian.org/2013-03.html}$B$K;qNA7G:\!#(B}
-
- $B:#2s$OEl5~%(%j%"(Bdebian$BJY6/2q$N(B2013$BG/(B3$B7n$NFbMF$rH/E8$5$;$F!"(B
- \begin{itemize}
-   \item debian$B$N(B*-dbg$B%Q%C%1!<%8$r;H$$!"(B
-$B!!(B \item gdb.Value$B%/%i%9$N1~MQ$r9T$$!"(B
-   \item php5$B$N(Bphp$B%l%Y%k$N%=!<%9%3!<%I%l%Y%k%G%P%C%0$r$7$F$_$k(B
- \end{itemize}
-$B!!;v$K$D$$$F=R$Y$^$9!#(B
-
-\subsection{debian$B$N(B*-dbg$B%Q%C%1!<%8(B}
+\subsection{debian$B$N(B*-dbg$B%Q%C%1!<%8$K$D$$$F$A$g$C$H$@$1(B}
 
  debian$B$K$O!"%P%$%J%j%Q%C%1!<%8$N%G%P%C%0MQ%7%s%\%k>pJs$@$1$r=8$a$?(B
 *-dbg$B%Q%C%1!<%872$,Ds6!$5$l$F$$$^$9!#(B
@@ -67,27 +53,13 @@ debian$B$G$O(Bsqueeze$B$N;~$+$i%G%U%)%k%H$G(Bpython$B%9%/%j%W%H$,;H$($k$h$&
 $B%Q%C%1!<%8$rF3F~$7!"(Bgdb$B$rF0$+$9$@$1$G$9!#(B
 
 \begin{commandline}
-# $B"-!!(B*-dbg$B%Q%C%1!<%8$N0lMw$r8+$F$_$k(B
-% aptitude search '.*-dbg' 
-p   0ad-dbg                         - Real-time strategy game of ancient warfare
-p   389-ds-base-dbg                 - 389 Directory Server suite - server debugg
-p   389-ds-base-libs-dbg            - 389 Directory Server suite - library debug
-p   7kaa-dbg                        - Seven Kingdoms Ancient Adversaries - debug
-...$BCfN,(B...
-# $B"-(B  $B;n$7$K(B php5$B$N%P%$%J%j%G%P%C%0$N$?$a$K!"(Bphp5-dbg$B$rF3F~$7$F$_$k!#(B
 % sudo aptitude install 'php5-dbg'
-# $B"-(B $B%=!<%9%3!<%I$r%+%l%s%H%G%#%l%/%H%j$KE83+$7$F$_$k!#(B
 % apt-get source php5
-# $B"-(B /usr/bin/php5$B$K$D$$$F(Bgdb$B$r;H$C$F$_$k(B
 % gdb --args /usr/bin/php5 -r 'phpinfo();'
-(gdb) !ls ($B"+(B $B%=!<%9%3!<%I$NF3F~>u67$r3NG'$7$F$_$k(B)
-php5-5.5.0~rc3+dfsg		     php5_5.5.0~rc3+dfsg-1.dsc
-php5_5.5.0~rc3+dfsg-1.debian.tar.gz  php5_5.5.0~rc3+dfsg.orig.tar.xz
-(gdb) !pwd ($B"+(B $B%=!<%9%3!<%I$NF3F~>l=j$N3NG'(B)
-/home/xxxx/src/php5/
+...$BCfN,(B...
 (gdb) b main
 Breakpoint 1 at 0x4640a0: file /tmp/buildd/php5-5.5.0~rc3+dfsg/sapi/cli/php_cli.c, line 1200.
-(gdb) set substitute-path /tmp/buildd/ /home/xxxx/src/php5/ ($B"+%=!<%9%3!<%I$N0LCV$N;XDj(B)
+(gdb) set substitute-path /tmp/buildd/ ./
 (gdb) run
 Starting program: /usr/bin/php5 -r phpinfo\(\)\;
 ...$BCfN,(B...
@@ -103,15 +75,12 @@ Breakpoint 1, main (argc=3, argv=0x7fffffffe668)
 1200	{
 1201	#ifdef ZTS
 ...$BCfN,(B...
-
 \end{commandline}
 
 $B!J$J$*!">e$NNc$G$O%=!<%9%3!<%I;XDj$K(B''set substitution-path''$B$rMxMQ$7$^$7$?$,!"(B
 $B8=>u$G$OI,$:$7$b$3$l$G$&$^$/9T$/$b$N$P$+$j$G$O$J$$;v$r8e$K=R$Y$^$9!#!K(B
 
-\subsection{*-dbg$B%Q%C%1!<%8$K$D$$$F$A$g$C$H$@$1(B}
-
- *-dbg$B%Q%C%1!<%8$K4X$7$F$N8=>u$H>\:Y$O(B2012$BG/$NBgE}0l(BDebian$BJY6/2q$N4d>>$5$s$NH/I=!V(Bdebug.debian.net$B!W(B\footnote{\url{http://gum.debian.or.jp/2012/}$B$K7G:\$5$l$F$$$^$9(B}$B$K>\$7$$$?$a!"$3$3$G$O!"$=$3$G?($l$i$l$F$$$J$+$C$?7o$r$$$/$D$+:\$;$F$*$-$^$9!#(B
+ $B$J$*!"(B*-dbg$B%Q%C%1!<%8$K4X$7$F$N8=>u$H>\:Y$O(B2012$BG/$NBgE}0l(BDebian$BJY6/2q$N4d>>$5$s$NH/I=!V(Bdebug.debian.net$B!W(B\cite{debug-debian-net}$B$K>\$7$$$G$9!#$3$3$G$O!"$=$3$G?($l$i$l$F$$$J$+$C$?7o$r$$$/$D$+:\$;$F$*$-$^$9!#(B
 
 \subsubsection{$B%=!<%9%3!<%I$N%Q%9$N;XDj$K$D$$$F(B}
 
@@ -128,7 +97,7 @@ Breakpoint 1, main (argc=3, argv=0x7fffffffe668)
 \subsubsection{debhelper$B$N(BCOMPATIBILITY LEVEL 9$B$+$iEk:\$5$l$?%G%P%C%0%7%s%\%k%U%!%$%k$N7A<0$K$D$$$F(B}
 
 $B!!%Q%C%1!<%89=C[$N:]!"(Bdebhelper$B$N(BCOMPATIBILITY LEVEL 9$B$+$i!"F3F~$5$l$?%G%P%C%0MQ%7%s%\%k%U%!%$%k$N%U%!%$%kL>$O!"%Q%C%1!<%8$N<B9T%U%!%$%k$N%P%$%J%j$KKd$a9~$^$l$F$$$k(BBuildID
-\footnote{BuildID$B2r@b!'(B\url{http://fedoraproject.org/wiki/RolandMcGrath/BuildID}$B!"(Bbinutils$B$N(Bld$BMQ%Q%C%A(B: \url{http://sourceware.org/ml/binutils/2007-07/msg00012.html}}$B$H$$$&%O%C%7%eCM$r85$K$D$1$i$l$F$$$^$9!#0JA0$N7A<0$G$O!"<B9T%P%$%J%j$NL>A0$,$=$N$^$^%G%P%C%0MQ%7%s%\%k%U%!%$%k$H$J$C$F$$$^$9!#(B
+\cite{build-id-desc}$B$H$$$&%O%C%7%eCM$r85$K$D$1$i$l$F$$$^$9!#0JA0$N7A<0$G$O!"<B9T%P%$%J%j$NL>A0$,$=$N$^$^%G%P%C%0MQ%7%s%\%k%U%!%$%k$H$J$C$F$$$^$7$?!#(B
 
 \begin{commandline}
 #$B"-(B COMPATIBILITY LEVEL 9$B7A<0$N>l9g(B
@@ -157,45 +126,161 @@ $ ls -l /usr/lib/debug/usr/bin/php5
 -rw-r--r-- 1 root root 22036903  6$B7n(B  2 01:44 /usr/lib/debug/usr/bin/php5
 \end{commandline}
 
-$B!!%G%P%C%0MQ%7%s%\%k%U%!%$%k$r07$&%=%U%H%&%'%"$H$7$F$O!"(BBuildID$B$5$(J,$+$l$P!"@5$7$$%G%P%C%0MQ%7%s%\%k%U%!%$%k$rFCDj$G$-$k$N$GET9g$,$h$+$C$?$j$7$^$9!#$H$3$m$G!"8=:_$N(Bdebian sid$B$G$OL$$@(BCOMPATIBILITY LEVEL$B$OMM!9$J(BLEVEL$B$N$b$N$,:.:_$7$F$$$k>u67$G$"$k$?$a!"JL$N%P%$%J%j%Q%C%1!<%8$G$O=>Mh$N(B/usr/lib/debug/"+"$B%G%P%C%0BP>]$N<B9T%U%!%$%k$N@dBP%Q%9L>(B"$B$bL$$@B8:_$7$F$$$^$9!#(B
+$B!!(Bgdb$B$N$h$&$J%G%P%C%0MQ%7%s%\%k%U%!%$%k$r07$&%=%U%H%&%'%"$H$7$F$O!"%P%$%J%j$N(BBuildID$B$5$(J,$+$l$P!"@5$7$$%G%P%C%0MQ%7%s%\%k%U%!%$%k$r$9$0$KFCDj$G$-$k$N$GET9g$,$h$+$C$?$j$7$^$9!#=>Mh$N$h$&$KF1$8%U%!%$%kL>$N%G%P%C%0MQ%7%s%\%k%U%!%$%k$rMQ0U$9$k$H$$$&J}K!$N>l9g!"@5$7$$%G%P%C%0MQ%7%s%\%k%U%!%$%k$G$"$k$3$H$rJ]>Z$9$k$K$O!"$o$6$o$6%7%s%\%k%U%!%$%k$N%A%'%C%/%5%`$r<h$C$F3NG'$9$k$0$i$$$7$+$"$j$^$;$s$G$7$?!#(B\cite{build-id-desc}
 
-\subsubsection{php5.5$B$N(Bphp$B%l%Y%k$N%=!<%9%G%P%C%0$7$F$_$k(B}
+$B!!8=:_$N(Bdebian sid$B$G$O(BCOMPATIBILITY LEVEL$B$OMM!9$J(BLEVEL$B$N$b$N$,:.:_$7$F$$$k>u67$N0Y!"B>$N%P%$%J%j%Q%C%1!<%8$G$O=>Mh$N(B/usr/lib/debug/"+"$B%G%P%C%0BP>]$N<B9T%U%!%$%k$N@dBP%Q%9L>(B"$B$bL$$@B??tB8:_$7$F$$$^$9!#(B
+
+\subsection{php5.5$B$N(Bphp$B%l%Y%k$N%=!<%9%G%P%C%0$7$F$_$k(B}
 
  php5$B7O$N(Bphp$B%l%Y%k$G$N%=!<%9%G%P%C%0$O!"$9$G$K$+$J$j6/NO$J$b$N$,B8:_$7$F$*$j!"Nc$($P(B
 xdebug$B%b%8%e!<%k$rMxMQ$7!"(Bvim-nox+debugger plugin/netbean/eclipse$BEy$N(B
 DBGp$B$r%5%]!<%H$G$-$k%(%G%#%?%W%i%0%$%s(B/$BE}9g4D6-$r;H$&$3$H$K$h$j!"4JC1$G!"$+$J$j6/NO$J(B
 $B%G%P%C%04D6-$r;H$&;v$,$G$-$^$9!#$7$+$7$J$,$i!"$3$3$G$O!"$=$l$G$O:$$k$h$&$J(B
 $B>u67$G!"$I$&$7$F$b(Bgdb$B$+$i(Bphp5$B$N(Bphp$B$N%=!<%9%3!<%I%G%P%C%0$r$;$6$k$rF@$J$$(B
-\footnote{$BNc!'$&$C$+$j(Bphp5$B$G(BDaemon$B:n$C$?$iIT6q9g=P$A$c$C$?$N$G!"$J$s$H$+(Bgdb$B$K$FF0$$$F$$$k%W%m%;%9$K(Battach$B$7$F(Bphp5$B%=!<%9%G%P%C%0$7$?$$$H$+!"$"$k$$$O!"(Bphp$B%W%m%0%i%`$NFCDj$N>l=j$G(Bphp5$B$,(BSEGV$B$9$k$N$r8!>Z$7$?$$(B($B>P(B)$B!"$"$k$$$O!"@UG$<h$C$FG<IJ8e$N(Bphp$B%7%9%F%`$GC/$K$bCN$i$l$:$K$3$C$=$j%G%P%C%0$7$F$3$$$h!*$H@hGZ$+$i8@$o$l$?!*(B($BN^(B)$B$H$+(B....}$B;~$K$I$&$9$k$+$r8!F$$7$F$_$^$9!#(B
+\footnote{$BNc!'$&$C$+$j(Bphp5$B$G(BDaemon$B:n$C$?$iIT6q9g=P$A$c$C$?$N$G!"$J$s$H$+(Bgdb$B$K$FF0$$$F$$$k%W%m%;%9$K(Battach$B$7$F(Bphp5$B%=!<%9%G%P%C%0$7$?$$$H$+!"$"$k$$$O!"(Bphp$B%W%m%0%i%`$NFCDj$N>l=j$G(Bphp5$B$,(BSEGV$B$9$k$N$r8!>Z$7$?$$(B($B>P(B)$B$H$+(B....}$B;~$K$I$&$9$k$+$r8!F$$7$F$_$^$9!#(B
 
 \subsubsection{gdb.Value$B%/%i%9(B}
 
- gdb$B$r;H$C$F(Bphp5$B$G<B9TCf$N(Bphp$B$N%=!<%9>e$N>pJs$rCN$kI,MW$,$"$k$?$a!"(Bphp5$B$NFbItJQ?t$K%"%/%;%9$9$kI,MW$,$"$j$^$9!#(Bgdb$B$N(Bpython$B3HD%$G$O$3$&$$$&$H$-$KJXMx$J(Bgdb.Value$B%/%i%9$,MQ0U$5$l$F$$$^$9!#(Bphp5.5$B$rMxMQ$7$F$A$g$C$H;n$7$F$_$^$9!#(B
+ gdb$B$r;H$C$F(Bphp5$B$G<B9TCf$N(Bphp$B$N%=!<%9>e$N>pJs$rCN$kI,MW$,$"$k$?$a!"(Bphp5$B$NFbItJQ?t$K%"%/%;%9$9$kI,MW$,$"$j$^$9!#(Bgdb$B$N(Bpython$B3HD%$G$O$3$&$$$&$H$-$KJXMx$J(Bgdb.Value$B%/%i%9$,MQ0U$5$l$F$$$^$9!#(Bgdb.Value$B%/%i%9$O!"(Bgdb$B$,%"%/%;%9$G$-$kJQ?t$r$=$N$^$^J];}$G$-!"MM!9$J;2>H$,$G$-$kG=NO$,$"$j$^$9!#(B
 
+\begin{commandline}
+$gdb --args /usr/bin/php5 ./foo.php
+...$BCfN,(B...
+(gdb) set substitute-path /tmp/buildd/ /home/yours/php5-src/
+(gdb) b zend_vm_execute.h:356
+(gdb) run
+(gdb) c 
+Breakpoint 1, execute_ex (execute_data=0x7ffff7e2b0a0)
+    at /tmp/buildd/php5-5.5.0~rc3+dfsg/Zend/zend_vm_execute.h:356
+356			if ((ret = OPLINE->handler(execute_data TSRMLS_CC)) > 0) {
+(gdb) p executor_globals.current_execute_data
+$1 = (struct _zend_execute_data *) 0x7ffff7e2b0a0
+(gdb) p executor_globals.current_execute_data->function_state->function->op_array->filename
+$1 = 0x7ffff7e5f8d8 "/home/yours/foo.php" ($B"+8=:_<B9TCf$N(Bphp$B%=!<%9%U%!%$%kL>!K(B
+(gdb) pi ($B"+(Bgdb$BEk:\$N(Bpython$B$r%$%s%?%i%/%F%#%V%b!<%I$K$9$k(B)
+>>> edata=gdb.parse_and_eval("executor_globals.current_execute_data")
+>>> print edata['function_state']['function']['op_array']['filename']
+0x7ffff7e5f8d8 "/home/nojima/prog/my-works/php5-dbg/test4.php"
+\end{commandline}
+%$
 
+ $B$3$A$i$NNc$G$O!"(Bphp5.5$B$NFbItJQ?t$G$"$k!"(Bexecutor\_globals.current\_execute\_data$B$H$$$&9=B$BN$+$i!"(Bedata$B$H$$$&(Bgdb.Value$B%*%V%8%'%/%H$r(Bgdb.parse\_and\_eval()$B$r;H$C$F@8@.$7!"(Bgdb.Value$B%*%V%8%'%/%H$N(Bdereference()$B%a%=%C%I$NG=NO$rMQ$$$F0l5$$K%]%$%s%?$rC)$C$FCM$r<h$j=P$7$F$_$^$7$?!#(B
 
+ $BB>$K(Bgdb.Value$B%/%i%9$G$9$,!"$3$A$i$K4X?t$X$N%]%$%s%?$rBeF~$9$k$H!"(Bpython$BB&$+$i(Bphp5.5$B$N(B
+$BFbIt4X?t$r8F$S=P$7$?$j$b$G$-$^$9!#!J<!$N>O$K$F;H$C$F$$$^$9!#!K(B
 
+\subsubsection{$B1~MQ(B}
 
+ $B0J>e$r1~MQ$7$F!"(Bphp5.5$B$N(Bgdb+python$B$NAH$_9g$o$;$G(Bphp$B%=!<%9%U%!%$%k$N(B
+$B<B9T%H%l!<%9$r<h$C$F$_$^$9!#(B
 
-$B?^(B \ref{fig:image01} $B$H$7$F2hA|$rF~$l$k>l9g!#(B
-\begin{figure}[ht!]
-  \begin{center}
-    \includegraphics[width=.5\hsize]{images/openlogo-nd.eps}
-  \end{center}
-  \caption{$B%-%c%W%7%g%s(B}
-  \label{fig:image01}
-\end{figure}
+$B!!$J$*!":#2s$N%9%/%j%W%H$N<B9T7k2L$O!"(B
 
-\begin{enumerate}
-\item $BHV9fIU$-%j%9%H(B1
-\item $BHV9fIU$-%j%9%H(B2
-\end{enumerate}
+\begin{commandline}
+$BI=<(%U%)!<%^%C%H(B:
+"$B4X?t%9%3!<%WL>(B" in $B<B9TCf$N%U%!%$%kL>(B:$B<B9TCf$N9THV9f(B
+$BNc!((B
+main$B4X?tCf$N(B/home/yours/test.php$B%U%!%$%k$N(B4$B9TL\$r<B9TCf$N>l9g$O!"(B
+"main" in /home/yours/test.php:4
+$B$HI=<(!#(B
+\end{commandline}
 
+$B$H$J$j$^$9!#(B
 
-\begin{description}
-\item[$BDj5A(B1] $BDj5AJ8(B1
-\item[$BDj5A(B2] $BDj5AJ8(B2
-\end{description}
+\begin{commandline}
+------php5.5-gdb.py$B$3$3$+$i(B-----------------
+# -*- coding: utf-8 -*-
 
+class _Php5ExecuterHook(gdb.Breakpoint):
+    """ peeking execution """
+    def __init__(self,spec):
+        super(_Php5ExecuterHook, self).__init__(spec,
+                                               gdb.BP_BREAKPOINT,
+                                               internal=False)
+        self._phpfile=(gdb.parse_and_eval("zend_get_executed_filename")).dereference()
+        self._phpfunc=(gdb.parse_and_eval("get_active_function_name")).dereference()
+        self._phplineno=(gdb.parse_and_eval("zend_get_executed_lineno")).dereference()
+    def _get_exec_info(self):
+        filename=((str(self._phpfile())).partition(' '))[2]
+        funcname=((str(self._phpfunc())).partition(' '))[2]
+        lineno=int(self._phplineno())
+        return (funcname,filename,lineno)
+
+    def stop(self):
+        print "%s in %s:%d" % (self._get_exec_info())
+        return False
+
+class _SetupAnalyzePhp5Executer(gdb.Command):
+    """ setup php5 executer tracer """
+    def __init__(self):
+        super(_SetupAnalyzePhp5Executer, self).__init__('setupphp5executer',
+                                                  gdb.COMMAND_OBSCURE)
+
+    def invoke(self, arg, from_ttyp):
+        gdb.execute("set pagination off")
+        _Php5ExecuterHook("zend_vm_execute.h:356")
+
+_SetupAnalyzePhp5Executer()
+------php5.5-gdb.py$B$3$3$^$G(B-----------------
+$ cat -n test4.php
+     1	<?php
+     2	function func_a() // 1
+     3	{
+     4		echo "func_a!\n";
+     5	}
+     6	function func_b()
+     7	{
+     8		echo "func_b!\n";
+     9	}
+    10	func_a();
+    11	func_b();
+    12	?>
+$ gdb --args /usr/bin/php5 test4.php
+...$BCfN,(B...
+(gdb) source php5.5-gdb.py
+(gdb) setupphp5executer 
+Breakpoint 1 at 0x746d70: file /tmp/buildd/php5-5.5.0~rc3+dfsg/Zend/zend_vm_execute.h, line 356.
+(gdb) run
+...$BCfN,(B...
+"main" in "/home/nojima/prog/my-works/php5-dbg/test4.php":2
+"main" in "/home/nojima/prog/my-works/php5-dbg/test4.php":6
+"main" in "/home/nojima/prog/my-works/php5-dbg/test4.php":10
+"func_a" in "/home/nojima/prog/my-works/php5-dbg/test4.php":4
+func_a!
+"func_a" in "/home/nojima/prog/my-works/php5-dbg/test4.php":5
+"main" in "/home/nojima/prog/my-works/php5-dbg/test4.php":11
+"func_b" in "/home/nojima/prog/my-works/php5-dbg/test4.php":8
+func_b!
+"func_b" in "/home/nojima/prog/my-works/php5-dbg/test4.php":9
+"main" in "/home/nojima/prog/my-works/php5-dbg/test4.php":13
+(gdb)
+\end{commandline}
+
+$B4J0W$J$b$N$G$O$"$j$^$9$,!"L5;v!"(Bphp$B$N%=!<%9%l%Y%k$N<B9T%H%l!<%9$,<h$l$F$$$^$9!#(B
+
+\subsection{$B$*$o$j$K(B}
+
+ $B:#2s(Bphp$B%=!<%9$N<B9T%H%l!<%9$r<h$kNc$r;H$$!"(Bdebian$B$N85$G(B
+gdb+python$B3HD%$r;H$C$?%G%P%C%0<jK!$K$D$$$F=R$Y$^$7$?!#$3$A$i$r(B
+$B1~MQ$9$l$P!"(Bphp$B%=!<%9%l%Y%k$N%V%l!<%/%]%$%s%H$r:n$k$J$I!"(B
+$BMM!9$J1~MQ$,$G$-$^$9!#(B
+
+$B!!(Bgdb+python$B3HD%$N%G%P%C%0G=NO$O$^$@$^$@Bt;3JXMx$J5!G=$,F~$C$F$^$9!#(B
+$B@'Hs!"(Bdebian$B%Q%C%1!<%8$N%G%P%C%0$N$*6!$K$$$+$,$G$7$g$&$+!)(B
+
+\begin{thebibliography}{0}
+
+\bibitem{tokyo-debian-march}
+$BBh(B98$B2sEl5~%(%j%"(BDebian$BJY6/2q;qNA!V(Bgdb python$B3HD%$=$N(B1$B!W(B,
+\url{http://tokyodebian.alioth.debian.org/2013-03.html}
+
+\bibitem{debug-debian-net}
+2012$BG/BgE}0l(BDebian$BJY6/2q!V(Bdebug.debian.net$B!W(B,
+\url{http://gum.debian.or.jp/2012/}
+
+\bibitem{build-id-desc}
+RolandMcGrath/BuildID,
+\url{http://fedoraproject.org/wiki/RolandMcGrath/BuildID}
+\end{thebibliography}
 
 \end{document}

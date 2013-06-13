@@ -665,6 +665,7 @@ python edata['prev_execute_data']['op_array']['filename']
 0x7fa7f27756b0 "/usr/share/php/cake/libs/configure.php"
 
 一発だった。
+
 --------さてここまでが、php 5.4 ---------------------
 
 うぎゃー、sidでupgradeしたら、phpは5.5.0になり、内部構造ががらり
@@ -682,7 +683,7 @@ executorの類は全部、Zend/zend_execute_API.cにあるようだ。
 　　　で現在のクラス名、（引数のspaceは、つなぎが"::"か、""かをかえす）
    Zend/zend_execute_API.c: const char* get_active_function_name()
     で、EG(current_excute_data)から現在の関数名を得る事ができ、
-   Zend/zend_execute_API.c: const char* zend＿get_executed_filename()
+   Zend/zend_execute_API.c: const char* zend_get_executed_filename()
     で、EG(active_op_array)から現在実行中のファイル名を、
    Zend/zend_execute_API.c: uint zend_get_executed_lineno()
     で、linenoを、
@@ -707,6 +708,22 @@ dtrace意識したコードが入ってるぜ。
 
 php5.5では、zend_execute_internal(),zend_execute_ex()になってた。
 
+
+取り急ぎ、gdb.Value()で格納して呼んでみた。
+(gdb) python phpfile=(gdb.parse_and_eval("get_active_function_name")).dereference()
+(gdb) python print phpfile()
+0x7ffff3b0b6a8 "getInstance"
+
+こんな感じ。
+
+がああ、char *について、gdb.Value()はstringに直す際に、gdbの内部関数を使うため、
+どうやっても、
+
+　0xabcdef "xxxxxx"
+
+のような文字列しか返さない。なので、文字列だけ抜きたかったら、毎度
+((str(gdb.Value())).partition(' '))[2]
+とかしなければならない。
 
 
 -----文章書きにつかった件------
