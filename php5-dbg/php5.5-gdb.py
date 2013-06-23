@@ -2,13 +2,17 @@
 
 class _Php5ExecuterHook(gdb.Breakpoint):
     """ peeking execution """
-    def __init__(self,spec):
-        super(_Php5ExecuterHook, self).__init__(spec,
+    def __init__(self,mode,*args):
+        super(_Php5ExecuterHook, self).__init__("zend_vm_execute.h:356",
                                                gdb.BP_BREAKPOINT,
                                                internal=False)
         self._phpfile=(gdb.parse_and_eval("zend_get_executed_filename")).dereference()
         self._phpfunc=(gdb.parse_and_eval("get_active_function_name")).dereference()
         self._phplineno=(gdb.parse_and_eval("zend_get_executed_lineno")).dereference()
+        self._mode=mode
+        if (mode == "break"):
+            
+
     def _get_exec_info(self):
         filename=((str(self._phpfile())).partition(' '))[2]
         funcname=((str(self._phpfunc())).partition(' '))[2]
@@ -16,8 +20,12 @@ class _Php5ExecuterHook(gdb.Breakpoint):
         return (funcname,filename,lineno)
 
     def stop(self):
-        print "%s in %s:%d" % (self._get_exec_info())
-        return False
+        if (self._mode == "trace"):
+            print "%s in %s:%d" % (self._get_exec_info())
+            return False
+        elif (self._mode == "break"):
+            (funcname,filename,lineno) == self._get_exec_info()
+            
 
 class _SetupAnalyzePhp5Executer(gdb.Command):
     """ setup php5 executer tracer """
@@ -27,6 +35,18 @@ class _SetupAnalyzePhp5Executer(gdb.Command):
 
     def invoke(self, arg, from_ttyp):
         gdb.execute("set pagination off")
-        _Php5ExecuterHook("zend_vm_execute.h:356")
+        _Php5ExecuterHook("trace")
+
+
+class _BreakpointOnPHP(gdb.Command):
+    """ setup breakpoint on PHP Source """
+    def __init__(self):
+        super(__BreakpointOnPHP, self).__init__('breakphp',
+                                                  gdb.COMMAND_OBSCURE)
+
+    def invoke(self, arg, from_ttyp):
+        gdb.execute("set pagination off")
+        _Php5ExecuterHook("break")
+
 
 _SetupAnalyzePhp5Executer()

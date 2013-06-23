@@ -734,7 +734,19 @@ dtrace意識したコードが入ってるぜ。
 ↑デバッガ作りに超参考になるなる...
 (今回は、Zend/zend_dtrace.cをgdb+pythonでエミュレートしてみた）
 
+Zend/zend_builtin_functions.c: debug_print_backtrace()
+という素敵なものがあるぞ。backtraceとれるんちゃう？
+See. http://www.php.net/manual/ja/function.debug-print-backtrace.php
+これのzend_api版として、Zend/zend_builtin_functions.c:
+zend_fetch_debug_bucktrace()というのがある。
+debug_backtrace()というのがどうもzend_fetch_debug_bucktrace()の
+ラッパー関数。
+See. http://php.net/manual/ja/function.debug-backtrace.php
+
 php5.5では、zend_execute_internal(),zend_execute_ex()になってた。
+
+げ、function callは、
+Zend/zend_excute_API.c: zend_call_function()にて対応か？
 
 
 取り急ぎ、gdb.Value()で格納して呼んでみた。
