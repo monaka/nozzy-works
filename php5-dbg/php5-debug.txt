@@ -666,6 +666,33 @@ python edata['prev_execute_data']['op_array']['filename']
 
 一発だった。
 
+xdebugから、どうやって変数の値抜くのかみてみたら、
+xdebug_var.cにてやってた。で、みるとパターンは以下のとおり。
+
+ EG(active_symbol)をzend_hash_find()にかけて値をひきずりだすらしい。
+
+ちょっとしたアイデアだが、引数のポインタへめがけて値返す奴は
+別にalloca()したメモリをgdbでひろって突っ込んで渡すでどうでっしゃろ？
+
+
+で、zend_hash_find()をキーワードにしてphp5.5のソースvimgrepしてみたが、
+結局変数の値を引きずり出すのに有用なAPIはなかったぜ。なので、今回の
+発表では、変数を引きずり出すには、gdb+pythonでzend_hash_find()を
+呼び出すようなスクリプトを自力作成する必要あり。
+
+あ、参考までに、vimgrepの使い方：
+ :vimgrep /zend_hash_find/ **/*.c | cw
+（ちなみに、vimgrepもquickfix.txtのhelpマニュアルにある）
+とかやると、vimのquickfix機能で、grepの結果をみながら、
+ソースを見れる。
+
+xdebugでvalueをみるなら、xdebug.cのxdebug_debug_zvalが役に立つ?
+xdebugのstep実行などは xdebug.cのxdebug_statement_callが役に立つ？
+
+xdebug_var.cには、xdebug_get_php_symbolというよさげなのがあるぜ？
+（これが、symboleテーブルからzend_hash_find()つかって値引きずり出す）
+
+
 --------さてここまでが、php 5.4 ---------------------
 
 うぎゃー、sidでupgradeしたら、phpは5.5.0になり、内部構造ががらり
@@ -705,6 +732,7 @@ dtrace意識したコードが入ってるぜ。
     char *dtrace_get_exected_filename()とか、
 
 ↑デバッガ作りに超参考になるなる...
+(今回は、Zend/zend_dtrace.cをgdb+pythonでエミュレートしてみた）
 
 php5.5では、zend_execute_internal(),zend_execute_ex()になってた。
 
