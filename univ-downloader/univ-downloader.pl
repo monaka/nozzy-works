@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 use Socket;
-use Net::Pcap qw(:functions);
+use Net::Pcap;
 use HTTP::Request;
 use Data::Hexdumper qw(hexdump);
 use NetPacket::Ethernet;
@@ -196,7 +196,7 @@ sub search_method {
 }
 sub download_video_streams {
 	my ($request)=@_;
-	my $fname=query_fname("found video link in".$request->header('Host').
+	my $fname=query_fname("found video link as".$request->uri.
 		": filename=?");
 	# never return
 	my @command_lines=('curl','-L','-A',$request->header('User-Agent'));
