@@ -1,0 +1,130 @@
+%; whizzy paragraph -pdf xpdf -latex ./whizzypdfptex.sh
+%; whizzy-paragraph "^\\\\begin{frame}\\|\\\\emtext"
+% latex beamer presentation.
+% platex, latex-beamer でコンパイルすることを想定。 
+
+%     Tokyo Debian Meeting resources
+%     Copyright (C) 2012 Junichi Uekawa
+%     Copyright (C) 2011 Nobuhiro Iwamatsu
+
+%     This program is free software; you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation; either version 2 of the License, or
+%     (at your option) any later version.
+
+%     This program is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warreanty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+
+%     You should have received a copy of the GNU General Public License
+%     along with this program; if not, write to the Free Software
+%     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+\documentclass[cjk,dvipdfmx,12pt]{beamer}
+\usetheme{Tokyo}
+\usepackage{monthlypresentation}
+
+%  preview (shell-command (concat "evince " (replace-regexp-in-string "tex$" "pdf"(buffer-file-name)) "&")) 
+%  presentation (shell-command (concat "xpdf -fullscreen " (replace-regexp-in-string "tex$" "pdf"(buffer-file-name)) "&"))
+%  presentation (shell-command (concat "evince " (replace-regexp-in-string "tex$" "pdf"(buffer-file-name)) "&"))
+
+%http://www.naney.org/diki/dk/hyperref.html
+%日本語EUC系環境の時
+\AtBeginDvi{\special{pdf:tounicode EUC-UCS2}}
+%シフトJIS系環境の時
+%\AtBeginDvi{\special{pdf:tounicode 90ms-RKSJ-UCS2}}
+
+\title{大統一Debian勉強会 2013}
+\subtitle{gdb+python拡張を使ったデバッグ手法}
+\author{野島 貴英\\nozzy@debian.or.jp}
+\date{2013年6月29日}
+\logo{\includegraphics[width=8cm]{image200607/openlogo-light.eps}}
+
+\begin{document}
+
+\frame{\titlepage{}}
+
+\section{Level Up Debian}
+
+\begin{frame}{さあ、皆さんに質問タイィィィィーム}
+
+\begin {itemize}[<+->]
+\item 皆さんDebianって使ってますかー？
+\item *-dbgパッケージって知ってますかー？
+\item gdbって使ったことありますかー？
+\item gdbのpython拡張使ったことありますかー？
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{回答}
+
+\begin {itemize}[<+->]
+\item 皆さんDebianって使ってますかー？\\
+→\large{\textcolor{red}{使ってない人はぜひ使いましょう}}
+\item *-dbgパッケージって知ってますかー？\\
+→\large{使ったことない人は、家に帰ったらaptitude install XXXX-dbg！（XXXXは何か好きなパッケージで）}
+\item gdbって使ったことありますかー？/gdbのpython拡張使ったことありますかー？\\
+→\large{使ったことない人は、本資料公開してますので、ぜひ真似をしてみてー。}
+\end{itemize}
+
+\end{frame}
+
+\section{ちょっとだけおさらい}
+
+\begin{frame}{*-dbgパッケージとは}
+
+ バイナリパッケージに対応して、デバッガが利用するデバッグシンボルを別のファイルに分離してパッケージにまとめたパッケージとなります。
+
+\begin{table}[htb]
+\scalebox{0.6}[0.6]{
+\begin{tabular}{|l|l|p{30em}|} \hline
+項番 & 種類 & 内容 \\ \hline 
+1 & *-dbgパッケージ名 & バイナリパッケージ名-dbg \\ \hline
+2 & シンボルファイル名 &
+\begin{itemize}
+  \item COMPATIBILITY LEVEL 9未満のパッケージの場合:\\
+    バイナリと同じファイル名
+  \item COMPATIBILITY LEVEL 9以上のパッケージの場合:\\
+    バイナリに埋め込まれたBuildIDに対応したファイル名
+\end{itemize} 
+\\ \hline
+3 & インストール先 &
+\begin{itemize}
+  \item COMPATIBILITY LEVEL 9未満のパッケージの場合:\\
+    /usr/lib/debug/<バイナリのインストール先のディレクトリ名>\\
+    例：/usr/bin/php5だったら、/usr/lib/debug/usr/bin/php5
+  \item COMPATIBILITY LEVEL 9以上のパッケージの場合:\\
+    /usr/lib/debug/.build-id/以下
+\end{itemize} 
+\\ \hline
+\end{tabular}
+}
+\end{table}
+\end{frame}
+
+\begin{frame}[containsverbatim]{*-dbgパッケージとは}
+
+どんな*-dbgパッケージがあるかみてみる 
+\begin{commandline}
+$ cat /etc/debian_version
+jessie/sid
+$ aptitude search '.*-dbg'
+p   0ad-dbg                         - Real-time strategy game of ancient warfare
+p   389-ds-base-dbg                 - 389 Directory Server suite - server debugg
+p   389-ds-base-libs-dbg            - 389 Directory Server suite - library debug
+p   7kaa-dbg                        - Seven Kingdoms Ancient Adversaries - debug
+...中略...
+$ aptitude search '.*-dbg' | wc -l
+2272
+$
+\end{commandline}
+
+\end{frame}
+
+\end{document}
+
+;;; Local Variables: ***
+;;; outline-regexp: "\\([ 	]*\\\\\\(documentstyle\\|documentclass\\|emtext\\|section\\|begin{frame}\\)\\*?[ 	]*[[{]\\|[]+\\)" ***
+;;; End: ***
