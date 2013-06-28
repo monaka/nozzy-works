@@ -48,10 +48,24 @@
 \section{Level Up Debian}
 \emtext{Level Up Debian}
 
-\begin{frame}{さあ、皆さんに質問タイィィィィーム}
+\begin{frame}{諸君!Level Upだ!}
+
+\begin{center}
+\Large
+ ちゃ〜、ちゃ〜、ちゃっちゃらぁぁーー\\
+---出典：ドラゴンクエストより \\ 
+\hspace{1cm} \\
+ れべるが１あがった！\\
+ (もし、あがらなかったら...マヂす、すみませーん)
+\end{center}
+
+\end{frame}
+
+\begin{frame}{質問タイィィィィーム}
 
 \begin {itemize}[<+->]
 \item 皆さんDebianって使ってますかー？
+\item debian sidでunstableな生活してますかー？
 \item *-dbgパッケージって知ってますかー？
 \item gdbって使ったことありますかー？
 \item gdbのpython拡張使ったことありますかー？
@@ -63,11 +77,13 @@
 
 \begin {itemize}[<+->]
 \item 皆さんDebianって使ってますかー？\\
-→\large{\textcolor{red}{使ってない人はぜひ使ってみましょう!}}
+→\textcolor{red}{使ってない人はぜひ使ってみましょう!}
+\item debian sidでunstable生活してますかー？\\
+→\textcolor{red}{level upを目指す人はぜひdebian sidへアップグレードしてunstableな生活を送りましょう!楽しいよ！}
 \item *-dbgパッケージって知ってますかー？\\
-→\large{\textcolor{red}{使ったことない人は、家に帰ったらaptitude install XXXX-dbg！（XXXXは何か好きなパッケージで）}}
+→\textcolor{red}{使ったことない人は、家に帰ったらaptitude install XXXX-dbg！（XXXXは何か好きなパッケージで）}
 \item gdbって使ったことありますかー？/gdbのpython拡張使ったことありますかー？\\
-→\large{\textcolor{red}{使ったことない人は、本資料公開してますので、ぜひ真似をしてみてー。}}
+→\textcolor{red}{使ったことない人は、本資料公開してますので、ぜひ真似をしてみてー。}
 \end{itemize}
 
 \end{frame}
@@ -123,8 +139,8 @@
 
 \end{frame}
 
-\section{本題}
-\emtext{本題}
+\section{*-dbgパッケージについてちょっと}
+\emtext{*-dbgパッケージについてちょっと}
 
 \begin{frame}{*-dbgパッケージとは}
 
@@ -370,7 +386,7 @@ gccに渡されるソースファイルの指定にソースがフルパスで指定されていません。\
 
 \end{frame}
 
-\begin{frame}[containsverbatim]{ところでソースのデバッグ出来ないんだけど？}
+\begin{frame}[containsverbatim]{gdbのdirコマンドによるソースの指定}
 
 できた。
 
@@ -392,7 +408,7 @@ tools
 %$
 \end{frame}
 
-\begin{frame}{ところでソースのデバッグ出来ないんだけど？}
+\begin{frame}{dirコマンド注意点}
 
  gdbのdirでソースファイルを指定している時は、gdbはdirで登録された
 パスをすべて検索して該当のソースファイルを見つけようとするため、
@@ -401,7 +417,92 @@ tools
 
 \end{frame}
 
+\section{gdb+pythonのgdb.Valueクラス}
+\emtext{gdb+pythonのgdb.Valueクラス}
 
+\begin{frame}[containsverbatim]{gdb+python動かす}
+
+　gdb内臓のpythonを動作させてみます。
+
+　なお、今回は、gdb 7.6から搭載された\footnote{gdb 7.6 released! \url{http://lwn.net/Articles/548781/}}python-interactiveコマンドを使って、
+pythonをインタラクティブモードで利用してみます。
+
+\begin{commandline}
+$ gdb 
+(gdb) pi
+>>> import sys
+>>> print sys.version_info
+sys.version_info(major=2, minor=7, micro=5, 
+releaselevel='final', serial=0)
+>>> 
+\end{commandline}
+%$
+ 見ての通り、gdbをpythonで制御できるわけです。
+\end{frame}
+
+\begin{frame}{gdb.Valueクラス}
+
+ gdbはブレークポイントの他に、バイナリのソースコード側で定義した
+変数を参照できます。
+
+　こちらをpython側で参照したり、応用きかせたりするのには、gdb.Value
+クラスがとても便利です。
+
+便利な機能一覧：
+\begin{enumerate}
+\item デバッグ対象の変数がstructureの場合、gdb.Value型オブジェクトはstructureのメンバ変数をそのまま連想配列にマップしてくれます。
+\item デバッグ対象の変数が配列なら、python上も配列としてアクセスできます。
+\item ポインタか即値かは自動で判定されて適宜問題無いように扱われるため、structureのポインタを辿ったりするのが非常に簡潔に書けます。
+\item 関数ポインタの呼び出しもサポート済みです。
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[containsverbatim]{gdb.Valueクラスまぢヤヴァイ}
+値の参照の例：\\
+\begin{commandline}
+$ sudo aptitude install php5-dbg
+$ cat ./phpinfo.php
+<?
+ phpinfo()
+?>
+$ gdb --args /usr/bin/php5 ./phpinfo.php
+(gdb) b zend_vm_execute.h:356
+(gdb) run
+(gdb) pi
+>>> edata=gdb.parse_and_eval(
+... "executor_globals.current_execute_data")
+>>> print edata.address
+0xe60920 <executor_globals+1120>
+>>> print edata.dereference()
+{opline = 0x7ffff7fbd778, function_state = 
+{function = 0x7ffff7fbd498, arguments = 0x0}, 
+...中略...,call = 0x0}
+>>> print edata['op_array']['filename']
+0x7ffff7fbd640 "/home/yours/phpinfo.php"
+\end{commandline}
+%$
+\end{frame}
+
+\begin{frame}[containsverbatim]{gdb.Valueクラスは超イケてるうぅぅー}
+関数ポインタ呼び出しの例：\\
+\begin{commandline}
+$ gdb --args /usr/bin/php5 ./phpinfo.php
+(gdb) b zend_vm_execute.h:356
+(gdb) run
+(gdb) pi
+>>> edata=gdb.parse_and_eval(
+... "executor_globals.current_execute_data")
+>>> print edata.address
+0xe60920 <executor_globals+1120>
+>>> print edata.dereference()
+{opline = 0x7ffff7fbd778, function_state = 
+{function = 0x7ffff7fbd498, arguments = 0x0}, 
+...中略...,call = 0x0}
+>>> print edata['op_array']['filename']
+0x7ffff7fbd640 "/home/yours/phpinfo.php"
+\end{commandline}
+%$
+\end{frame}
 
 \end{document}
 

@@ -692,6 +692,10 @@ xdebugのstep実行などは xdebug.cのxdebug_statement_callが役に立つ？
 xdebug_var.cには、xdebug_get_php_symbolというよさげなのがあるぜ？
 （これが、symboleテーブルからzend_hash_find()つかって値引きずり出す）
 
+gdbにpython interactiveモード搭載されたのは、gdb 7.6からのようだ。
+gdb 7.6 released!
+http://lwn.net/Articles/548781/
+
 
 --------さてここまでが、php 5.4 ---------------------
 
