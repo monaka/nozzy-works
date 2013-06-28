@@ -48,19 +48,6 @@
 \section{Level Up Debian}
 \emtext{Level Up Debian}
 
-\begin{frame}{諸君!Level Upだ!}
-
-\begin{center}
-\Large
- ちゃ〜、ちゃ〜、ちゃっちゃらぁぁーー\\
----出典：ドラゴンクエストより \\ 
-\hspace{1cm} \\
- れべるが１あがった！\\
- (もし、あがらなかったら...マヂす、すみませーん)
-\end{center}
-
-\end{frame}
-
 \begin{frame}{質問タイィィィィーム}
 
 \begin {itemize}[<+->]
@@ -417,8 +404,8 @@ tools
 
 \end{frame}
 
-\section{gdb+pythonのgdb.Valueクラス}
-\emtext{gdb+pythonのgdb.Valueクラス}
+\section{gdb+pythonとgdb.Valueクラス}
+\emtext{gdb+pythonとgdb.Valueクラス}
 
 \begin{frame}[containsverbatim]{gdb+python動かす}
 
@@ -457,12 +444,12 @@ releaselevel='final', serial=0)
 \end{enumerate}
 \end{frame}
 
-\begin{frame}[containsverbatim]{gdb.Valueクラスまぢヤヴァイ}
+\begin{frame}[containsverbatim]{gdb.Valueクラスで変数アクセス}
 値の参照の例：\\
 \begin{commandline}
 $ sudo aptitude install php5-dbg
 $ cat ./phpinfo.php
-<?
+<?php
  phpinfo()
 ?>
 $ gdb --args /usr/bin/php5 ./phpinfo.php
@@ -479,30 +466,146 @@ $ gdb --args /usr/bin/php5 ./phpinfo.php
 ...中略...,call = 0x0}
 >>> print edata['op_array']['filename']
 0x7ffff7fbd640 "/home/yours/phpinfo.php"
+>>> [Ctrl+D]
 \end{commandline}
 %$
 \end{frame}
 
-\begin{frame}[containsverbatim]{gdb.Valueクラスは超イケてるうぅぅー}
+\begin{frame}[containsverbatim]{gdb.Valueクラスで関数ポインタ}
 関数ポインタ呼び出しの例：\\
 \begin{commandline}
 $ gdb --args /usr/bin/php5 ./phpinfo.php
 (gdb) b zend_vm_execute.h:356
 (gdb) run
 (gdb) pi
->>> edata=gdb.parse_and_eval(
-... "executor_globals.current_execute_data")
->>> print edata.address
-0xe60920 <executor_globals+1120>
->>> print edata.dereference()
-{opline = 0x7ffff7fbd778, function_state = 
-{function = 0x7ffff7fbd498, arguments = 0x0}, 
-...中略...,call = 0x0}
->>> print edata['op_array']['filename']
-0x7ffff7fbd640 "/home/yours/phpinfo.php"
+>>> phpfile=(gdb.parse_and_eval(
+... "zend_get_executed_filename")).dereference()
+>>> print phpfile
+{const char *(void)} 0x6c7600 <zend_get_executed_filename>
+>>> print phpfile()
+0x7ffff7fc4418 "/home/yours/phpinfo.php
+>>> [Ctrl+D]
+(gdb)
 \end{commandline}
 %$
 \end{frame}
+
+\begin{frame}[containsverbatim]{gdb.Valueクラスに文字列格納時の注意点}
+
+ gdb.Valueクラスに文字列へのポインタが代入された場合、こちらの文字列を
+str()で取り出そうとすると、どうしてもgdbで''p pointer''した時とまったく同じ
+フォーマットで文字列に変換されてしまいます。
+
+　このとき、''アドレス 文字列''というフォーマットにされてしまうので、
+\verb+str.partition(" ")+等を使って、欲しい文字列だけ取り出す必要があります。
+
+\begin{commandline}
+$ gdb --args /usr/bin/php5 ./phpinfo.php
+(gdb) b zend_vm_execute.h:356
+(gdb) run
+(gdb) pi
+>>> phpfile=(gdb.parse_and_eval(
+... "zend_get_executed_filename")).dereference()
+>>> filename=phpfile()
+>>> print str(filename)
+0x7ffff7fc4418 "/home/yours/phpinfo.php"
+>>> print (str(filename).partition(" "))[2]
+"/home/yours/phpinfo.php"
+\end{commandline}
+%$
+\end{frame}
+
+\section{php5.5.0内部構造}
+\emtext{php5.5.0内部構造}
+
+\begin{frame}[containsverbatim]{php5.5.0の中間コード実行部分}
+
+ php5.5.0では、中間コードを実行する部分が２つあります。
+
+\begin{itemize}
+\item \verb+execute_ex()(Zend/zend_vm_execue.h)+ \\
+  ユーザが定義した関数を実行するときに呼ばれる
+\item \verb+execute_internal()(Zend/zend_execute.c)+ \\
+  php本体にC等で実装されている関数を実行するときに呼ばれる
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{今回gdbを仕掛ける場所}
+
+ 今回、ユーザ定義の関数の実行トレースを取ってみたいので、\verb+execute_ex()+の
+中間コード実行部分直前に、gdbを仕掛け、どこを実行しているかを
+表示してみます。
+
+\begin{commandline}
+　Zend/zend_vm_execute.h
+  330 ZEND_API void execute_ex(zend_execute_data 
+       *execute_data TSRMLS_DC)
+  331 { 
+  332     DCL_OPLINE
+  333     zend_bool original_in_execution;
+  ...中略...
+  356         if ((ret = OPLINE->handler( <---ココ
+                  execute_data TSRMLS_CC)) > 0) {
+  357             switch (ret) {
+\end{commandline}
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{php5.5.0の便利なAPI}
+
+ php5.5.0から、Zend Engineは現在どこを実行中なのか
+について情報を得る為に、便利なAPIが用意されています。
+
+\begin{itemize}
+\item \verb+zend_get_executed_filename()+ \verb+(Zend/zend_execute_API.c)+ \\
+  現在実行中のphpファイル名を得る
+\item \verb+get_active_function_name()+ \verb+(Zend/zend_execute_API.c)+ \\
+  現在実行中の関数スコープ名を得る
+\item \verb+zend_get_executed_lineno()+ \verb+(Zend/zend_execute_API.c)+ \\
+  現在実行中の行番号を得る
+\end{itemize}
+\end{frame}
+
+\section{phpのソースの実行トレースを取ってみる}
+\emtext{phpのソースの実行トレースを取ってみる}
+
+\begin{frame}{gdbを使ってphpのソースをデバッグする事について}
+
+　 通常、phpのデバッグをするのであれば、xdebugを導入して、
+vim-nox+debugger plugin/netbean/eclipse等でデバッグするのが
+手軽ですし、強力なデバッグが可能です。
+
+　しかしながら、バックグラウンドで動作するようなphpプログラムを
+書いた際に、運用中、突然暴走するなどがあったとき、
+何が起きているのかをデバッグするには、xdebugの環境だけでは厳しい
+ものがあります。
+
+　ここで、gdbが使えれば、暴走中のphpプロセスに直接アタッチして
+デバッグする事が可能も可能になるので、デバッグの方法が広がります。
+
+\end{frame}
+
+
+\begin{frame}{実行トレースを取ってみた}
+
+ 今回の勉強会資料には、今まで説明したものを組み合わせて、
+phpソースレベルでの実行トレースを取った例を載せていますので、お試しあれ！
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{今回紹介の方法の問題点}
+
+ 今回のgdb+pythonで、phpソースレベルのトレースを取るやり方は、
+実は、以下の問題点があります。
+
+\begin{itemize}
+\item 中間コードが１つ実行される度にgdb側に逐一ブレークが入りpythonスクリプトが動くため、phpの実行速度が極端に遅くなります。大きいphpプログラムについて、gdbを用いたデバッグをするにはもっと別のアプローチを検討する必要があるかもしれません。
+\item phpの変数の値を参照するには、phpの内部変数である　\verb+executor_globals+　に登録されているシンボルテーブルからデータを引っ張ってくる必要があります。しかしながら、現行のphp5.5.0のZendエンジンのAPIには、 phpの変数の値をデバッガ側から簡単に参照できるようなAPIが存在しない為、gdbからphpの変数を参照するにはそれなりの工夫がいると思われます。
+\end{itemize}
+
+\end{frame}
+
 
 \end{document}
 

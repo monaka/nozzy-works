@@ -687,14 +687,19 @@ xdebug_var.cにてやってた。で、みるとパターンは以下のとお�
 ソースを見れる。
 
 xdebugでvalueをみるなら、xdebug.cのxdebug_debug_zvalが役に立つ?
+
 xdebugのstep実行などは xdebug.cのxdebug_statement_callが役に立つ？
 
 xdebug_var.cには、xdebug_get_php_symbolというよさげなのがあるぜ？
 （これが、symboleテーブルからzend_hash_find()つかって値引きずり出す）
+-->実際zend_hash_find()にEG(symbol_table)とかぶち込んでみたが、
+　得られるzvalが一筋縄では解析できん...
+
 
 gdbにpython interactiveモード搭載されたのは、gdb 7.6からのようだ。
 gdb 7.6 released!
 http://lwn.net/Articles/548781/
+
 
 
 --------さてここまでが、php 5.4 ---------------------
