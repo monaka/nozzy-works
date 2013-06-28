@@ -46,6 +46,7 @@
 \frame{\titlepage{}}
 
 \section{Level Up Debian}
+\emtext{Level Up Debian}
 
 \begin{frame}{さあ、皆さんに質問タイィィィィーム}
 
@@ -62,21 +63,73 @@
 
 \begin {itemize}[<+->]
 \item 皆さんDebianって使ってますかー？\\
-→\large{\textcolor{red}{使ってない人はぜひ使いましょう}}
+→\large{\textcolor{red}{使ってない人はぜひ使ってみましょう!}}
 \item *-dbgパッケージって知ってますかー？\\
-→\large{使ったことない人は、家に帰ったらaptitude install XXXX-dbg！（XXXXは何か好きなパッケージで）}
+→\large{\textcolor{red}{使ったことない人は、家に帰ったらaptitude install XXXX-dbg！（XXXXは何か好きなパッケージで）}}
 \item gdbって使ったことありますかー？/gdbのpython拡張使ったことありますかー？\\
-→\large{使ったことない人は、本資料公開してますので、ぜひ真似をしてみてー。}
+→\large{\textcolor{red}{使ったことない人は、本資料公開してますので、ぜひ真似をしてみてー。}}
 \end{itemize}
 
 \end{frame}
 
+\section{今回発表の環境}
+\emtext{今回発表のDebian環境}
+
+\begin{frame}{今回のDebian環境}
+
+\begin{table}[htb]
+\begin{tabular}{|l|l|l|} \hline
+項番 & 種類 & 内容 \\ \hline 
+1 & Debianバージョン & debian sid (jessie/sid) \\ \hline
+2 & CPU & amd64 (多分i386も一緒かな？）\\ \hline
+3 & OS種別 & linux \\ \hline
+4 & php & version 5.5.0 (debian sidから)\\ \hline
+5 & gdb & version 7.6 (debian sidから)\\ \hline
+\end{tabular}
+\end{table}  
+
+ kFreeBSDとか、Hurd環境とか、ARMとかの他のCPUの人は...大変申し訳ない...
+
+\end{frame}
+
 \section{ちょっとだけおさらい}
+\emtext{ちょっとだけおさらい}
+
+\begin{frame}{*-dbgパッケージ今までのDebian勉強会での発表}
+
+ *-dbgパッケージの技術的な話と、debianの*-dbgパッケージの現状については、
+\begin{quote}
+2012年の大統一Debian勉強会の岩松さんの発表「debug.debian.net」↓
+\url{http://gum.debian.or.jp/2012/}
+\end{quote}
+
+に掲載されているプレゼン資料が大変参考になりますので、
+こちらもあわせてご覧くださいませ。\\
+(今回の発表はこちらの資料読んでなくても大丈夫なように調整してます！)
+\end{frame}
+
+\begin{frame}{gdb+pythonの今までのDebian勉強会での発表}
+
+ gdb+pythonについては、
+
+\begin{quote}
+第98回東京エリアDebian勉強会↓
+\url{http://tokyodebian.alioth.debian.org/2013-03.html}
+\end{quote}
+
+に掲載されている勉強会資料に内部構造、コマンド拡張、ブレークポイントの応用など
+載せてますので、こちらもあわせてご覧くださいませ。\\
+(今回の発表はこちらの資料読んでなくても大丈夫なように調整してます！)
+
+\end{frame}
+
+\section{本題}
+\emtext{本題}
 
 \begin{frame}{*-dbgパッケージとは}
 
- バイナリパッケージに対応して、デバッガが利用するデバッグシンボルを別のファイルに分離してパッケージにまとめたパッケージとなります。
-
+ バイナリパッケージに対応して、デバッガが利用するデバッグシンボルを別のファイルに分離してパッケージにまとめたパッケージとなります。Debianに含まれているバイナリ
+をデバッグするときに大変便利です。
 \begin{table}[htb]
 \scalebox{0.6}[0.6]{
 \begin{tabular}{|l|l|p{30em}|} \hline
@@ -106,24 +159,253 @@
 
 \begin{frame}[containsverbatim]{*-dbgパッケージとは}
 
-どんな*-dbgパッケージがあるかみてみる 
+試しにどんな*-dbgパッケージがあるかみてみます。
+
 \begin{commandline}
 $ cat /etc/debian_version
 jessie/sid
 $ aptitude search '.*-dbg'
-p   0ad-dbg                         - Real-time strategy game of ancient warfare
-p   389-ds-base-dbg                 - 389 Directory Server suite - server debugg
-p   389-ds-base-libs-dbg            - 389 Directory Server suite - library debug
-p   7kaa-dbg                        - Seven Kingdoms Ancient Adversaries - debug
+p   0ad-dbg              - Real-time strategy game of 
+p   389-ds-base-dbg      - 389 Directory Server suite 
+p   389-ds-base-libs-dbg - 389 Directory Server suite 
+p   7kaa-dbg             - Seven Kingdoms Ancient 
 ...中略...
 $ aptitude search '.*-dbg' | wc -l
 2272
 $
 \end{commandline}
 
+\begin{center}
+debian sid(jessie/sid)で 2272パッケージ程度
+\end{center}
 \end{frame}
 
+\begin{frame}[containsverbatim]{*-dbgパッケージを早速使ってみる}
+
+php5をデバッグしてみます。
+
+\begin{commandline}
+$ aptitude install php5-dbg
+$ apt-get source php5/sid
+$ ls 
+php5-5.5.0+dfsg	 php5_5.5.0+dfsg-1.dsc
+php5_5.5.0+dfsg-1.debian.tar.gz  
+php5_5.5.0+dfsg.orig.tar.xz
+$ pwd
+/home/yours/php5-src/
+$ gdb --args /usr/bin/php5 -r 'phpinfo()'
+(gdb) set substitute-path /tmp/buildd/ /home/yours/php5-src/
+(gdb) b main
+(gdb) run
+(gdb) l
+1197	#else
+1198	int main(int argc, char *argv[])
+1199	#endif
+1200	{
+1201	#ifdef ZTS
+1202		void ***tsrm_ls;
+\end{commandline}
+%$
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{COMPATIBILITY LEVEL}
+
+ Debianのソースパッケージは、debhelperのCOMPATIBILITY LEVELにより
+構築に使われるdebian/以下のファイルのフォーマットや、実際にビルドされる
+時の挙動がちょっと異なっています。
+現在のdebian sidでも様々なLEVELを持つパッケージが混在している状況です。
+確認にはソースパッケージを取ってきてdebian/compatファイルを見るとわかります。
+
+　COMPATIBILITY LEVELの見方↓
+\begin{commandline}
+$ apt-get source php5
+$ cat php5-5.5.0+dfsg/debian/compat
+5
+$ apt-get source gstreamer0.10
+$ cat gstreamer0.10-0.10.36/debian/compat
+9
+\end{commandline}
+
+\end{frame}
+
+
+\begin{frame}[containsverbatim]{COMPATIBILITY LEVEL 9未満の*-dbg}
+
+ debhelperのCOMPATIBILITY LEVEL 9未満の形式で構築されているパッケージの*-dbgの中身：\\
+例えばphp5-dbgが該当
+\begin{commandline}
+$ dpkg -L php5-dbg
+...中略...
+/usr/lib/debug
+/usr/lib/debug/usr
+/usr/lib/debug/usr/bin
+/usr/lib/debug/usr/bin/php5
+/usr/lib/debug/usr/bin/php5-cgi
+/usr/lib/debug/usr/sbin
+/usr/lib/debug/usr/sbin/php5-fpm
+...中略...
+$
+\end{commandline}
+
+php5コマンドは/usr/bin/php5にあるので、インストール先は
+/usr/lib/debug/usr/bin/php5に、デバッグシンボルがインストールされています。
+\end{frame}
+
+\begin{frame}[containsverbatim]{COMPATIBILITY LEVEL 9以上の*-dbg}
+
+ debhelperのCOMPATIBILITY LEVEL 9以上の形式で構築されているパッケージの*-dbgの中身：\\
+例えばlibgstreamer0.10-0-dbgが該当
+\begin{commandline}
+$ dpkg -L libgstreamer0.10-0-dbg
+...中略...
+/usr/lib/debug/.build-id/3f/bdb94562139d00e153a2fc6c
+720772ca28acad.debug
+/usr/lib/debug/.build-id/86
+/usr/lib/debug/.build-id/86/cc80bb6f2bdb31a2ed02973d
+54530b3d99846f.debug
+/usr/lib/debug/.build-id/44
+/usr/lib/debug/.build-id/44/ff321f11ffd750f8c351ffa3
+f5d20028d2f6a6.debug
+/usr/share
+/usr/share/doc
+...中略...
+$
+\end{commandline}
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{COMPATIBILITY LEVEL 9以上の*-dbg}
+
+どのシンボルファイルがどのバイナリに対応するかを確認してみます↓
+\begin{commandline}
+$ file /usr/lib/x86_64-linux-gnu/libgstreamer-0.10.
+so.0.30.0
+/usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0.30.0:
+ELF 64-bit LSB  shared object, x86-64, version 1 
+(SYSV), dynamically linked, 
+BuildID[sha1]=44ff321f11ffd750f8c351ffa3f5d20028d2f6a6, 
+stripped
+$
+\end{commandline}
+
+ \verb+BuildID[sha1]+の値から /usr/lib/debug/.build-id/44/ff321f11ffd750f8c351ffa3f5d20028d2f6a6.debug がlibgstreamer-0.10.so.0.30.0のシンボルファイルとなります。
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{ところでBuildIDって何？}
+
+ バイナリを一意に指定できるように埋め込んだID。バイナリの構築時に、リンカがバイナリのハッシュ値を計算して埋め込んでいます。
+
+\begin{commandline}
+$ readelf -n /usr/lib/x86_64-linux-gnu/libgstreamer-
+0.10.so.0
+Notes at offset 0x000001c8 with length 0x00000024:
+  Owner              Data size	Description
+  GNU               0x00000014	NT_GNU_BUILD_ID 
+    Build ID: 44ff321f11ffd750f8c351ffa3f5d20028d2f6a6
+\end{commandline}
+%$
+
+ BuildIDについて詳しくは、
+\begin{itemize}
+\item BuildID解説 \\
+\url{http://fedoraproject.org/wiki/RolandMcGrath/BuildID}
+\item BuildIDに関してbinutilsへ寄贈されたパッチ↓\\
+\url{http://sourceware.org/ml/binutils/2007-07/msg00012.html}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{どうやってシンボルファイルを見つける？}
+
+  gdbはバイナリに埋め込まれている \verb+.gnu_debuglink+ セクション
+を見てシンボルファイルのファイル名を判断します。
+
+\begin{commandline}
+$ readelf -x .gnu_debuglink /usr/bin/php5
+Hex dump of section '.gnu_debuglink':
+  0x00000000 70687035 ..中略..0dd10 php5.....`..
+$ readelf -x .gnu_debuglink  /usr/lib/x86_64-linux-gnu/
+libgstreamer-0.10.so.0.30.0
+Hex dump of section '.gnu_debuglink':
+  0x00000000 66663332 ..中略..06638 ff321f11ffd750f8
+  0x00000010 63333531 ..中略..03238 c351ffa3f5d20028
+  0x00000020 64326636 ..中略..00000 d2f6a6.debug....
+  0x00000030 0da0b0f5               ....
+\end{commandline}
+つまり、バイナリphp5のシンボルファイル名はphp5というファイル名、
+バイナリlibgstreamer-0.10.so.0.30.0のシンボルファイル名は、
+ff321f11ffd750f8c351ffa3f5d20028d2f6a6.debugという事がわかります。
+\end{frame}
+
+\begin{frame}[containsverbatim]{ところでソースデバッグ出来ないんだけど？}
+
+ 先ほどの/usr/bin/php5はgdbから'set substitute-path'で、ソースのありかを
+一発で指定できましたが、いつもうまくいくとは限りません。
+
+うまくいかない例↓
+\begin{commandline}
+$ gdb --args /usr/bin/gst-launch
+(gdb) set substitute-path /tmp/buildd/ /home/yours/gstreamer/
+(gdb) b main
+(gdb) run
+Breakpoint 1, main ...中略... at gst-run.c:318
+318 gst-run.c: そのようなファイルやディレクトリはありません.
+\end{commandline}
+%$
+\begin{center}
+\Large{あれ？}
+\end{center}
+\end{frame}
+
+\begin{frame}[containsverbatim]{ところでソースのデバッグ出来ないんだけど？}
+
+ gst-launchのソースであるgstreamer0.10-0.10.36を実際にビルドするとわかるのですが、
+gccに渡されるソースファイルの指定にソースがフルパスで指定されていません。\\
+(php5はgccにソースファイルが指定されるときフルパスで指定されています）
+
+　こういうときは、gdbのdirコマンドを利用してソースの入っている可能性のある場所を
+すべて指定するとソースのデバッグができるようになります。
+
+\end{frame}
+
+\begin{frame}[containsverbatim]{ところでソースのデバッグ出来ないんだけど？}
+
+できた。
+
+\begin{commandline}
+$ gdb --args /usr/bin/gst-launch
+(gdb) dir /home/yours/gstreamer/gstreamer0.10-0.10.36/
+tools
+(gdb) b main
+(gdb) run
+(gdb) l
+314	}
+315	
+316	int
+317	main (int argc, char **argv)
+318	{
+319	  GHashTable *candidates;
+320	  gchar *dir;
+\end{commandline}
+%$
+\end{frame}
+
+\begin{frame}{ところでソースのデバッグ出来ないんだけど？}
+
+ gdbのdirでソースファイルを指定している時は、gdbはdirで登録された
+パスをすべて検索して該当のソースファイルを見つけようとするため、
+万一同じファイル名のファイルが別のディレクトリで先に発見されると、
+間違ったソースファイルを表示してしまうので注意がいります。
+
+\end{frame}
+
+
+
 \end{document}
+
+
 
 ;;; Local Variables: ***
 ;;; outline-regexp: "\\([ 	]*\\\\\\(documentstyle\\|documentclass\\|emtext\\|section\\|begin{frame}\\)\\*?[ 	]*[[{]\\|[]+\\)" ***
