@@ -804,6 +804,12 @@ gdb/symtab.cにて、find_line_pc_range()で、pcカウンタから
 
 ./a.out | egrep -o '0x[0-9a-f]{7}' | addr2line -fだってさ。
 
+addr2lineみると、
+ binutils/addr2line.cに記載されているfind_addres_in_section()とかの
+bfd_find_nearest_line_discriminator()にて、vma/pcから、いろいろ
+情報引き出している
+--->でもよーわからんぞ。
+
 
 -----文章書きにつかった件------
 
