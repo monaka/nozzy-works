@@ -775,6 +775,36 @@ Zend/zend_excute_API.c: zend_call_function()にて対応か？
 とかしなければならない。
 
 
+ところで、gdb7.6の"list"コマンド実装部分は、
+:vimgrep /"list"/ **/*.c | cw
+
+とかで調べると、list_command()(gdb/cli/cli-cmds.c:848)にある。
+
+gdb/source.cというlistコマンドに対して怪しい部分がある。
+print_source_lines_base()(gdb/source.c)
+
+どうも、current_sourcxe_symtab(gdb/source.c)とか、
+にstruct symtab で何か定義されているなぁ。
+gdb/symtab.h--> struct symtab
+
+ソースの位置突き止めるのは、こちらの構造体の
+char *filename,char *dirnameで見つけるらしい。
+他におもしろいものとして、struct objfile *objfileなんてのもある。
+
+gdb/symtab.cには、デバッグの為のシンボルを得ようと相当泥臭い
+対応をとろうとしている跡が見つかった。どうもデバッガは
+シンボル情報をかき集めるために、あらゆるセクションに埋め込まれている
+デバッグでもないシンボル情報をかたっぱしから集めてくるようだ。
+
+gdb/symtab.cにて、find_line_pc_range()で、pcカウンタから
+シンボルテーブル使ってソースの位置を求める部分があった....
+
+むー、binutilsのaddr2lineという必殺技もあるようだ。
+※一体どうやってんのかまるで分からんが...
+
+./a.out | egrep -o '0x[0-9a-f]{7}' | addr2line -fだってさ。
+
+
 -----文章書きにつかった件------
 
 squeezeのgdb-7.0.1-2+b1にて、内臓バイナリを調べると、
