@@ -528,6 +528,10 @@ $readelf -x .gnu_debuglink /usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0
 の項目を見ればわかるが、基本的に--strip-debugの真逆をやるので、
 こうなる。
 
+あとですね、*-dbgで避けられるデータの定義で参考になる↓
+http://dwarfstd.org/Home.php
+要は、この機能を*-dbgでは搭載しているわけだ。
+
 おっと、build-idについては、
 
  binutilsへ寄贈されたパッチ↓
@@ -537,8 +541,6 @@ $readelf -x .gnu_debuglink /usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0
 
 build-id解説↓
 http://fedoraproject.org/wiki/RolandMcGrath/BuildID
-
-
 
 php5のdbgパッケージ突っ込むと、line-no情報がフルパスではいっている
 ので、gdb上から、substitute-pathでソースパスの変更が可能で便利であるが、
@@ -554,6 +556,27 @@ php5のdbgパッケージ突っ込むと、line-no情報がフルパスではい
        とわざわざやっているため、ディレクトリ情報が含まれる。
 
 　(dpkg-buildpackageで、apache2/php5をそれぞれbuildするとわかる)
+
+--->ところが！これは間違いで、
+    objdump -g /usr/lib/debug/usr/sbin/apache2 | lv
+    とかやると、
+   <15>   DW_AT_comp_dir    : (間接文字列、オフセット: 0x528): /build/apache2-gmAdn0/apache2-2.4.4 
+　　ってなかんじで、ソースパスへのdirectory情報は存在。で、試しに、
+　　sudo gdb /usr/sbin/apache2 XXXX
+    (gdb) frame 3
+    (gdb) set substitute-path /build/apache2-gmAdn0/ /home/nojima/prog/debian/apache2/
+    (gdb) l
+ 227	    exit(code);
+228	}
+229	
+230	static void accept_mutex_on(void)
+231	{
+232	    apr_status_t rv = apr_proc_mutex_lock(accept_mutex);
+233	    if (rv != APR_SUCCESS) {
+234	        const char *msg = "couldn't grab the accept mutex";
+235	
+
+ってな感じでばっちりやんけ。
 
 取り急ぎ、現在実行中のphp5上のソース位置と、現在どこの関数スコープにいるのか？
 について表示するpythonスクリプトを書いて実行してみたが...遅っせー
