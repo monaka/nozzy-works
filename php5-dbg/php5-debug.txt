@@ -406,6 +406,10 @@ objcopy --add-gnu-debuglink debug stripped-binary
 
 なお、static libだけは、strip --strip-debugするのみ。
 
+--->どうでもよいが、
+ dh_stripの--dbg-package=XXXXは、Debina::Debhelper::Dh_Getopt.pmのgetoptions()
+で、$dh{DEBUGPACKAGE}に配列でぶち込まれる。
+
 debian sidではgcc-4.7はhardened-ccというperlスクリプトだった...何をいっているか判らないと思うが(ry
 
 gcc-4.7のソースおっかけると、
@@ -532,6 +536,15 @@ $readelf -x .gnu_debuglink /usr/lib/x86_64-linux-gnu/libgstreamer-0.10.so.0
 http://dwarfstd.org/Home.php
 要は、この機能を*-dbgでは搭載しているわけだ。
 
+--->dwarfstd.orgからのおもしろい件の抜粋
+FAQより抜粋：
+Why is it called DWARF? And why isn't it spelled "Dwarf"?
+It's a pun, since it was developed along with ELF, the Executable and Linking Format (nee Extensible Linking Format). Brian Russell, the original developer of DWARF, christened it the "Debugging With Attributed Record Formats".
+ 
+Where did DWARF come from?
+DWARF was orginally developed by Bell Labs for use with the System V debugger named sdb. This format was standardized as DWARF v. 1.0 by the PLSIG (Programming Languages Special Interest Group) of Unix International.
+--->ありがとう！Bell研！
+
 おっと、build-idについては、
 
  binutilsへ寄贈されたパッチ↓
@@ -577,6 +590,40 @@ php5のdbgパッケージ突っ込むと、line-no情報がフルパスではい
 235	
 
 ってな感じでばっちりやんけ。
+
+また、恐ろしいことにphp5の方が異常で、
+objdump -g /usr/lib/debug/usr/bin/php5 | lv
+とかすると、
+-----抜粋----------
+.debug_info セクションの内容:
+
+  コンパイル単位 @ オフセット 0x0:
+   長さ:        0x15bf3 (32-bit)
+   バージョン:    4
+   Abbrev Offset: 0x0
+   ポインタサイズ:8
+ <0><b>: 省略番号: 1 (DW_TAG_compile_unit)
+    <c>   DW_AT_producer    : (間接文字列、オフセット: 0x1832): GNU C 4.8.1 -mtu
+ne=generic -march=x86-64 -g -O2 -fstack-protector -fPIC --param ssp-buffer-size=
+4       
+    <10>   DW_AT_language    : 1        (ANSI C)
+    <11>   DW_AT_name        : (間接文字列、オフセット: 0x1955): /tmp/buildd/php
+5-5.5.0+dfsg/ext/date/php_date.c        
+    <15>   DW_AT_comp_dir    : (間接文字列、オフセット: 0x6f0): /tmp/buildd/php5
+-5.5.0+dfsg/cli-build   
+-----抜粋----------
+
+ってな感じで、comp_dirにはまったくしらんがなという場所のdirが...一体どうやって
+gdbはソース探してくるんだ?
+
+うああああ、$(GDB_SOURCE)/bfd/dwarf2.cのconcat_filename()に
+　DW_AT_nameが絶対pathか、相対pathかで処理変更してんジャン！まじかーっ。
+
+ つまり、DW_AT_name絶対path ---> このままcomp_dirとして利用
+ DW_AT_name相対path--->DW_AT_comp_dirと連結
+
+ってことらしい...
+
 
 取り急ぎ、現在実行中のphp5上のソース位置と、現在どこの関数スコープにいるのか？
 について表示するpythonスクリプトを書いて実行してみたが...遅っせー
