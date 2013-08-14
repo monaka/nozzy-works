@@ -210,6 +210,22 @@ Shaders, point/line/triangle rasterization and vertex processing are implemented
 
 そんじゃー、waystonと、waylandいってみようか。
 
+どうでもよいが、linux-image-3.10から、KMS cirrusドライバ
+がKVMでも利用できる。
+
+ Step1. libvirtで、cirrus&vncつかえるようにする。
+ Step2. debianをKVMでたちあげて、virt-viewerとかでつなぎ、
+ Step3. 一旦 sudo service gdm3 stop
+ Step4. sudo modprobe cirrus modeset=1
+        ※modeset=1がないと絶対にロードされない
+ Step5. いきなりコンソール解像度がvirt-viewerで変わる。
+ Step6. dmesg | fgrep drmとかすると、drmのcirrusが有効になったことがわかる。
+
+で、xinitとかでいろいろしてみたが、残念ながら、fbdevがKMSなcirrusに
+対応していないようで、まったくうごかんぜ。
+
+では、このままwaylandであそぼうとしてみる。
+
 waylandの遊び方：くやしいが、archlinuxがくわしいぜ。
 https://wiki.archlinux.org/index.php/Wayland
 
@@ -221,10 +237,69 @@ sudo aptitude install weston
 ssh して、sudo service gdm3 stop
 実行
 
-sudo weston-launchできればいいが、
-http://wayland.freedesktop.org/building.html
-にある、XDG_RUNTIME_DIRがないとかいわれるので、
-簡易的にXDG_RUNTIME_DIR=/tmpとかしてみる。
+weston-lanunchではclear_env()されてしまうので、
+XDG_RUNTIME_DIRはどうやっても指定できず。なので、
+export XDG_RUNTIME_DIR=/tmp
+export EGL_DRIVER=/usr/lib/x86_64-linux-gnu/egl/egl_gallium.so
+weston --log weston.log 
+
+したが、egl初期化失敗でdrm cirrusではしゅーりょー。
+
+あと良く分からんオプション--use-pixmanというのがあり、
+こいつを設定すると、libgdm1が吹っ飛び、westonが死ぬ。
+
+あと、westonのソースみるとわかるが、DISPLAY環境変数あると、
+backendとしてxが利用されるらしいぜ。
+
+で、cirrus&vncの結論。
+
+Step 1. Guest OSから、xinitでXあげ。
+Step 2. sudo -s -u root -H
+Step 3. export XDG_RUNTIME_DIR=/tmp
+Step 4. export EGL_DRIVER=/usr/lib/x86_64-linux-gnu/egl/egl_gallium.so
+Step 5. 見えているxtermから、westonを実行
+　　　　　→glにより全画面奪われ、shellが走る。
+Step 6. 別の端末から、KVMへsshする。
+Step 7. sudo -s -u root -H
+Step 8. export XDG_RUNTIME_DIR=/tmp
+Step 9. weston-terminalすると...terminalが現れる。
+
+よかったね！
+
+ここで、cirrus&vncだと画面ぐちゃぐちゃでつかいもんにならんわ。
+で、ここで、われらが、qxl+spiceでやってみた。
+
+Step 3. export XDG_RUNTIME_DIR=/tmp
+Step 5. gnome-xtermから、westonを実行
+　　　　　→glにより全画面奪われ、shellが走る。
+
+とっても、横に長いつかいものにならんweston-terminalとか動く。
+
+chromium-bsuとかいれてみたが、クソ遅くて正直つかいものにならんわー。
+
+llvmpipeがdebianで使える?っていう2012年8月ころの投稿。
+http://forums.debian.net/viewtopic.php?f=5&t=82860
+
+lvmpipeはどうも、mesa-9.2シリーズでさらに劇速になるらしい。
+http://www.phoronix.com/scan.php?page=article&item=mesa_92dev_llvmpipe&num=1
+
+gnome3がllvmpipeで動いたのはどうも2011/11/03っぽいかな。
+http://www.happyassassin.net/2011/11/03/fedora-16-is-gold-but-more-importantly/
+http://www.phoronix.com/scan.php?page=news_item&px=MTAxMTI
+http://www.phoronix.com/scan.php?page=news_item&px=MTAxMjI
+
+llvmpipe driverは、どうも、2009/9/28のMesa 7.6で搭載されたようだ。
+file:///home/nojima/prog/debian/mesa/mesa-9.1.6/docs/relnotes-7.6.html
+
+Gallium3Dは2007/11/13のようだ。
+file:///home/nojima/prog/debian/mesa/mesa-9.1.6/docs/index.html
+
+
+
+
+
+
+
 
 
 
