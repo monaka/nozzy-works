@@ -1,0 +1,232 @@
+
+gnome3では、gdm後にxsession経由か、gdm3直接起動かしらんが、gnome-sessionが
+sessionマネージャとして走ってgnome-shellが起動される予定。
+
+なお、この時gnome-sessionの
+/usr/share/gnome-session/sessions/にて、
+gdm-fallback.sessionが選択されるか、
+gdm-shell.sessionが選択されるかして、
+どちらかのモードが選ばれる。
+
+ここで、defaultファイルである、
+/usr/share/gnome-session/sessions/gnome.sessionみると、
+/usr/lib/gnome-session/gnome-session-check-accelerated
+を動かしてチェックするような事がデフォルトで記載されたりする。
+
+$XDG_CONFIG_HOME/gnome-session/saved-sessionにも
+savedセッションとして保存されるので、こちらも見られる。
+
+gnome-session,
+gnome-session-save
+gnome-session-properties
+
+の３つがgnome-sessionを管轄するコマンド。
+他のコマンドなどは、
+gnome-session-binパッケージに一通り入ってる。
+
+gnome-session-quitは電源OFFやら、logoffやら担当。
+
+ためしに、
+env DISPLAY=:0.0 gnome-session-quit --logout --no-prompt
+とかすると、動いているgnome-sessionが停止し、問答無用のログアウトになる。
+
+おっと、なんで
+gnome3にて、spice経由であがらんのか良く判ったぜ。
+/usr/lib/gnome-session/gnome-session-check-accelerated
+が（実際にはgnome-session-check-accelerated-helperが）
+/usr/share/gnome-session/hardware-compatibility
+を見て（このあたりはどうもハードコーディングされてた)、libGLあたりのチェックぶっこくと、
+----ここから----
+# Intel 830-865
+-Intel\(R\) 8[[:digit:]]{2,2}[^[:digit:]]
+
+# Pre-R300 radeon
+-Mesa DRI R[12]00[^[:digit:]]
+-Mesa DRI R[12]00$
+
+# Old Mesa software GL renderer
+-software rasterizer
+
+# Gallium has softpipe and llvmpipe
+-softpipe
+-llvmpipe
+---ここまで------
+
+こんな事が記載されているのでうまくいかんのじゃぁ。
+
+※たとえ、hardware-compatibility-helper突破してもな。
+
+なんてこった、gnome-session-quitは単にdbusめがけて指令ブチ込むだけでしたー。
+
+なんてこった２
+
+gnome-session-check-acceleratedは、ちょっとwindowのお膳立てをして、
+gnome-session-check-accelerated-helperを呼び出すものでした...
+
+gnome-session-3.4.2.1/tools/gnome-session-check-accelerated-helper.c
+の以下のコードにニヤリ。
+125                                 else /* invalid value */
+126                                         ret = 0xDEAD;
+
+DEADって、16進数だったんだー。
+
+で、おもしろいのは、kernelの起動オプションで、gnome.fallback=数字
+というのがfallbackで強制アップかどうかを検出する仕組みだった。
+
+とゆーわけで、起動オプションで、gnome.fallback=0とすると
+強制的にgnome-shellはgnome-session-check-acceleratedの検査を
+スキップして立ち上がるぜ。
+--->成功した。
+
+とゆーわけで、llvmだとか、gallium3dだとかお構いなしに立ち上がるぜ。
+
+まあ、ネタとして、virt-viewerでいけるかどうかは試してみようかな。
+
+ただ、debian jessie/sidだといろいろbuggyだけどな。
+※gnome-shellのアクティビティ叩いただけで、いろいろ誤動作。
+
+おー、glxgearsで、spiceな環境で、74FPSぐらいは出たぜ。ちょっとガクガクだがな。
+
+とおもって、virt-viewerでやってみたら、笑えるぐらいダメダメ。
+glxgearsでは、27.45FPSだった。藁。
+おまけにスゲエbuggy。まともにつかえんわー。
+
+さて、gallium3d+llvmpipeでイカシタ状況でwaylandいってみようか。
+
+ごは、llvmpipeのHP(http://www.mesa3d.org/llvmpipe.html)みると、
+Support for SSE2 is strongly encouraged. Support for SSSE3 and SSE4.1 will yield the most efficient code. 
+らしいので、試しにKVMにて、cpu typeを俺様環境にあわせ、
+x86         core2duo  Intel(R) Core(TM)2 Duo CPU     T7700  @ 2.40GHz 
+に強制指定してspiceな環境で再度チャレンジしてみよっかなー。
+（/proc/cpuinfoによれば、
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 23
+model name	: Intel(R) Core(TM)2 Duo CPU     U9400  @ 1.40GHz
+stepping	: 6
+microcode	: 0x60c
+cpu MHz		: 800.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 2
+core id		: 1
+cpu cores	: 2
+apicid		: 1
+initial apicid	: 1
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 10
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm sse4_1 lahf_lm ida dtherm tpr_shadow vnmi flexpriority
+bogomips	: 2793.11
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+なので、最強(藁）スペックだー）
+
+この最高スペックを指定すべく、
+
+  <cpu mode='host-passthrough'/>
+
+つっこんでみた。すんごいことに、Gust上でも、/proc/cpuinfoしたら、
+Hostといっしょの能力のCPUが1個みえたぜ。
+
+んー、glxgears は、58〜60FPSだな。
+
+で、試しに、
+
+      <model type='qxl' ram='65536' vram='65536' heads='1'>
+        <acceleration accel2d='yes'/> 
+      </model>
+
+を付け加えたところ、glxgears 74FPSぐらいは出たぜ。なので、cputypeは
+あんまし影響無いなぁ。
+
+ちゅーことで戻す。
+
+まあ、わかったことは、gallium3d+llvmpipeで結構でるっちゅーねん。
+
+で、やってみた。irrlicht1.8をつっこみ、demoの11.PixelPerLightで、
+4〜5 FPSは出たぜ。
+(Gallium 0.4 on llvmpipe (LLVM 3.2, 128 bits): VMware, Inc.)
+
+まず、
+Mesa DRI Mobile Intel® GM45 Express Chipset : Intel Open Source Technology Center
+のハードウェアアクセラレーションの元では、FPS:51は安定して軽い。
+
+次に,ベアの
+
+env LIBGL_ALWAYS_SOFTWARE=1 ./11.PerPixelLighting 
+Gallium 0.4 on llvmpipe (LLVM 3.2, 128 bits): VMware, Inc.
+だと、FPS:12〜15ぐらい。
+
+gallim3d
+http://akademy2008.kde.org/conference/slides/zack-akademy2008.pdf
+
+が本家。
+(Video : http://stecchino.blip.tv/file/1181861/)
+
+わかりやすい資料は↓
+Gallium3D Mesa's New Driver Model
+http://www.slideshare.net/olvaffe/gallium3d-mesas-new-driver-model
+
+以前DRIはどうだったかというと...
+Data Flow Diagram
+http://dri.sourceforge.net/doc/dri_data_flow.html
+Control Flow Diagram
+http://dri.sourceforge.net/doc/dri_control_flow.html
+というまさに、
+http://akademy2008.kde.org/conference/slides/zack-akademy2008.pdf
+のpp.4のような状況そのもの。
+
+つまりは、DRIがもう大変なことになってたので、
+State Trackerと、hwに特化したpipeと、OS/環境依存のpipeにわけちゃえ
+という発想で組み直したのがgallium3d。
+
+で、hwに特化したpipeのsoft版rendererは
+http://www.mesa3d.org/llvmpipe.html
+であり、llvmの機能（動的コンパイラ等込み）を搭載した
+めちゃめちゃ速いsoftrendererとなる。
+
+mesa-9.1.6付属の
+mesa-9.1.6/src/gallium/docs/以下のレンダリング済み文章
+http://people.freedesktop.org/~csimpson/gallium-docs/
+
+
+なんと、llvmpipeのそこいら中にLLVMの手続きが埋め込まれており、
+どうもLLVM Code Representationを使ったコンパイラ（ちゅーか、
+オプティマイザ付きアセンブラ）が動く
+しくみのようだ。 ニモニックに相当するのはLLVM Intermediate Representation (IR)
+つまり、LLVM IRというらしい。
+http://www.aosabook.org/en/llvm.html
+
+やるこた
+Shaders, point/line/triangle rasterization and vertex processing are implemented with LLVM IR which is translated to x86 or x86-64 machine code.
+ということだそうな。まあ、OpenGLって、〜して〜して、んだばレンダリング
+してちょ？視点や、カメラの位置はかえるけどな？というような使い方なので、
+こういうことできるんですな...たぶん。
+
+そんじゃー、waystonと、waylandいってみようか。
+
+waylandの遊び方：くやしいが、archlinuxがくわしいぜ。
+https://wiki.archlinux.org/index.php/Wayland
+
+なぜか、libwayland側は入っているので、
+sudo aptitude install weston
+
+するとよい。
+
+ssh して、sudo service gdm3 stop
+実行
+
+sudo weston-launchできればいいが、
+http://wayland.freedesktop.org/building.html
+にある、XDG_RUNTIME_DIRがないとかいわれるので、
+簡易的にXDG_RUNTIME_DIR=/tmpとかしてみる。
+
+
+
+
+
