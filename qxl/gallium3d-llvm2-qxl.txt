@@ -77,6 +77,7 @@ DEADって、16進数だったんだー。
 強制的にgnome-shellはgnome-session-check-acceleratedの検査を
 スキップして立ち上がるぜ。
 --->成功した。
+(sid,wheezyともに)
 
 とゆーわけで、llvmだとか、gallium3dだとかお構いなしに立ち上がるぜ。
 
@@ -243,7 +244,11 @@ export XDG_RUNTIME_DIR=/tmp
 export EGL_DRIVER=/usr/lib/x86_64-linux-gnu/egl/egl_gallium.so
 weston --log weston.log 
 
-したが、egl初期化失敗でdrm cirrusではしゅーりょー。
+したが、egl初期化失敗
+(実際にはlibgbmで、ドライバ見つからず?
+　PCI deviceのリストからドライバ見つからず）
+
+でdrm cirrusではしゅーりょー。
 
 あと良く分からんオプション--use-pixmanというのがあり、
 こいつを設定すると、libgdm1が吹っ飛び、westonが死ぬ。
@@ -270,10 +275,14 @@ Step 9. weston-terminalすると...terminalが現れる。
 で、ここで、われらが、qxl+spiceでやってみた。
 
 Step 3. export XDG_RUNTIME_DIR=/tmp
+Step 4. export LANG=C
 Step 5. gnome-xtermから、westonを実行
-　　　　　→glにより全画面奪われ、shellが走る。
 
-とっても、横に長いつかいものにならんweston-terminalとか動く。
+weston-terminalとか普通に動く。
+
+（LANG=ja_JP.utf8でやたら横に長い理由はバグのようです：
+　https://bugassistant.libreoffice.org/show_bug.cgi?id=63796。
+）
 
 chromium-bsuとかいれてみたが、クソ遅くて正直つかいものにならんわー。
 
@@ -294,14 +303,284 @@ file:///home/nojima/prog/debian/mesa/mesa-9.1.6/docs/relnotes-7.6.html
 Gallium3Dは2007/11/13のようだ。
 file:///home/nojima/prog/debian/mesa/mesa-9.1.6/docs/index.html
 
+では、ちょっと、gtk-3-examples 3.8.2-3
+
+https://wiki.gnome.org/Wayland/GTK+
+みながら、weston-terminalから、
+exprot GDK_BACKEND=wayland
+aptitude install gtk-3-examples
+して、
+gtk3-demo
+したら、
+(gtk3-demo:3370): Gdk-ERROR **: Unsupported GDK backend: wayland
+Trace/breakpoint trap
+
+といわれてうごかねー。
+
+----- wheezyでもやってみた---
+sudo virt-install --connect=qemu:///system -n debian-wheezy01 --ram 512 --cdrom /home/nojima/prog/net-image/debian-7.1.0-amd64-netinst.iso --disk /var/lib/libvirt/images/debian-wheezy01,bus=virtio,size=10,format=raw,cache=writeback --bridge=br0,model=virtio --graphics spice,port=5901,disable-ticketing --hvm --accelerate --noautoconsole
+
+してみたが、disable-ticketingがうまく指定できずに、認証にTLS使おうとqemuが
+エラー吐いてなにもできねー。
+
+ virt-installのソースみるとわかるが、vnc依存が結構凄い。--graphics spiceと
+やっても勝手にvirt-viewerを動かそうとするぜ。
+
+というわけで、
+
+sudo virt-install --connect=qemu:///system -n debian-wheezy01 --ram 512 --cdrom /home/nojima/prog/net-image/debian-7.1.0-amd64-netinst.iso --disk /var/lib/libvirt/images/debian-wheezy01,bus=virtio,size=10,format=raw,cache=writeback --bridge=br0,model=virtio --graphics spice,port=5901 -d --hvm --accelerate --noautoconsole
+
+して考えてみた。
+
+すると、
+
+-----デバッグ出力---
+...中略...
+  <graphics type='spice' port='5901' tlsPort='-1'/>
+---中略...
+[金, 16  8月 2013 18:56:24 virt-install 15015] ERROR (cli:445) unsupported configuration: Auto allocation of spice TLS port requested but spice TLS is disabled in qemu.conf
+[金, 16  8月 2013 18:56:24 virt-install 15015] DEBUG (cli:448) 
+Traceback (most recent call last):
+  File "/usr/bin/virt-install", line 636, in start_install
+    noboot=options.noreboot)
+  File "/usr/lib/pymodules/python2.7/virtinst/Guest.py", line 1249, in start_install
+    noboot)
+  File "/usr/lib/pymodules/python2.7/virtinst/Guest.py", line 1317, in _create_guest
+    dom = self.conn.createLinux(start_xml or final_xml, 0)
+  File "/usr/lib/python2.7/dist-packages/libvirt.py", line 2892, in createLinux
+    if ret is None:raise libvirtError('virDomainCreateLinux() failed', conn=self)
+libvirtError: unsupported configuration: Auto allocation of spice TLS port requested but spice TLS is disabled in qemu.conf
+[金, 16  8月 2013 18:56:24 virt-install 15015] DEBUG (cli:457) 仮想マシンのインストールが成功したように見えません。
+----ここまで
+
+となり、どうも勝手にtlsPort='-1'を突っ込んでしまう挙動だ。
+
+で、なぜかしらんが、VirtualGraphics.pyにて、tlsportは、
+値指定してなくても(Value=None)、勝手に-1指定と決め打ちされてしまい、
+こちらが原因で勝手にtls指定されてしまう。
+
+See. VirtualGraphics.py
+class VirtualGraphics(VirtualDevice.VirtualDevice):
+
+つまりは、virt-installのバグ。実は最近までlibvirtがtlsport attribute
+を勝手に指定しまうのを防ぐなどの議論が。
+このあたり。
+Subject: [libvirt] [PATCHv2] Error out when using SPICE TLS with spice_tls=0
+http://osdir.com/ml/libvir-list/2012-02/msg00985.html
+
+正直いってクソ面倒なので、vncでやることに。
+
+ sudo virt-install --connect=qemu:///system -n debian-wheezy01 --ram 512 --cdrom /home/nojima/prog/net-image/debian-7.1.0-amd64-netinst.iso --disk /var/lib/libvirt/images/debian-wheezy01,bus=virtio,size=10,format=raw,cache=writeback --bridge=br0,model=virtio --vnc --hvm --accelerate
+
+いっぱつだった。
+
+で、しらべると。
+westonはexperimentalだけ。
+
+http://packages.debian.org/search?keywords=weston&searchon=names&suite=all&section=all
+
+藁。
+
+-----------------
+weston-1.1.1
+
+westonのmain関数は、src/compositor.cにあるっぽい。
+
+src/compositor.cでさがすと、
+なんと、wl_display_createとかは、wayland側にあるぜ。
+--->つまりは、サーバーの抽象部分のコードはlibwaylandのなか。
+
+で、weston-1.1.1/compositor-XXXX.cにてハードウェア初期化を行う。
+ハード初期化エントリ部分はbackend_init()が担当。
+->compositor-rpi.cってRasspberry Piのcompositorだった....)
+->compositor-headlessってよくわからんが、画面なしモードのようだ。
+-> compositor-fbというのがlinux frame buffer経由でハンドリング
+　　---> udlfbというのはDisplayLinkとよばれ、USBで画面だせるやつ。
+        See. https://wiki.archlinux.org/index.php/DisplayLink
+   ---> cirrusならいけるぜ。
+　      今度やってみよう。
+　 ---> vesafbではどうかなー。
+       よーわからんが、uvesafbというのが該当か?
+       
+modprobe uvesafbとかしてみたところ、
+/sbin/v86dとかがないとかでエラーにあった。
+なんじゃこりゃ？
+--> aptitude show v86dとかすると、
+------中略-----
+daemon to run x86 code in an emulated environment
+ v86d provides a backend for kernel drivers that need to execute x86 BIOS code. The code is
+ executed in a controlled environment and the results are passed back to the kernel via the
+ netlink interface. 
+ 
+ v86d is needed by the uvesafb kernel module.
+ホームページ: http://dev.gentoo.org/~spock/projects/uvesafb/
+-----ここまで------
+ということらしい。
+
+で、qxlの元で
+aptitude install v86d
+とかして、ブートプロンプトで、
+video=uvesafb:1024x768-32@60とかやってみたが、
+uvesafbがvesa bios見つからんのでコケてNGだった。
+
+あー、普通にmodprobe cirrusfbしただけだと、
+[01:26:58.108] Calculating pixman format from:
+                - type: 0 (aux: 0)
+                - visual: 3
+                - bpp: 8 (grayscale: 0)
+                - red: offset: 0, length: 8, MSB: 0
+                - green: offset: 0, length: 8, MSB: 0
+                - blue: offset: 0, length: 8, MSB: 0
+                - transp: offset: 0, length: 0, MSB: 0
+となり、westonが対応できるフォーマットである、
+TRUECOLORではない為、起動できず。
+fbset -fb /dev/fb0 -g 1024 768 1024 768 24
+とかして強制的にTRUECOLORにしてみたが、westonが起動して、
+ioctl(fd, FBIOGET_VSCREENINFO)の返り値が、
+なぜか元のまま。
+
+---> virt-viewer にてvt 8に切り替えてから、別コンソールで、
+     fbset -fb /dev/fb0 -g 1024 768 1024 768 24
+　　　とかしたら、今度はちゃんとbpp:24 visual2 で読み込んでくれた。
+　　　で、
+      env LANG=C weston --backend=fbdev-backend.so
+      で起動に成功！Yeah!
+
+env LANG=C weston --modules=tablet-shell.so --backend=fbdev-backend.so
+したら、tabletモードになった。が、weston-terminal
+しても何も起動せず。キーバインディングもよくわからん。
+
+---- KVMでのうごかしかた----
+virt-viewer で、Ctl-ALT-F1
+rootでログイン
+
+service gdm3 stop
+fbset -g 1024 768 1024 768 24
+export XDG_RUNTIME_DIR=/tmp
+env LANG=C weston --backend=fbdev-backend.so
 
 
 
 
+root@debian-sid0:/home/nojima# fbset -i
+
+mode "640x480-60"
+    # D: 25.175 MHz, H: 31.469 kHz, V: 59.940 Hz
+    geometry 640 480 1024 768 24
+    timings 39722 48 16 33 10 96 2
+    accel true
+    rgba 8/16,8/8,8/0,0/0
+endmode
+
+Frame buffer device information:
+    Name        : CL Picasso4
+    Address     : 0xfc000000
+    Size        : 4194304
+    Type        : PACKED PIXELS
+    Visual      : TRUECOLOR
+    XPanStep    : 1
+    YPanStep    : 1
+    YWrapStep   : 0
+    LineLength  : 3072
+    Accelerator : Trident BladeXP
+
+
+compositor-fbdev.cのソースから、
+fbdev_frame_buffer_open()-->fbdev_query_screen_info()-->exit()
+のBadEndコースでした。
+
+
+ところで、pixmanって、drmでつかえるんだがこれなに。
+A Software-Based Pixman Renderer For Wayland's Weston
+http://www.phoronix.com/scan.php?page=news_item&px=MTI2Nzg
+
+なんかしらんが、MIT-shmでやるそうな。
+
+本家↓
+pixman
+http://pixman.org/
+
+しらんかった。こんなのがあるのかー。compositor-x11.cで
+しらべても--use-pixman=1がある。おおー。
+
+Xのうえで、
+weston --use-pixman=1
+としたら動いた。で、
+Using pixman renderer
+とかでてるんだな。これが。
+
+ちょっと早くなった気がする。うそかもしらんが。
+pixmanはcairographics.orgの生産物
+-> http://cairographics.org/
 
 
 
 
+で、さらにcodesearch.debian.netとかで探すと、wayland用のコードが
+なぜかmesaのegl/以下に...
 
+なぜか、libwaylandはwheezyにもある。ver 0.85だけどな。
 
+debianでは、westonコンパイルののちインストールは、
+debian/install
+で指定されているバイナリのみ。
 
+なぜだろう？
+
+実際、
+aptitude build-dep weston
+aptitude install jpeg-dev
+で、
+
+dpkg-buildpackageでbuildして
+$(src)/client/
+以下にテストクライアントである、
+flower,
+gears
+....
+等が入ってる。
+
+cirrus+fb経由だと、gearsは8FPSだってさ。
+flower ---> 縁なし非四角のウィンドウを出すデモ
+calibrator--->タッチパネル用の調整
+clickdot  ---> 線引くデモ
+cliptest
+dnd --> drag and drop test
+editor ---> form入れのテスト。ソフトキーボードでてくる。
+eventdemo-->よくわからん
+image---> image image-fileとやると表示される。
+smoke ---> 煙の描画テスト
+
+まあ、こんなもんか。
+
+-----------xもしゃべらせる---------
+sudo -s -u root -H
+update-rc.d gdm3 disable
+cat .conf/weston.ini
+-----ここから----
+[core]
+modules=xwayland.so,desktop-shell.so
+-----ここまで----
+export XDG_RUNTIME_DIR=/tmp
+modprobe cirrusfb
+fbset -g 1024 768 1024 768 24
+cat /etc/X11/xorg.conf
+-----ここから---
+Section "Device"
+	Identifier "Device"
+	Driver "fbdev"
+EndSection
+-----ここまで---
+env LANG=C weston --log=weston.log --backend=fbdev-backend.so
+
+でもね、desktop-shellにweston-terminalはでないわ、
+Xはあがってないわでうまく行っている様にはみえん。
+
+weston-terminalから、
+export DISPLAY=:0.0
+xlogo
+とかやってみたが、
+Can't open display
+といわれてしゅーりょー。
+
+いちおう、単体でxinitしてみたが、無問題で起動できる。

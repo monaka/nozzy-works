@@ -15,7 +15,7 @@ Readonly my $wlan0 => 'wlan0';
 Readonly my $buffer_size => 65535; # set maxium buffer size
 Readonly my $infinite => -1;
 Readonly my $filter_cmd => 
-	'port 80 and ( tcp[tcpflags] & (tcp-push|tcp-ack) !=0)';
+	'( port 80 or port 8080 ) and ( tcp[tcpflags] & (tcp-push|tcp-ack) !=0)';
 my $err='';
 my %devinfo;
 my $found_if=$ppp0;
@@ -110,8 +110,8 @@ sub search_method {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
-	if (($request->header('Host') =~ /nicovideo\.jp$/ ) &&
-		($request->url =~ /^\/smile/)) {
+	if (($request->header('Host') =~ /anyap\.info:8080/ ) &&
+		($request->url =~ /^\/sound/)) {
 		pcap_close($pcap);
 		download_video_streams($request);
 	}
