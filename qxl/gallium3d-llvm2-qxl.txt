@@ -459,6 +459,7 @@ fbset -g 1024 768 1024 768 24
 export XDG_RUNTIME_DIR=/tmp
 env LANG=C weston --backend=fbdev-backend.so
 
+あと、CTRL+ALT+BACKSPACEで終了。
 
 
 
@@ -584,3 +585,125 @@ Can't open display
 といわれてしゅーりょー。
 
 いちおう、単体でxinitしてみたが、無問題で起動できる。
+
+-----ksm---
+
+GBMとは、Generic Buffer Managementというらしい。
+KSMチュートリ：
+See. 
+libgbmをつかうわけだ。
+http://virtuousgeek.org/blog/index.php/jbarnes/2011/10/31/writing_stanalone_programs_with_egl_and_
+
+mesaの
+src/gbm/backends/dri/gbm_dri.cにて、GBMの組み込み済み
+バックエンドのdriソースが入ってる。一方で、
+GBM_BACKEND=gbm_dri.soか、
+GBM_BACKEND=gbm_gallium_drm.so
+のどちらを環境変数に指定すると使える。
+--->と思ったらウソでしたー。GBM_BACKEND指定してても、
+　　　両方順番にロードされますー。
+　　
+ブートときにKMS有効にするなら、KVMだと、
+cirrus.modeset=1
+を起動オプションに突っ込むと有効になる。
+
+
+GBM_BACKEND=gbm_dri.soにして、gdbでおっかけてみた。
+
+_gbm_create_device()($(MESA_SRC)/src/gbm/main/backend.c)
+---> backend->create_device(fd)
+---> dri_device_create ($(MESA_SRC)/src/gbm/backends/dri/gbm_dri.c)
+　　なお、dri->base.driver_name=driだそうな。
+　　
+で、結局gbm_gallium_dri.soが吸い込まれ、
+ pip_loader_drm_probe_fd(pipe_loader_drm.c)にてgallium3d用
+デバイスドライバが吸い込まれるはずであるが、ここで、
+pciデバイスのIDから検索しても、
+$(MESA_SRC)/include/pci_ids/pci_id_driver_map.h
+の
+ static const struct {
+ 61    int vendor_id;
+ 62    const char *driver;
+ 63    const int *chip_ids;
+ 64    int num_chips_ids;
+ 65 } driver_map[] = {
+ 66    { 0x8086, "i915", i915_chip_ids, ARRAY_SIZE(i915_chip_ids) },
+ 67    { 0x8086, "i965", i965_chip_ids, ARRAY_SIZE(i965_chip_ids) },
+ 68 #ifndef DRIVER_MAP_GALLIUM_ONLY
+ 69    { 0x1002, "radeon", r100_chip_ids, ARRAY_SIZE(r100_chip_ids) },
+ 70    { 0x1002, "r200", r200_chip_ids, ARRAY_SIZE(r200_chip_ids) },
+ 71 #endif
+ 72    { 0x1002, "r300", r300_chip_ids, ARRAY_SIZE(r300_chip_ids) },
+ 73    { 0x1002, "r600", r600_chip_ids, ARRAY_SIZE(r600_chip_ids) },
+ 74    { 0x1002, "radeonsi", radeonsi_chip_ids, ARRAY_SIZE(radeonsi_chip_ids) },
+ 75    { 0x10de, "nouveau", NULL, -1 },
+ 76    { 0x15ad, "vmwgfx", vmwgfx_chip_ids, ARRAY_SIZE(vmwgfx_chip_ids) },
+ 77    { 0x0000, NULL, NULL, 0 },
+ 78 };
+に、cirrusは存在しないので、ロードできず。
+で、gallium_screen_create(gbm.c)は失敗に終わる。
+---> gbm_gallium_drm_device_create(gbm_drm.c)は失敗におわる。
+
+つまりは、なにしてもkms/cirrus.koの元ではNG。
+
+------- xwayland試し-----
+
+env LANG=C weston --log=weston.log --modules=xwayland.so,desktop-shell.so --backend=fbdev-backend.so
+
+で起動かけてみたら、ちゃんと、
+
+[02:50:24.107] xserver listening on display :0
+
+とかでるんだけど、weston-terminal上で、xlogoとか動かすと
+Cant open display :0
+とか言われてNG。なんでじゃ？
+
+うおー、xwayland/launcher.cでexecしてるぜ。
+
+[02:56:15.880] lock surface gone
+[02:56:38.678] forked X server, pid 2610
+[02:56:38.747] libwayland: disconnect from client 0x1af4500
+[02:56:38.747] xserver crashing too fast: 256
+
+とかで死にまくってるぜ。
+
+で、見ると、
+/usr/bin/Xorg :0 -wayland -rootless -retro -nolisten all -terminate
+で実行しているとおもわれ。エラーメッセージから、-waylandが問題。
+-waylandをサポートできてるxorgバイナリでないと、xwayland.soはXを
+launch出来ない模様。
+
+/root/.config/westion.iniには、以下の設定を入れてみる。
+-----ここから-----------
+[shell]
+background-image=/usr/share/wallpapers/joy/contents/images/1024x768.png
+background-type=tile
+locking=true
+animation=zoom
+num-workspaces=6
+binding-modifier=ctrl
+
+
+[launcher]
+icon=/usr/share/weston/terminal.png
+path=/usr/bin/weston-terminal
+----ここまで------------
+とりあえず、壁紙はJoyになるし、zoomのアニメーションしてちょっとだけクール。
+
+知らんかったが、VTはtty0で起動。画面切り替えたかったら、Ctl+ALT+F2とか。
+fbdevはpixman経由のレンダラ。
+
+なんかしらんが、compositorは直接udevとお話しするらしい。
+デバイスの追加等は直接udevから得る仕組み。compositorのevent handlerに
+直接登録されるようだ。
+
+画面ショットもshellの役目らしい。
+（See. screenshooter-protocol.c)
+スクリーンセーバーもshellの役目。
+See. src/desktop-shell-protocol.c
+一応shellの動きはprotocol経由で変更かのうらしい。
+workspaceもshellの役目。
+See. workspaces-protocol.c
+
+
+
