@@ -374,6 +374,145 @@ http://osdir.com/ml/libvir-list/2012-02/msg00985.html
 
 いっぱつだった。
 
+-----wayland/westonインストール方法メモ-----------
+ sudo qemu-img create -f raw /var/lib/libvirt/images/debian-sid0 7G
+ sudo virt-install --connect=qemu:///system -n debian-sid0 --ram 512 --cdrom /home/nojima/prog/net-image/debian-7.1.0-amd64-netinst.iso --disk /var/lib/libvirt/images/debian-sid0,bus=virtio,size=10,format=raw,cache=writeback --bridge=br0,model=virtio --vnc --hvm --accelerate
+で、勝手にvirt-viewerが立ち上がるので、
+
+   ----ここから----
+ select a language --> Japanese
+ 場所の選択 ---> 日本
+ キーボードの選択 ---> 日本語
+ネットワークの設定 --> ネットワークを手動で設定
+                     IP:192.168.0.2
+                     netmask: 255.255.255.0
+                     gateway: 192.168.0.1
+                     nameserver: 10.22.80.1 202.234.232.6 221.113.139.250
+                     Host名: debian-sid0
+                     Domain: local
+ユーザとパスワードのセットアップ --> rootのパスワードを入力,
+                                  一般ユーザの情報を入力
+ディスクのパーティショニング--->ガイド - ディスク全体を使う
+                             パーティショニングするディスクの選択：
+　　　　　　　　　　　　　　　　　　　仮想ディスク 1 (vda) 
+                             すべてのファイルを１つのパーティションに
+
+パッケージマネージャの設定 ---> ミラー：日本 ミラーサイト：ftp.jp.debian.org
+                              HTTPプロキシ：なし(空欄)
+(こちらでいくつもソフトがネットワーク越しに取ってきてインストールが始まる...)
+popularity-contestを設定 ---> いいえ
+ソフトウェアの選択 ---> 「SSHサーバー」、「標準システムユーティリティ」のみ選択
+　　　　　　　　　　　　　あとは全部解除
+マスターブートレコードにgrubインストール --> はい
+
+ (全部カーソルキー選択→Returnで受付)
+※オースゲー、virt-installはリブートの場合ちゃんとvirt-viewerを
+あげて落としてってやってるぜ。
+
+
+   ----ここまで----
+を選択してインストール。
+
+ rootでログインのち、
+
+/etc/apt/preferences.d/experimental
+Package: *
+Pin: release experimental
+Pin-Priority: 150
+
+/etc/apt/preferences.d/unstable
+Package: *
+Pin: release unstable
+Pin-Priority: 500
+
+/etc/apt/preferences.d/testing
+Package: *
+Pin: release jessie
+Pin-Priority: 150
+
+を作成。
+
+ /etc/apt/sources.listは中身全部を一旦消して
+    ----------ここから---------
+deb http://ftp.jp.debian.org/debian/ sid main contrib non-free
+deb-src http://ftp.jp.debian.org/debian/ sid main contrib non-free
+deb http://ftp.jp.debian.org/debian/ experimental main contrib non-free
+deb-src http://ftp.jp.debian.org/debian/ experimental main contrib non-free
+deb http://ftp.jp.debian.org/debian/ testing main contrib non-free
+deb-src http://ftp.jp.debian.org/debian/ testing main contrib non-free
+    ----------ここまで---------
+に指定。
+
+　/etc/ssh/sshd_configのラストに
+  UseDNS no
+
+を挿入
+
+で、aptutude update;aptitude full-upgrade;aptitude cleanを実行。
+
+
+sudo aptitude install sudo
+のあと、
+ /etc/sudouers.d/nojimaをchmod 600で作成
+-----こっから-------
+nojima	ALL=(ALL) NOPASSWD: ALL
+-----ここまで-------
+
+sudo aptitude install weston fbset
+
+あとはリブートして様子見
+----ここまで-----------------------
+※wifi使ってもだいたい丸1時間〜2時間かかる...orz
+(そもそも最小限installといえど、200個近いパッケージを遅いI/Oの元で
+　インスコするため遅い...)
+
+笑ったのだが、libwaylandを吸い込んでるpackageがあるようだ。
+誰だ?
+
+　---------------ここから------------------
+apt-cache rdepends libwayland-client0
+libwayland-client0
+Reverse Depends:
+  libwayland-client0:armel
+  libwayland-client0:armel
+  libwayland-dev
+  libwayland-cursor0
+  libwayland-client0-dbg
+  weston
+  libgbm1
+  libegl1-mesa-drivers
+  libegl1-mesa
+  libwayland-client0:armel
+  libwayland-client0:armel
+  libwayland-dev
+  libwayland-cursor0
+  libwayland-client0-dbg
+  mpv
+  libegl1-mesa-drivers
+  libegl1-mesa
+とのこと。
+
+libwayland-server0
+Reverse Depends:
+  libwayland-server0:armel
+  libwayland-server0:armel
+  libwayland-server0-dbg
+  libwayland-dev
+  weston
+  libgbm1
+  libegl1-mesa-drivers
+  libegl1-mesa
+  libwayland-server0:armel
+  libwayland-server0:armel
+  libwayland-server0-dbg
+  libwayland-dev
+  libegl1-mesa-drivers
+  libegl1-mesa
+というわけ。
+　---------------ここまで------------------
+※multiarch-supportってパッケージ何だ？と思ってdpkg -Lしても
+ changelogぐらいしかないぞ。
+
 で、しらべると。
 westonはexperimentalだけ。
 
@@ -435,6 +574,7 @@ uvesafbがvesa bios見つからんのでコケてNGだった。
 となり、westonが対応できるフォーマットである、
 TRUECOLORではない為、起動できず。
 fbset -fb /dev/fb0 -g 1024 768 1024 768 24
+(fbsetは aptitude install fbset)
 とかして強制的にTRUECOLORにしてみたが、westonが起動して、
 ioctl(fd, FBIOGET_VSCREENINFO)の返り値が、
 なぜか元のまま。
@@ -705,5 +845,341 @@ See. src/desktop-shell-protocol.c
 workspaceもshellの役目。
 See. workspaces-protocol.c
 
+なんてこった、rdp用途のbackendが無い...
+※configure.ac確認するとデフォルトでenable_rdp_compositor=noなので、
+ rulesのconfigureにては、--enable-rdp-compositorする必要あり。
+
+見ると、westonはshellを2系統内臓している構造。
+なお、dynamic linkなモジュールで持つ部分と、
+weston-desktop-shell/weston-tablet-shell
+として実行形式で持つ部分に分かれる模様。
+
+westonの心臓部はeventハンドラ。
+
+shellのお仕事は、shell,screensaver,input(softkey board?),panelI/F,
+workspace manager等。
+
+内部ではsignal飛ばしまくってイベントドリブンする。
+--->今時のアーキテクチャ
+
+westonのmainは、compositor.cとなる。
+
+wl_display()でいろいろ登録。
+  ---> 環境変数 WAYLAND_DEBUG=serverとかするとサーバー側のデバッグコードが走る。
+     んでもって、epollがイベントドリブンの心臓部だったわ。
+      で、良く判らんが、wl_display_add_globalとかしてるし、
+　　　中では、どこかに何かを飛ばしてる...
+　　　　※closureなので、適当に関数作って呼び出しまくるらしい。
+
+  ---> --backend=のxxx-backend.so中のbackend_init()がバックエンド
+　　　　の初期化エントリー部分。
+　　　  keyboardはxkb_context_new(0)で作ってるぜ。
+
+  ---> screen_shooterは出力先をバッファにしてrepaintする作り。
+      (see. screenshooter.c screenshooter_shoot())
+      うは、しかも手でコピーだ...
+
+  ----> イベントは各種キューにぶち込んでdispatchというのが基本構造。
+
+  ALTか、CTL+Sでshoot?(weston-screenshooterがランチする。このアプリの名前はハードコーディングされてる。)
+  ALTか、CTL+Rでレコーダ？(filename=capure.wcapだそうだ)
+  レコーダ形式はWCAP形式とのこと。
+
+　text_backend()とはなんだ？text_cursor_position_notifier_create()とか
+　あるらしい。---> input-methodのことだった。weston.iniで変えられる。
+　デフォルトではweston-keyboardだ。
+
+  おお、すっげー、udev_new()とかしてるぜ。ハードこいつでハンドル
+　するつんもりらしい。
+
+  ハードの何かをseatと呼ぶ。
+  画面切りもやるらしい（dpmsとお話してるぜ）
+  weston本体はCTLもしくはALT+F1-9が仮想画面切り替えに使えるらしい...
+
+  Rキーにdebugコード仕込んでる。なんだろう？
+　fbdevは基本的にpixman使う。
+　（weston-1.1.1/src/pixman-renderer.cがラッパー）
+
+  composter-fbdev.cのfbdev_query_screen_info()は、fbdevから、
+　情報を得る。この時実サイズと、仮想サイズの2通りを取ってくるようだ。
 
 
+ うは、開けた/dev/fb0とかをmmapしてフレームバッファ直接共有かー。
+
+ 画面回転もサポートだー。
+ pixmanは座標変換（ローテーションとか）もお手の物らしい。
+
+
+weston-1.1.1/src/evdev.cのevdev_led_xxxxってキーボードのLEDの事。
+/dev/fb0とかにメッセージとして書き込むと、LED制御が可能。
+
+udevにカテゴリinputでnotifyかかると、epollとかでひっぱってくる。
+-->基本的にudevは入力デバイスハンドリングに使われるようだ。
+--> 個別のハードウェアI/Fのことをseatというらしい。
+
+weston-1.1.1/src/udev-seat.cのdevice_add()では、
+udev_device_get_property_value()のWL_CALIBRATION項目に
+一定のキャリブレーション用のデータが突っ込まれるお約束になっているらしい。
+
+weston-1.1.1/src/compositor.cのデフォルトでは、
+modules=desktop-shell.so
+option_modules=NULL
+がデフォルト。
+
+モジュールのエントリポイントは、module_init()という関数。
+desktop-shell.so--->shell.c
+tablet-shell.so --> tablet-shell.c
+
+窓アニメーションしたり、スクリーンセーバーはshellの役目。
+
+animationはzoom/fadeしかない。その他指定するとanimationなし。
+
+0番目のワークスペースが必ず最初に有功になる。
+ワークスペースも移動するとアニメーションするような事が書いてある気がする。
+
+で、weston-1.1.1/src/compositor.cはwl_display_run()でくるくる回る。
+
+weston-1.1.1/src/shell.cのshell_add_bindings()に
+desktop-shell.so固有のキーバインドがハードコーディングされてるぜ。
+CTRL/ALT+BACKSPACEで終了らしい。
+ ---> wl_display_terminate()で無事終了できるようにする。
+ALT+縦スベリで、透明度のコントロール?
+MODIFIER_SUPERって何キー？
+(CTRL/ALT/SHIFTは普通にある)
+-->http://ja.wikipedia.org/wiki/%E4%BF%AE%E9%A3%BE%E3%82%AD%E3%83%BC
+   用はwindowsキーとからしい。
+SUPERキー(windowsキー)押したら、
+[10:40:44.457] pixman renderer does not support zoom
+[10:40:44.457] pixman renderer does not support zoom
+[10:40:44.486] pixman renderer does not support zoom
+[10:40:44.487] pixman renderer does not support zoom
+[10:40:44.487] pixman renderer does not support zoom
+[10:40:44.519] pixman renderer does not support zoom
+[10:40:44.520] pixman renderer does not support zoom
+とか言われてハング。
+
+
+WAYLAND_DEBUG=server
+とかすると、ログが出るわ出るわ...
+
+Date: 2013-08-28 JST
+[17:09:12.283] weston 1.1.1
+               http://wayland.freedesktop.org/
+               Bug reports to: https://bugs.freedesktop.org/enter_bug.cgi?product=Wayland&component=weston&version=1.1.1
+               Build:  
+[17:09:12.284] OS: Linux, 3.10-2-amd64, #1 SMP Debian 3.10.7-1 (2013-08-17), x86_64
+[17:09:12.284] warning: XDG_RUNTIME_DIR "/tmp" is not configured
+correctly.  Unix access mode must be 0700 but is 777,
+and XDG_RUNTIME_DIR must be owned by the user, but is
+owned by UID 0.
+Refer to your distribution on how to get it, or
+http://www.freedesktop.org/wiki/Specifications/basedir-spec
+on how to implement it.
+couldn't open /root/.config/weston.ini
+[17:09:12.419] Loading module '/usr/lib/x86_64-linux-gnu/weston/fbdev-backend.so'
+[17:09:12.452] initializing fbdev backend
+couldn't open /root/.config/weston.ini
+couldn't open /root/.config/weston.ini
+[17:09:12.471] compositor: using new vt /dev/tty7
+[17:09:12.493] Creating fbdev output.
+[17:09:12.493] Opening fbdev frame buffer.
+
+superキーが判ったので、tablet-shell.soしたら...端末iconは出るようになったが、
+それ以上がない
+
+ -----ここから----
+/root/.config/weston.ini
+[core]
+modules=tablet-shell.so
+
+[shell]
+background-image=/usr/share/wallpapers/joy/contents/images/1024x768.png
+background-type=tile
+locking=true
+animation=zoom
+num-workspaces=6
+binding-modifier=ctrl
+
+
+[launcher]
+icon=/usr/share/weston/terminal.png
+path=/usr/bin/weston-terminal
+----ここまで-------
+また、
+ weston --backend=fbdev-backend.so
+しないと起動しない。
+（[core]セクションに登録してみたが、ダメ
+  modules=fbdev-backend.so,tablet-shell.soとかね）
+
+※最初/root/.config
+あと、エラーメッセージが絶望的...
+
+[10:11:08.538] libwayland: using socket /tmp/wayland-0
+[10:11:12.514] libwayland: disconnect from client 0xa91440
+[10:11:12.515] input_method died, respawning...
+[10:11:12.515] launching '/usr/lib/x86_64-linux-gnu/weston-keyboard'
+couldn't load background image: (null)
+[10:11:12.747] libwayland: disconnect from client 0xa91440
+[10:11:12.747] input_method died, respawning...
+[10:11:12.747] launching '/usr/lib/x86_64-linux-gnu/weston-keyboard'
+[10:11:12.954] libwayland: disconnect from client 0xa91440
+[10:11:12.955] input_method died, respawning...
+[10:11:12.955] launching '/usr/lib/x86_64-linux-gnu/weston-keyboard'
+[10:11:13.133] libwayland: disconnect from client 0xa91440
+[10:11:13.134] input_method died, respawning...
+[10:11:13.134] launching '/usr/lib/x86_64-linux-gnu/weston-keyboard'
+[10:11:13.315] libwayland: disconnect from client 0xa91440
+[10:11:13.315] input_method died, respawning...
+[10:11:13.315] launching '/usr/lib/x86_64-linux-gnu/weston-keyboard'
+[10:11:13.499] libwayland: disconnect from client 0xa91440
+[10:11:13.500] input_method died, giving up.
+
+couldn't load background image: (null)
+couldn't load lockscreen icon: (null)
+couldn't load background image: (null)
+couldn't load background image: (null)
+とか言われる。
+
+キーボードが死滅しているので、CTL+BACKSPACEもキカネー/SUPERキー何それ
+
+desktop-shell.soだと、
+4122         weston_compositor_add_key_binding(ec, KEY_PAGEUP, mod,
+4123                                           zoom_key_binding, NULL);
+4124         weston_compositor_add_key_binding(ec, KEY_PAGEDOWN, mod,
+4125                                           zoom_key_binding, NULL);
+4126         weston_compositor_add_button_binding(ec, BTN_LEFT, mod, move_bindin     g,
+4127                                              shell);
+4128         weston_compositor_add_button_binding(ec, BTN_MIDDLE, mod,
+4129                                              resize_binding, shell);
+4130         weston_compositor_add_button_binding(ec, BTN_RIGHT, mod,
+4131                                              rotate_binding, NULL);
+4132         weston_compositor_add_key_binding(ec, KEY_TAB, mod, switcher_bindin     g,
+4133                                           shell);
+4134         weston_compositor_add_key_binding(ec, KEY_F9, mod, backlight_bindin     g,
+4135                                           ec);
+4136         weston_compositor_add_key_binding(ec, KEY_BRIGHTNESSDOWN, 0,
+4137                                           backlight_binding, ec);
+4138         weston_compositor_add_key_binding(ec, KEY_F10, mod, backlight_bindi     ng,
+4139                                           ec);
+4140         weston_compositor_add_key_binding(ec, KEY_BRIGHTNESSUP, 0,
+4141                                           backlight_binding, ec);
+4142         weston_compositor_add_key_binding(ec, KEY_K, mod,
+4143                                           force_kill_binding, shell);
+4144         weston_compositor_add_key_binding(ec, KEY_UP, mod,
+4145                                           workspace_up_binding, shell);
+4146         weston_compositor_add_key_binding(ec, KEY_DOWN, mod,
+4147                                           workspace_down_binding, shell);
+4148         weston_compositor_add_key_binding(ec, KEY_UP, mod | MODIFIER_SHIFT,
+4149                                           workspace_move_surface_up_binding     ,
+4150                                           shell);
+4151         weston_compositor_add_key_binding(ec, KEY_DOWN, mod | MODIFIER_SHIF     T,
+4152                                           workspace_move_surface_down_bindi     ng,
+4153                                           shell);
+のはずが、まったくキーが入らないぜ。なんでだ？
+
+weston基本構造
+
+weston-> 画面初期化->shell -> weston-xxxshell起動 
+-->あとはevent driven.
+
+eventはepol+signalの組み合わせでハンドリング。
+
+WAYLAND_DISPLAY=って、ディスプレイ名というのか？
+どうも、フォーマットはwayland-0という感じの名前。
+PF_LOCALでこの名前でsoket openするので、UNIXドメインソケット。
+
+pixmanはドキュメントが存在しないらしい。
+--->ソース嫁ってさ。
+で、apt-get source libpixmanして中身見たら...
+各cpu用に最適化された命令を駆使した描画エンジンだった...
+cpu detectorとかあるある...
+pixman-x86.cなんて中身ほとんどASM命令の塊...
+API一覧はpixman.hを参照。
+
+pixmanがやってそうな事は基本的な（といっても今時の操作が多い）2D操作
+を全部CPU最適で回そうということらしい。
+
+
+westonでは、Rキー押下にpixman使用時にデバッグスクリーンが出る
+仕組みらしい...(が、shellか、xkbに奪われてしまう感じがするがどうなんだろう？
+）--->R押しても何も起きんかった...
+
+linux fbは、
+ open(fb,O_RDWR|O_CLOEXEC)
+ ioctl(fd,FBIOGET_XXXXXX,*ptr)--->fb情報引き抜き
+ output=mmap(...)
+
+で、
+pixman-src/pixman/pixman-bits-image.c
+にて、
+
+ PIXMAN_EXPORT pixman_image_t *
+1787 pixman_image_create_bits (pixman_format_code_t format,
+1788                           int                  width,
+1789                           int                  height,
+1790                           uint32_t *           bits,
+1791                           int                  rowstride_bytes)
+
+して*bitsにframebufferのI/Oバッファのポインタをわたすらしい...
+
+pixman_image_set_transform()
+pixman_renderer_output_create()
+
+westonはこのあと、wl_event_loop_add_timer()にぶちこんで、
+イベントループする。
+
+
+weston-src/src/comositor.cが描画ハンドラ。
+
+weston-src/src/compositor-fbdev.cにて、
+fbdev_output_repaint()内部で
+pixman_image_compsite32()
+
+weston再構築のばあい、libwaylandは1.1.0-2を利用しないと
+いろいろ変わりすぎて構築不能。
+
+sudo aptitude libwayland-hoge/testing
+とかする
+
+で、cirrus KMS にてweston drm-backend,use-pixmanでぶっとぶ理由は、
+
+(gdb) bt
+#0  drm_fb_create_dumb (ec=0x62aab0, width=1280, height=1024) at compositor-drm.c:262
+#1  0x00007ffff43dce6e in drm_output_init_pixman (output=0x62e430, c=0x62aab0)
+    at compositor-drm.c:1453
+#2  0x00007ffff43dd96b in create_output_for_connector (ec=0x62aab0, 
+    resources=0x62c720, connector=0x62cb00, x=0, y=0, drm_device=0x62cbe0)
+    at compositor-drm.c:1642
+#3  0x00007ffff43de386 in create_outputs (ec=0x62aab0, option_connector=0, 
+    drm_device=0x62cbe0) at compositor-drm.c:1821
+#4  0x00007ffff43df447 in drm_compositor_create (display=0x629970, connector=0, 
+    seat=0x7ffff43e5e70 <default_seat> "seat0", tty=0, pixman=1, argc=0x7fffffffe49c, 
+    argv=0x7fffffffe738, config_file=0x629cb0 "/root/.config/weston.ini")
+    at compositor-drm.c:2273
+#5  0x00007ffff43e00a5 in backend_init (display=0x629970, argc=0x7fffffffe49c, 
+    argv=0x7fffffffe738, config_file=0x629cb0 "/root/.config/weston.ini")
+    at compositor-drm.c:2521
+#6  0x000000000040fd6e in main (argc=1, argv=0x7fffffffe738) at compositor.c:3607
+
+259		ret = drmModeAddFB(ec->drm.fd, width, height, 24, 32,
+(gdb) 
+261		if (ret)
+(gdb) 
+262			goto err_bo;
+
+ということで、drmModeAddFBが失敗に終わって吹っ飛ぶ。
+
+参考：KMSの遊び方
+http://virtuousgeek.org/blog/index.php/jbarnes/2011/10/31/writing_stanalone_programs_with_egl_and_
+が超詳しい。(eglの例だけどな）
+
+上のdrmModeAddFBは、
+In this example, we’re assuming a 24 bit depth buffer with 32 bits per pixel. 
+という意味じゃ。
+
+で、わけわかめなのだが、24bit depth 32bits per pixは、
+linux-3.11~rc4/drivers/gpu/drm/cirrus/cirrus_mode.c
+だとサポートされてるぜ...orz
+
+libgbm1って、Mesa3dの成果物だったのね。drmも扱えるframe buffer用
+ライブラリらしい...
