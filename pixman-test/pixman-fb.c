@@ -5,16 +5,20 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/vt.h>
+#include <linux/kd.h>
 #include <termios.h>
 #include <unistd.h>
+#include <string.h>
 
 int main (int argc,char **argv)
 {
 	int tty0_fd,new_vt;
-	int new_tty_fd;
+	int new_tty_fd,kb_mode;
 	struct vt_stat vts;
 	char fname[16];
 	struct termios tty_attr;
+	char tty_buf[10];
+	int n_char;
 	tty0_fd=open("/dev/tty0",O_WRONLY | O_CLOEXEC);
 	if (tty0_fd < 0) {
 		perror("uh? cant open /dev/tty0,abort");
@@ -56,7 +60,27 @@ int main (int argc,char **argv)
 		perror("uh? cant set attribute of tty,abort");
 		exit(1);
 	}
-	
+	if (ioctl(new_tty_fd, KDSKBMODE,K_OFF)) {
+		if (ioctl(new_tty_fd, KDSKBMODE, K_RAW)) {
+			perror("uh? KBD is not set K_RAW,abort");
+			exit(1);
+		}
+	}
+	if (ioctl(new_tty_fd, KDSKBMODE,KD_GRAPHICS)) {
+		perror("uh? KBD is not set KD_GRAPHICS,abort");
+		exit(1);
+	}
+	while(1) {
+		memset(&tty_buf[0],0,sizeof(tty_buf));
+		n_char=read(new_tty_fd,&tty_buf[0], sizeof(tty_buf)-1);
+		if (n_char <0) {
+			perror("uh? failure to read from tty,abort");
+			exit(1);
+		} else if  (n_char == 0) {
+			sleep(1); /* avoid busy loop */
+		}
+		printf("key=%s\n",&tty_buf[0]);
+	}	
 	close(new_tty_fd);	
 	exit(0);
 }
