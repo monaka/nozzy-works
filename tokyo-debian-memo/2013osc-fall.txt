@@ -1,0 +1,642 @@
+dplより
+
+startは前回OSC Springで2/18まで喋ってるからそれ以降のトピックまで
+
+＊2013/3/4
+
+debian 6.0.7リリース
+--->セキュリティアップデート
+    詳しくhttp://www.debian.org/News/2013/20130223
+--->あーもー、debian 7.0.xが出たのでdebian 6系の話はカットね。
+
+
+毎年恒例GSoC募集
+
+ありゃりゃwheezyまだでてねーよ。
+
+arm64(64bit ARMv8)のイメージが出た。
+
+
+Paul Wise さんは、Jakub Wilk さんが開発し、adequate 
+パッケージの不適切な点 (シンボリックリンクの破損、コピーライトファイルの
+欠如、使われていない設定ファイルなど) を発見する QA ツール [13] をブログ
+で紹介しました
+
+   12: http://jwilk.net/software/adequate
+   13: http://bonedaddy.net/pabs3/log/2013/02/23/inadequate-software/
+   14: http://wiki.debian.org/qa.debian.org
+
+*2013/3/18
+
+DPL 選挙運動
+------------
+
+今年の DPL 選挙運動が今や公式に始まりました。今年の DPL に立候補したのは
+以下の 3 人です: Moray Allan さん [3] 、Gergely Nagy さん [4] 、Lucas
+Nussbaum さん [5] 
+--->
+さらに、暇な時間に DPL として活動しようとして
+いる志願者同士が民主的に戦う様子を見るのは実に清々しいことです。フリーソ
+フトウェア活動における自主性は良好な状態にあるように見えます" と最近の 3
+年間 DPL を務めてきた Stefano Zacchiroli さんは述べました。
+※嘘つけぇぇZak。てめー DPLをhellとかsacrificeとかいったくせに。
+
+Ultimate Debian Database (UDD) [19] によると、3 月の RC バグ修正者トップ
+10 は以下の方々です。
+
+   1. Michael Gilbert さん
+   2. LaMont Jones さん
+   3. Julien Cristau さん
+   4. Ludovico Cavedon さん
+   5. Raphaël Hertzog さん
+   6. Gregor Herrmann さん
+   7. Sebastian Ramacher さん
+   8. Abou Al Montacir さん
+   9. Arno Töll さん
+  10. Sébastien Villemot さん
+
+   19: http://udd.debian.org/
+
+おめでとう!
+より詳細なデータは、こちらのメール [20] にあります。
+
+   20: http://lists.debian.org/debian-vote/2013/03/msg00024.html
+--->トップランカーか、そこにしびれる憧れる！
+
+Debian ブースを運営したり Debian インストールパーティーを開催しませんか?
+開催予定の Debian 関連のイベントについて知りませんか? 講演のページ [27]
+にリンクを貼りたい Debian 関連の講演を行いましたか? そのような場合は、
+Debian イベントチーム [28] 宛に電子メールを送信してください。
+
+   27: http://www.debian.org/events/talks
+   28: events@debian.org
+
+---->OSC fallをおくらんと。
+
+新規の注目パッケージ
+  * adequate — Debian パッケージのクオリティ検定ツール [52]
+--->早っ
+
+*2013/4/1
+DSA チームからの一言
+--------------------
+
+Martin Zobel-Helas さんは、Debian システム管理者 (DSA) チームからの一
+言 [5] を投稿し、最近のチームの活動について報告しました。この数ヶ月間、
+チームは多数の物理マシンの仮想化に専念し、多種多様な仮想マシンを管理する
+ための ganeti クラスタを作りました。さらに、チームはアカウント管理のコー
+ドベースを Django フレームワークを使用して書き直しはじめました。
+DSA チームからの一言は、全ての寄贈者とホスティングパートナー (特に
+Eaton [6] と Brainfood [7]) および、geneti パッケージのメンテナである
+Iustin Pop さんと Guido Trotter さんに対するチームからの感謝の言葉で締め
+くくられています。
+
+    5: http://lists.debian.org/debian-devel-announce/2013/03/msg00010.html
+    6: http://www.eaton.com
+    7: http://www.brainfood.com
+
+DebConf13 マッチング基金
+------------------------
+
+Didier Raboud さんは DebConf13 への寄付についてのマッチング基金 [8] を発
+表しました。 "DebConf13 への募金活動の一環として、気前の良いスポンサーで
+ある Brandorr グループ [9] は 4 月 30 日まで米ドルによるマッチング募金を
+行うことを提案しました" と Didier さんは述べました。この活動を通じて、
+Brandorr グループは個人から DebConf13 への募金 1 ドルにつき 1 ドルの募金
+を行う予定です。1 人からの募金により Brandorr グループが行うマッチング募
+金の最高額は 100 米ドルです。Brandorr グループは米ドルによる募金に限り
+マッチング募金を行います。Brandorr グループは最高総額 5 千米ドルまでの
+マッチング募金行う予定です。
+--->なんじゃこりゃ？
+
+新メンテナプロセス
+------------------
+
+Enrico Zini さんが新メンテナプロセスに応募する男女の比率が大きく異なる点
+についてブログ記事を書きました [11] 。Enrico さんは Debian Women [12] プ
+ロジェクトなどが女性からの応募を奨励する取り組みを行ったにもかかわらず女
+性の応募者はいまだに非常に少ない [13] 、と指摘しました。このため Enrico
+さんは Debian プロジェクトは積極的な行動を採り、1 名の女性志願者につき 1
+名の男性志願者からの応募を許めるようにすることを提案しました。 "Debian
+における男女比を等しくすることが目標であるため、とにかく明らかに女性名の
+DD 1 人に対して明らかに男性名の DD を 1 人だけ承認することに決めてみては
+いかがでしょうか" と Enrico さんは述べました。 "つまり: 明らかに女性名の
+DD が承認されない限り明らかに男性名の DD は新しく誕生しません。"
+
+   11: http://www.enricozini.org/2013/debian/on-gender-imbalance/
+   12: http://www.debian.org/women/
+   13: https://nm.debian.org/public/processes
+
+
+
+Debian 憲章の編集改正
+---------------------
+
+Francesca Ciceri さんは Debian の選挙制度の変更に関して憲章の改正を提案
+しました [14] 。Francesca さんは毎年の選挙議論によって大量の時間が無駄に
+なっており、他のプロジェクトメンバーを言葉巧みに選挙に参加させることが問
+題であると指摘しました。改正案は現在の選挙プロセスを中止し、亡くなるまで
+Stefano Zacchiroli さんを DPL の任に就かせるというものでした。 "民主的な
+プロセスは Debian の特徴の 1 つですが、我々はここ何年かの間に民主的なプ
+ロセスを乱用しない方法、特に決断の効率を妨げるという危険を冒すタイミング
+を学びました" と現在の Debian プロジェクトリーダである Stefano
+Zacchiroli さんはコメントしました。 "私は "終身 DPL" に推挙されたことを
+嬉しく思います。もし提案が可決されたら、選挙をせずとも Debian プロジェク
+トメンバーからの提案に常に耳を傾けるよう全力を尽くします。"
+
+   14: http://blog.zouish.org/posts/gr
+--->釣りなのか？
+
+Jan Wagner さんは Chemnitzer Linuxtage 2013 における Debian の参加に関す
+る詳細な報告書 [20] を発表しました。
+
+   20: http://blog.waja.info/2013/03/20/chemnitzer-linux-tage-2013/
+
+---> Linuxtageはノーチェックだったから、ちぇっくするとおもしろい?
+
+Debian の商標使用を奨励する発表が最近なされたこと [21] を受けて、Debian
+の商標を使ったいくつかの新商品が発表されました。新商品には、有名なペット
+用 Debian 傘の新バージョンやお気に入りの Debian 開発者のフラシ天縫いぐる
+みから、Debian ブランドの殺虫スプレー (有機農作物用に使うことを完全認可
+されている) や Debian Flame-Away™ マークの鎮静剤まで揃っています。
+
+   21: http://www.debian.org/News/2013/20130301
+
+--->笑う
+
+八田真行さんは Haskell ソフトウェアのパッケージ方法 [22] に関する事例集
+を執筆しました。
+
+   22: http://www.mhatta.org/blog/2013/03/21/recipe-for-debian-haskell-packaging/
+
+-->やるなJAP
+
+次期リリースに関するリリースクリティカルバグの統計
+--------------------------------------------------
+
+Ultimate Debian Database のバグ検索インタフェース [26] によると、次期リ
+リースの Debian "Wheezy" には、現在 50 個のリリースクリティカルバグが存
+在します。簡単に修正できるか修正作業が始まっているバグを除けば、リリース
+までにおよそ 24 個のリリースクリティカルバグの修正が必要です。
+
+   26: http://udd.debian.org/bugs.cgi
+--->ってそんなもんあったんだっけ？
+
+*2013/4/15
+
+新 DPL の選出
+-------------
+
+Lucas Nussbaum さん
+
+Debian が Google Summer of Code に選ばれる
+------------------------------------------
+
+Debian が 8 年連続で Google Summer of Code [2] (SoC) の 指導組織に選ばれ
+ました [3] 。Google Summer of Code とは指定されたフリーソフトウェアや
+オープンソースソフトウェアプロジェクトのコードを 18 歳以上の学生が書くこ
+とに対して様々な賞金を支払うプログラムです。 このプログラムの対象となる
+学生は申請書を準備するために、Debian が提案するプロジェクトのリスト [4]
+を閲覧したり、 指導者に連絡することができます。
+    2: http://www.google-melange.com/gsoc/homepage/google/gsoc2013
+    3: http://bits.debian.org/2013/04/call-for-students-gsoc-2013.html
+    4: http://wiki.debian.org/SummerOfCode2013/Projects
+    5: http://wiki.debian.org/SummerOfCode2013
+    6: soc-coordination@lists.alioth.debian.org
+    7: http://lists.debian.org/debian-devel-announce/2013/03/msg00004.html
+
+Debian は女性用の雇用促進プログラムに参加します
+-----------------------------------------------
+
+Mònica Ramírez Arceda さんは Debian が次回のフリー及びオープンソースソフ
+トウェアにおける女性用の雇用促進プログラム [8] に参加する予定であると発
+表しました。このプログラムは GNOME Foundation が 2006 年に始めたものであ
+り、その他の FOSS 組織がプログラムに協力しています。Debian は 6 月から 9
+月までの期間にインターンシップを企画しています。 [9] インターンシップで
+は、プログラミング、デザイン、マーケティング、ウェブ開発などを含む、プロ
+ジェクトに関する様々な取り組みが行われます。Debian 開発者もしくは Debian
+メンテナでない女性なら誰でも参加することを推奨されています。 年齢制限は
+なく、参加者は学生でなくても構いません。詳しい内容は専用のウィキペー
+ジ [10] を参照してください。
+
+    8: http://lists.debian.org/debian-devel-announce/2013/04/msg00001.html
+    9: http://bits.debian.org/2013/04/joining-opw.html
+   10: http://wiki.debian.org/OutreachProgramForWomen
+
+--->まぢか
+
+カナダ人ジャーナリスト Bruce Byfield さんは Debian 周辺のありがちな勘違
+いを正そうとする記事 [11] を執筆しました。
+
+   11: http://www.datamation.com/open-source/nine-myths-that-shouldnt-stop-you-from-trying-debian-1.html
+
+DebConf チームは 2014 年 8 月に DebConf14 をアメリカ合衆国オレゴン州の
+ポートランドで開催すること [12] を発表しました [13] 。
+
+   12: http://bits.debian.org/2013/04/debconf14-in-portland-usa.html
+   13: http://lists.debian.org/debian-project/2013/04/msg00039.html
+
+Sylvestre Ledru さんはすでに存在している Debian のNEW キュー [14] 、新し
+いバグ [15] 、削除されたパッケージ [16] 用のフィードに加えて、最近
+Debian アーカイブにアップロードされたパッケージ用の新しい Twitter と
+Identi.ca [17] フィードが利用可能になったことをブログで紹介しました。
+
+   14: http://identi.ca/debiannew
+   15: http://identi.ca/debianbug
+   16: http://identi.ca/debianremove
+   17: http://identi.ca/debianupload
+
+---> identi.caしってるぅ？という話もよいかも...
+
+*2013/4/29
+
+Qt 5 パッケージが初めて experimental に
+---------------------------------------
+
+Lisandro Damián Nicanor Pérez Meyer さんは Qt 5 パッケージが初めて
+experimental 版に受け入れられたこと [3] を発表しました。現在 Qt 5 パッ
+ケージは 64 ビット PC (amd64) アーキテクチャのみで利用可能ですが、まもな
+く 32 ビット PC (i386) アーキテクチャでも利用可能になる予定です。ARM
+ベースのアーキテクチャでは、もう少し時間が必要です。この Qt 5 パッケージ
+は GLES2 や Wayland をサポートしませんが、テスト用に GLES2 や Wayland を
+利用可能にした非公式パッケージをある時点で公開する予定です。
+
+-->だとさ
+
+
+開発ニュース寄せ集め [6] の第 32 号が発行され、以下の話題が取り上げられ
+ました。
+
+  * QA インフラに関するニュース寄せ集め
+  * dedup.debian.net を使ったアーカイブサイズの縮小
+  * DEP 12 の開始
+  * PTS 用に RDF メタデータを Turtle フォーマットで提供
+  * 作業が必要で面白そうなパッケージを見つける最も簡単な方法
+
+    6: http://lists.debian.org/debian-devel-announce/2013/04/msg00007.html
+
+Niels Thykier さんが Lintian の新機能を紹介するために Lintian メンテナか
+らの一言 [7] を報告しました。Lintian [8] とは最重要かつ利用頻度がもっと
+も高い Debian パッケージ用のパッケージチェックツールです。Lintian は主と
+して Debian ポリシーと様々なサブポリシーへの違反を洗い出します。
+
+    7: http://lists.debian.org/debian-devel-announce/2013/04/msg00008.html
+    8: http://lintian.debian.org/
+
+Andreas Tille さんが Debian Blends プロジェクトの状況 [9] の最新情報を送
+信しました。メールの中で Andreas さんはいくつかの Debian Blends が現在取
+り組んでいることについて説明し、同時に Wheezy に収録されている Blends
+パッケージの総合的なユーザエクスペリエンスを向上させるための貢献者を募集
+しました。
+
+    9: http://lists.debian.org/debian-devel-announce/2013/04/msg00010.html
+
+*2013/5/13
+
+Debian 7.0 "Wheezy" がリリースされました
+----------------------------------------
+
+Debian "Wheezy" の新機能紹介
+----------------------------
+
+Michael Prokop さんが、ユーザや開発者に "Wheezy" で新しく追加されたパッ
+ケージを紹介することを目的とした #newinwheezy 活動 [12] を立ち上げまし
+た。活動に参加した Debian コントリビュータによると、中でも特に興味を惹く
+新しいパッケージは以下のものでした: 様々なフォレンジックツール [13] 、
+vcsh [14] ("fake bare git リポジトリで $HOME の設定ファイルを管理す
+る")、Charybdis [15] ("Freenode ネットワークの裏側で使われている、人気と
+信頼性の高い IRC サーバ")、Grml system のパッケージ [16] 、mosh [17]
+("ラグがある場合に SSH よりも優れている UDP ベースのリモートシェル端
+末")、軽量ブラウザ (dillo、netsurf、surf、xxxterm) [18] 、libghc-stm-
+dev、バグの少ないスレッドプログラムの作成を手助けするツール [19] 、
+scratch [20] ("簡単で対話的な協調プログラミング環境で、インタラクティブ
+なストーリー、アニメーション、ゲーム、音楽、アートの創作ができるよう設計
+されている")、plymouth [21] ("ブート時 I/O マルチプレクサ")。
+
+   12: http://lists.debian.org/debian-devel/2013/04/msg00870.html
+   13: http://michael-prokop.at/blog/2013/04/29/the-newinwheezy-game-new-forensic-packages-in-debianwheezy/
+   14: http://richardhartmann.de/blog/posts/2013/04/29-newinwheezy/
+   15: http://anarcat.koumbit.org/2013-05-01-new-debian-release-my-contributions-newinwheezy-game
+   16: http://michael-prokop.at/blog/2013/05/02/the-newinwheezy-game-grml-packages-in-debianwheezy/
+   17: http://noone.org/blog/English/Computer/Debian/New%2520SSH%2520stuff%2520in%2520Wheezy.html
+   18: http://noone.org/blog/English/Computer/Debian/New%2520web%2520browsers%2520in%2520Wheezy.html
+   19: http://joeyh.name/blog/entry/the_newinwheezy_game:_STM/
+   20: http://people.skolelinux.org/pere/blog/Debian_Wheezy_is_out___and_Debian_Edu___Skolelinux_should_soon_follow___newinwheezy.html
+   21: http://web.dodds.net/~vorlon/wiki/blog/Plymouth_is_not_a_bootsplash/
+
+DebConf11 と 12 のビデオ
+------------------------
+
+DebConf の動画のスポンサーである IRILL が DebConf11 と 12 の全ての動画を
+公開しました。これらの映像は MP4 (H.264) と Ogg (推奨) フォーマットで入
+手可能になっており、さらに IRILL のビデオプレイヤーでも視聴することがで
+きます (DebConf11: 56 本のビデオ [22] 、DebConf12: 72 本のビデオ [23])。
+
+   22: http://www.irill.org/videos/debconf-11/
+   23: http://www.irill.org/videos/debconf-12/
+
+→そうなんだー
+
+雲の上の Debian
+---------------
+
+NASA の Space Operations Computing (SpOC) のマネージャである Keith
+Chuvala さんは SpOC が国際宇宙ステーションのラップトップのオペレーティン
+グシステムを Debian に替えることを今週報告しました [24] 。具体的に言う
+と、国際宇宙ステーションの宇宙飛行士は Debian 6 が動くコンピュータを使う
+予定です。Chuvala さんは SpOC が "安定で信頼できるオペレーティングシステ
+ムを必要としていた" ことと、宇宙飛行士と IT スペシャリストの訓練について
+Linux Foundation を当てにしていると述べました。
+
+   24: http://www.zdnet.com/to-the-space-station-and-beyond-with-linux-7000014958/
+
+Google Compute Engine での Debian
+---------------------------------
+
+最近、Google は自社の IaaS (サービスとして提供されるインフラ) である
+Google Compute Engine [25] で、Debian のイメージが利用可能になったとアナ
+ウンスしました。今のところ、このインフラでは移行作業を簡単にするために
+6.x と 7.x 両方のバージョンの Debian が配布されています。パフォーマンス
+を高めて帯域幅を節約するために、Google は Google Compute Engine の
+Debian インスタンスから利用できる Debian パッケージのミラーをホストして
+います。
+Google のアナウンスによると、今後は Debian が Compute Engine のデフォル
+トのイメージになるとのことです。
+
+   25: https://cloud.google.com/products/compute-engine
+
+
+DPL からの一言
+--------------
+
+Lucas Nussbaum さんが DPL 活動に関するはじめての月刊報告 [26] を投稿しま
+した。新たに選出されたプロジェクトリーダは、他の候補者と投票者そして前任
+のプロジェクトリーダである Stefano Zacchiroli さんへの感謝に加え、最初の
+13 日間の活動について報告しました。Lucas さんは特に Debian ロゴと登録商
+標に関する進行中の議論 [27] に注力し、Moray Allan さんの協力のもと主要な
+Debian チームの健康状態に関して調査を実施する計画を立て、プロジェクトに
+参加する方法の改善と文書化に取り掛かりました。
+
+   26: http://lists.debian.org/debian-devel-announce/2013/05/msg00002.html
+   27: http://lists.debian.org/debian-project/2013/04/msg00082.html
+
+
+"Coding Freedom" : Debian 貢献者を詳しく調査
+--------------------------------------------
+
+Gabriella Coleman さんは自分が最近出版した "Coding Freedom: ハッキングの
+倫理と美学" [28] という本について発表しました。Gabriella さんは Debian
+のコミュニティと活発なメンバーから刺激を受けてこの本を出版しました。この
+本はフリーソフトウェアプロジェクトの開発の原動力になる主要な要因を明らか
+にして、それを説明しようとしています。一方でこの本はフリーソフトウェアプ
+ロジェクトが社会に及ぼす影響を調べています。大部分は Debian に対する 2
+年間の民族学的調査に基づいています。1 つの章は Debian プロジェクトに関す
+るもので、他の多くの章は Debian 開発者に対するインタビューを基にしていま
+す。
+この本はクリエイティブコモンズライセンスの下で利用でき、自由にダウンロー
+ドできます [29] 。
+
+   28: http://codingfreedom.com/
+   29: http://codingfreedom.com/buy_download.html
+--->翻訳のネタによいかもな
+
+*2013/5/27
+
+Debian GNU/Hurd のリリース
+--------------------------
+
+Debian GNU/Hurd チームが Debian GNU/Hurd 2013 のリリース [1] を告知しま
+した。これは Debian の公式なリリースではありませんが、Debian GNU/Hurd の
+公式移植版のリリースです。Debian 移植版 [2] のアーカイブでは、インストー
+ル用の ISO イメージ (netinst、CD、DVD) と、Debian GNU/Hurd をより手軽に
+試すことができるプリインストールされたディスクイメージをダウンロードでき
+ます。Debian GNU/Hurd は現在、i386 アーキテクチャで 10,000 個以上のソフ
+トウェアパッケージを利用することができます。
+GNU/Hurd の素晴らしい機能を理解するためには、設定ガイド [3] 、FAQ [4] 、
+translator 入門 [5] を必ず読みましょう。
+
+    1: http://www.debian.org/ports/hurd/hurd-news
+    2: http://ftp.debian-ports.org/debian-cd/hurd-i386/current/
+    3: http://www.debian.org/ports/hurd/hurd-install
+    4: http://www.gnu.org/software/hurd/faq.html
+    5: http://www.gnu.org/software/hurd/hurd/documentation/translator_primer.html
+
+*2013/6/24
+
+Debian Code Search のビデオ
+---------------------------
+
+Debian Code Search とは Michael Stapelberg さんによって書かれた Debian
+が配布するソースコードの検索エンジンです。 Debian Code Search は
+codesearch.debian.net から利用できます。Michael Stapelberg さんは GPN13
+で Debian Code Search について講演した際のビデオが入手できる [4] ことを
+自分のブログ [5] に書きました。Michael さんは Debian Code Search プロ
+ジェクトの動機とコードの動作について説明しています。講演はドイツ語で行な
+われましたが、Michael さんはより多くの人々がこのビデオを見れるよう、英語
+の字幕 [6] を作成しました。
+
+    4: http://ftp.ccc.de/events/gpn/gpn13/gpn13-debian-code-search.mp4
+    5: http://people.debian.org/~stapelberg//2013/06/17/debian-code-search-talk.html
+    6: http://t.zekjur.net/gpn13-debian-code-search.srt
+
+インタビュー
+------------
+
+前回の Debian プロジェクトニュース以降に、Jonathan Carter さん [8] と
+Victor Nițu さん [9] の 2 人への Debian Edu に関するインタビュー [10] が
+ありました。2 人は、とりわけ、彼らがどのように Debian Edu に関わるように
+なったかや、彼らの考えについて述べています。
+
+    8: http://people.skolelinux.org/pere/blog/Debian_Edu_interview__Jonathan_Carter.html
+    9: http://people.skolelinux.org/pere/blog/Debian_Edu_interview__Victor_Ni_u.html
+   10: http://people.skolelinux.org/pere/blog/tags/intervju/
+
+LLVM と Clang 3.3 に関する記事で、フランスのウェブサイト LinuxFR.org が
+Sylvestre Ledru さんに Debian での LLVM と Clang に関する作業についてイ
+ンタビューしました (フランス語) [11] 。
+
+   11: https://linuxfr.org/news/llvm-3-3-et-clang-3-3#toc_20
+
+Julien Viard de Galbert さんが simple-cdd を使ってカスタム Debian インス
+トール CD をビルドする方法について詳細なチュートリアルを書きまし
+た [12] 。
+
+   12: http://silicone.homelinux.org/2013/06/19/building-a-custom-debian-cd/
+
+Ingo Juergensmann さんは m68k 移植版を復活させるための副作用として、
+buildd.net [13] で debian-ports.org のミラーをセットアップすることを決定
+したと報告しました [14]
+
+   13: http://mirror.buildd.net/debian-ports
+   14: http://blog.windfluechter.net/content/blog/2013/06/15/1634-debian-ports-mirror-builddnet
+
+Steve Kemp さんは APT の sources.list を操作するクイックハックを紹介
+し [15] 、これに対する代替案がコメントに寄せられました。これらのうちどれ
+を使っても、/etc/apt/sources.list ファイルから debian-multimedia.org の
+エントリを削除する [16] ことが可能です。
+
+   15: http://blog.steve.org.uk/debian_is_missing_a_tool__want_to_write_it_.html
+   16: http://bits.debian.org/2013/06/remove-debian-multimedia.html
+
+*7/8
+
+すべての Debian のソースコードは我々のもの
+------------------------------------------
+
+Stefano Zacchiroli さんが、Debian パッケージで提供されているソースコード
+すべてを閲覧・検索出来る新しいサービスを紹介しました [1] :
+sources.debian.net [2] 。
+
+    1: http://upsilon.cc/~zack/blog/posts/2013/07/introducing_sources.debian.net/
+    2: http://sources.debian.net/
+
+-->これでスマホで観れる
+
+代表団の再編
+------------
+
+事実上活動していない代表団の廃止に関する発表 [3] に続き、Lucas Nussbaum
+さんが、Debian Policy の編集者 [4] に Jonathan Nieder さんを迎え入れまし
+た。また、Google Summer of Code 管理者 [5] に Sukhbir Singh さんを正式な
+メンバーとして迎え入れました。更なる再編が予定されています。
+
+    3: http://lists.debian.org/debian-devel-announce/2013/06/msg00003.html
+    4: http://lists.debian.org/debian-devel-announce/2013/06/msg00004.html
+    5: http://lists.debian.org/debian-devel-announce/2013/06/msg00005.
+
+--->これはすごい
+
+Debian 商標チーム
+-----------------
+
+Lucas Nussbaum さんが Debian には現在商標チーム [6] があると述べました。
+より公式な発表はまだされておりません。商標チームは現在、商標利用要求に対
+する回答の他に、Debian ロゴを登記する作業と、Debian 関連のドメイン名の状
+態を明らかにする作業に取り組んでいます。
+
+    6: http://lists.debian.org/debian-project/2013/06/msg00132.html
+
+
+Jessie における移植版開発のサポート
+-----------------------------------
+
+前回のスプリント [7] の期間中に、Debian システム管理者ら (DSA) は、次期
+安定版リリースに向けて移植版をサポートするための機材に必要と考えられる要
+件のリスト [8] を作成しました。また、以下のアーキテクチャへの移植版開発
+に用いられている機材に対する問題点を具体的に挙げました: armel、armhf、
+hurd、mips、mipsel、sparc、s390/x。今のところほとんどの問題点に対して対
+処が開始されていますが、移植版開発者からの援助は歓迎です。
+
+    7: http://www.debian.org/News/weekly/2013/13/#dsasprint
+    8: http://lists.debian.org/debian-release/2013/06/msg00606.html
+-->今回すげー
+
+その他のニュース
+----------------
+
+開発ニュース寄せ集め [9] の第 33 号が発行され、以下の話題が取り上げられ
+ました。
+
+  * Debian システム管理スプリントの概要
+  * sources.debian.net [10] サービスの導入
+  * codesearch.debian.net [11] で稼働中の検索エンジンのソースコードの公開
+  * これまで一度もバグ報告を受けたことのないパッケージのリスト [12] 、これは Debian の品質保証活動により深くかかわるための出発点としての機能を果たすものです。
+  * 開発者向けのパッケージの状況確認ページ [13] の改良
+
+    9: http://lists.debian.org/debian-devel-announce/2013/07/msg00001.html
+   10: http://sources.debian.net/
+   11: http://codesearch.debian.net
+   12: http://udd.debian.org/cgi-bin/nobugs.cgi
+   13: http://qa.debian.org/developer.php
+
+*2013/7/22
+
+コミュニティディストリビューション
+----------------------------------
+
+Debian は FOSS Force ブログ [7] が読者に対して行った "正統なコミュニティ
+ディストリビューション" の調査で第 1 位になりました。255 人の読者がこの
+調査に参加し、855 票 (複数回答可) が投票されました。Debian は 173 票
+(20%) を獲得し、Arch Linux (141 票、16%) と Linux Mint (95 票、11%) があ
+とに続きました。面白いことに、この結果はコミュニティディストリビューショ
+ンの定義に関するブログ編集者の意見と一致していました。
+
+    7: http://fossforce.com/2013/07/debian-tops-our-community-distro-poll/
+
+うは、翻訳はここで終了か。
+--->とおもたら、単に9/16が次のだった...debconf13で忙しかったのか?
+
+*2013/9/16
+
+Bits from the Release Team
+--------------------------
+
+Niels Thykier sent some bits from the Release Team [3], containing
+proposals to improve the Jessie development cycle: a change to the
+testing migration rule, automated removals and automated metrics for
+architecture qualification for Jessie.
+
+    3: http://lists.debian.org/debian-devel-announce/2013/08/msg00006.html
+
+In related news, Jonathan Wiltshire called for release goals for
+Jessie [4]. To propose a goal, create a wiki page [5] before September
+30 with a short description of the goal, details of the advocate(s) and
+how the goal will be achieved.
+
+    4: http://lists.debian.org/debian-devel-announce/2013/09/msg00001.html
+    5: http://wiki.debian.org/ReleaseGoals
+
+---->おおかえるんか...
+
+
+Bits from the DPL
+-----------------
+
+Lucas Nussbaum sent his monthly report of DPL activities for August
+2013 [6]. Among other things, Lucas mentioned the status of MariaDB in
+Debian and the fact that Debian was invited to participate in the
+OpenZFS community. He also summarised some actions taken as a
+consequence of the survey of new contributors [7], such as the creation
+of a package how-can-i-help, and moves to encourage the asking of
+packaging questions on localised mailing lists. He also mentioned that
+the next Outreach Program for Women will start soon. If you are willing
+to be a coordinator for the Debian side, please contact the Debian Women
+mailing list [8].
+
+    6: http://lists.debian.org/debian-devel-announce/2013/09/msg00002.html
+    7: http://lists.debian.org/debian-project/2013/08/msg00011.html
+    8: http://lists.debian.org/debian-women/
+
+Other news
+----------
+
+Raphaël Hertzog announced on his blog [17] that the first chapters of
+the Debian Administrator’s Handbook are now available updated for
+Debian 7.
+
+   17: http://debian-handbook.info/2013/first-chapters-of-the-debian-administrators-handbook-updated-for-debian-7/
+
+Andreas Tille put a spotlight on two Debian infrastructure teams that
+are in need of contributors: Internationalisation and DebTags [18]. If
+you want to contribute to Debian's infrastructure and do work directly
+visible for users, please consider joining these teams.
+
+   18: http://lists.debian.org/debian-project/2013/09/msg00065.html
+
+--->やったね。Raphael!
+
+
+------------資料案--------------
+
+・大統一の件喋ってもいいかも？
+・現時点で [37] 、513 のパッケージがメンテナ不在となり [38] 、147 のパッ
+ケージがメンテナの引き継ぎを募集中です [39] 。完全なリストは支援が必要な
+パッケージ [40] をご覧ください。
+をグラフ化とかおもしろいかも？
+
+・wheezyリリースとリリースパーティーは喋った方がいいかも？
+
+・JessieのReleaseGoalsを喋るのもありか...
+    5: http://wiki.debian.org/ReleaseGoals
+
+
