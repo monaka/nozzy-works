@@ -607,6 +607,36 @@ mailing list [8].
     7: http://lists.debian.org/debian-project/2013/08/msg00011.html
     8: http://lists.debian.org/debian-women/
 
+Videos of DebConf13 available
+-----------------------------
+
+Thanks to the amazing work of the DebConf Video Team, there are video
+recordings available for download [9] of many sessions of
+DebConf13 [10], which took place in August, in Vaumarcus, Switzerland.
+Sylvestre Ledru announced on his blog [11] that they can be viewed
+through a nice HTML5 interface on the IRILL website [12].
+
+    9: http://meetings-archive.debian.net/pub/debian-meetings/2013/debconf13/
+   10: http://debconf13.debconf.org/
+   11: http://sylvestre.ledru.info/blog/2013/08/19/video-of-debconf-13-available
+   12: http://www.irill.org/videos/debconf13
+
+Francesca Ciceri made a start on providing English subtitles for some of
+these videos [13] and getting them translated into various languages.
+Some are already available [14] online. If you would like to help with
+this initiative, have a look at the dedicated page on the DebConf
+wiki [15].
+
+   13: http://lists.debconf.org/lurker/message/20130816.100346.cce380e6.en.html
+   14: http://meetings-archive.debian.net/pub/debian-meetings/2013/debconf13/subtitles/
+   15: http://wiki.debconf.org/wiki/Videoteam/Subtitles
+
+If you enjoyed the work of the DebConf Video Team, you can leave a kind
+message on their wiki page [16].
+
+   16: http://wiki.debconf.org/wiki/DebConf13/Videoteam/Thanks
+
+
 Other news
 ----------
 
@@ -626,6 +656,81 @@ visible for users, please consider joining these teams.
 --->やったね。Raphael!
 
 
+--------以下はdevel-annouce----------
+2.18 ---> GSoC用DebianテーマのCFP開始
+2.26 ---> CTTEがgnome-network-managerの扱いについて見解を出す
+3.02 ---> DPL選挙アナウンス
+3.07 ---> Debconf14の調整開始（というか、Debconf Committeeの開始)
+3.10 ---> DPL選挙の候補者発表
+          - Gergely Nagy
+          - Moray Allan
+          - Lucas Nussbaum
+3.16 ---> GSoC CFPのリマインド
+          https://wiki.debian.org/SummerOfCode2013/Projects
+          GSoCサマリ↓
+          http://ja.wikipedia.org/wiki/Google_Summer_of_Code
+3.17 ---> bit from DPL
+- The technical committee had to deal with a rather urgent issue during
+  last month (#699808). I mention it here only to applaud their
+  efficiency in doing so: 4 days to reach a decision. Resorting to
+  tech-ctte shall always remain a last resort in Debian, but when it
+  comes to that it's useful to know that we can count on a wise and
+  speedy answer.
+との事
+I've worked with the press and publicity teams to [announce][6] the
+  new trademark policy more widely and call for producing Wheezy
+  merchandise.--->内容は日本語訳すみ
+http://www.debian.org/News/2013/20130301
+
+In related news, Brian Gupta has volunteered to help with answering
+  [trademark@d.o inquiries][8] and has already helped a lot in
+  streamlining the process and keeping track of past requests (thanks!)
+http://www.worldtrademarkreview.com/daily/detail.aspx?g=e4019b9e-5eec-4110-9660-f60a833a3929
+-->debianという言葉に法的意味を与えるためにSPIへいろいろ掛け合ってる。
+　（つまり、他の良く判らん件でdebianとかの商標を使われないようにブロックできる）
+お金だっているさ
+お金のぶち込みについて
+ Together with auditors, we have updated [reimbursement procedures][16]
+  to better keep track of both outstanding and past requests. Main
+  difference is that you'll now have to mail a RT queue instead of
+  leader@d.o directly. Check the [wiki page][16] for details.
+[16]: http://wiki.debian.org/Teams/DPL/Reimbursement
+
+
+
+------------------------------------
+
+
+--------debian announce ------------
+5/5のdebian-announce 
+---> debian 7(wheezy) release!
+
+6/15のdebian-announce
+----> debian 7.1(wheezy 1st update) release
+     changelogのサマリは6/15のdebian-annonceのメール参照
+
+
+--------------------------------------
+
+--------------debconf13------------------
+debconf13スケジュール↓
+http://penta.debconf.org/dc13_schedule/
+
+FreedomBox.mp4
+--->これはすごい考え方だ。しらんかった。
+    FreedomBox ---> 
+http://www.freedomboxfoundation.org/
+https://wiki.debian.org/FreedomBox
+http://ja.wikipedia.org/wiki/FreedomBox
+ここにDebianは最適だぜという内容。ボランティアベースだし、
+国際的だし、そもそも何かの企業に依存とかもないし、民主的だしetc...
+個人認証もweboftrustがあるやんけというすごい内容。
+Novenaというのは知らんかった（100% Freeのlaptopをつくろうプロジェクト)
+http://www.bunniestudios.com/blog/?p=2686
+http://www.kosagi.com/w/index.php?title=Novena_Main_Page
+
+
+
 ------------資料案--------------
 
 ・大統一の件喋ってもいいかも？
@@ -639,4 +744,5 @@ visible for users, please consider joining these teams.
 ・JessieのReleaseGoalsを喋るのもありか...
     5: http://wiki.debian.org/ReleaseGoals
 
+・OSS関係者として、GSoCは喋った方がいいかも。
 
