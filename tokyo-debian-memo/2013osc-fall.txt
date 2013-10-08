@@ -655,6 +655,27 @@ visible for users, please consider joining these teams.
 
 --->やったね。Raphael!
 
+*9/30 DPN
+
+A summary of Debian GSoC 2013
+--> 15名の学生さんががんばったらしいぞ。
+
+Adam D. Barratt announced that both stable and oldstable Debian releases
+will be updated in the coming weeks: the Wheezy 7.2 minor revision is
+scheduled for October 12 [9] and the Squeeze 6.0.8 minor revision for
+October 19 [10].
+
+
+だそうな。
+
+---> debianに関するイベント開くなら
+   21: http://www.debian.org/events/talks
+   22: events@debian.org
+に連絡してくれとさ。
+
+
+
+
 
 --------以下はdevel-annouce----------
 2.18 ---> GSoC用DebianテーマのCFP開始
@@ -697,6 +718,150 @@ http://www.worldtrademarkreview.com/daily/detail.aspx?g=e4019b9e-5eec-4110-9660-
 [16]: http://wiki.debian.org/Teams/DPL/Reimbursement
 
 
+03.26 bit from DSA Team
+適当にサーバーおいていたが、もっと予測に基づく積極的対応に5年で切り替えるとのこと。
+また、いままで運良くいろいろなDCから１〜２台というサーバーを借りれていた
+ので、これらをフル活用して仮想環境にしてシステムを移行することにしたそうな。
+
+で、OSはDebianで、仮想環境マネジは、ganetiを使うとのこと。
+
+また最近、Bytemark Hosting社より、HP c7000 Blade Systemを借りれたらしい。
+（ http://www.bytemark.co.uk/）
+で、実は近年EOLなIBMマシンで稼働してた、manpages.debian.net. dde.debian.net,
+patch-tracker.debian.org and backports-master.debian.orgを
+次の4半期にubcece(http://ece.ubc.ca/)に作ったganeti配下の仮想環境群に移行
+を計画しているとのこと。
+で、今まで/srvディレクトリをdebian.orgのサービスの
+ドキュメントルートとして使っていたが、wheezyリリースからこちらが変更になり、
+/orgとなります。今はsymlinkしてるけど、将来はずすから直せ。
+
+4月にはbytemark社の上のganetiクラスタが完成。で、こいつの停止予告とかは、
+http://lists.debian.org/debian-infrastructure-announce/
+に出すからみといてね。
+
+userdir-ldap and userdir-ldap-cgi using
+django[6] and django-ldapdb[7]とするそうな。
+
+まーとにかくやるこた多いので手伝ってくれとのこと。
+
+4.8 Debian joins Free & Open Source Software Outreach Program for Women
+
+FOSSの女性contributerを増やそうぜPJのこと。GSoCの女性向け判。
+ただ、こちらは若造限定ではない。
+一般向けアナウンス：
+https://wiki.gnome.org/OutreachProgramForWomen
+debian特化判アナウンス:
+http://wiki.debian.org/OutreachProgramForWomen 
+また、コーディングにかかわらずOK。
+
+4.9 GSoC 2013の呼びかけ
+採択されたPJは
+https://wiki.debian.org/SummerOfCode2013/Projects
+に掲載のとおり。
+また、GSoC側で応募者とメンターと、PJは、
+http://www.google-melange.com/gsoc/org/google/gsoc2013/debian
+に掲載中。
+
+4.14 DPL選挙結果が公開
+ Lucas Nussbaum(ID:lucas)が勝利。
+--->で、関係ないがDebian パッケージ化入門って、こいつの作品なのね。
+　　ヤヴァイ事に日本語判がない。
+
+4.16 bits from the DPL: March-April 2013
+zack最後の声明：
+
+[17]: http://bits.debian.org/
+の開始に謝辞をのべてるなぁ。
+
+Debianの法的問題の件のとてもよい資料↓
+http://upsilon.cc/~zack/talks/2013/20130404-fsfe-legal.pdf
+これは傑作だ。過去の法的問題で頭痛い件とコミュニティの動き
+についての秀作。すばらしい。
+
+debian-multimedia.orgのforkの件もここ。
+-->参考：patentの章にある
+http://www.debian.org/reports/patent-faq
+は日本語訳されてた...がっ、内容は相当にショッキングな内容だ...
+特許調べんなという内容だ...意外すぐる。
+
+TrademarksがDFSG 4掌と真っ向勝負とは...涙。
+
+※the usual suspects（思い当たる人々、すぐに頭に浮かぶもの）
+hysteria,FUD has won,
+ communities tend to avoid(only) the usual suspect
+
+-->false sense of security
+be lulled into a false sense of security
+（実は安心できないのに）安心してしまう.
+---> thou shalt not speak about
+Know thyself.(汝自身を知れ）とおなじで古語。
+thouはyouの古語。なので、「汝語ることなかれ」と言う感じ。
+
+
+
+SFLC 
+http://www.softwarefreedom.org/
+(Software Freedom Law Center)
+
+
+http://upsilon.cc/~zack/talks/2013/20130324-libreplanet.pdf
+はちょっと悲しい話だ。ドキュメントにnon-freeのプロダクトインストール
+を推奨する記載があるのでGNU的にはNGというのがなんとも...
+※free distributionを目指してとにかくnon-freeなものを全力分離したというのに
+
+http://upsilon.cc/~zack/talks/2013/20130320-nylug.pdf
+こちらの冒頭語句は情熱を感じるぜ。
+また、13page目は現在の使い方だ。
+うは、
+ apitude install devsripts;wnpp-alert
+の結果はショッキングだ。
+内容的にはDebianに参加してくれ（参加の仕方）を訴えるものだった。
+
+4.20
+Misc Developer News 
+>頑張るなぁ、Paul
+重複などを避けまくって、パッケージの大きさを減らそうという試み
+※他のパッケージが重複して持っているファイルはsymlinkしようぜっていう考え方
+ dedup.debian.net
+https://wiki.debian.org/dedup.debian.net
+http://subdivi.de/~helmut/debconf13-dedup.html
+
+debian/upstreamファイルの提案：
+説明：http://dep.debian.net/deps/dep12/
+
+wnpp-by-tags.debian.net[10] makes it easier to find packages to adopt, by
+ organising O/BA/RFA/RFH bug reports based on debtags. 
+ [10] http://wnpp-by-tags.debian.net/
+ [11] http://wnpp-by-tags.debian.net/tags/implemented-in/index.html
+ [12] http://wnpp-by-tags.debian.net/tags/uitoolkit/index.html
+ [13] http://wnpp-by-tags.debian.net/tags/field/index.html
+
+なるほど。
+--->このシステムのできた理由：http://wnpp-by-tags.debian.net/about.html
+
+4.20 Bits from the Lintian maintainers
+Lintianについてenhanceの内容のアナウンス。ちょっと物量があるので、ここでは割愛。
+
+4.24 Bits of Debian Blends
+
+linuxtageのプレゼン資料（ドイツ語）だけど、Debian Pure blendについてのよい資料だ。
+[1] http://people.debian.org/~tille/talks/201303_chem_gis/
+[2] http://www.linux-support.com/cms/jonas-smedegaard-debian-pure-blends-creating-sustainable-hacks/
+
+4.28 Bit from the 6th Debian Groupware Meeting
+
+Debian Groupware project:
+https://wiki.debian.org/Groupware
+
+こんなのもあるんだ...知らんかった。
+
+5.6 wheezyリリース
+
+5.9 Debating difficult development issues in essay form
+
+<http://wiki.debian.org/Debate>の件
+
+
 
 ------------------------------------
 
@@ -729,7 +894,8 @@ Novenaというのは知らんかった（100% Freeのlaptopをつくろうプ�
 http://www.bunniestudios.com/blog/?p=2686
 http://www.kosagi.com/w/index.php?title=Novena_Main_Page
 
-
+debian womanおもろい。
+統計みると女性の割合が少なすぎて泣けてくる。
 
 ------------資料案--------------
 
@@ -746,3 +912,6 @@ http://www.kosagi.com/w/index.php?title=Novena_Main_Page
 
 ・OSS関係者として、GSoCは喋った方がいいかも。
 
+・DSAなど略語については略語表つくってもよいかも？
+　まー、多いこと多いこと。
+　　DSA Sprint ---> DSAチームの作業追い込み会
