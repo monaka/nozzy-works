@@ -655,6 +655,27 @@ visible for users, please consider joining these teams.
 
 --->やったね。Raphael!
 
+*9/30 DPN
+
+A summary of Debian GSoC 2013
+--> 15名の学生さんががんばったらしいぞ。
+
+Adam D. Barratt announced that both stable and oldstable Debian releases
+will be updated in the coming weeks: the Wheezy 7.2 minor revision is
+scheduled for October 12 [9] and the Squeeze 6.0.8 minor revision for
+October 19 [10].
+
+
+だそうな。
+
+---> debianに関するイベント開くなら
+   21: http://www.debian.org/events/talks
+   22: events@debian.org
+に連絡してくれとさ。
+
+
+
+
 
 --------以下はdevel-annouce----------
 2.18 ---> GSoC用DebianテーマのCFP開始
@@ -697,9 +718,497 @@ http://www.worldtrademarkreview.com/daily/detail.aspx?g=e4019b9e-5eec-4110-9660-
 [16]: http://wiki.debian.org/Teams/DPL/Reimbursement
 
 
+03.26 bit from DSA Team
+適当にサーバーおいていたが、もっと予測に基づく積極的対応に5年で切り替えるとのこと。
+また、いままで運良くいろいろなDCから１〜２台というサーバーを借りれていた
+ので、これらをフル活用して仮想環境にしてシステムを移行することにしたそうな。
+
+で、OSはDebianで、仮想環境マネジは、ganetiを使うとのこと。
+
+また最近、Bytemark Hosting社より、HP c7000 Blade Systemを借りれたらしい。
+（ http://www.bytemark.co.uk/）
+で、実は近年EOLなIBMマシンで稼働してた、manpages.debian.net. dde.debian.net,
+patch-tracker.debian.org and backports-master.debian.orgを
+次の4半期にubcece(http://ece.ubc.ca/)に作ったganeti配下の仮想環境群に移行
+を計画しているとのこと。
+で、今まで/srvディレクトリをdebian.orgのサービスの
+ドキュメントルートとして使っていたが、wheezyリリースからこちらが変更になり、
+/orgとなります。今はsymlinkしてるけど、将来はずすから直せ。
+
+4月にはbytemark社の上のganetiクラスタが完成。で、こいつの停止予告とかは、
+http://lists.debian.org/debian-infrastructure-announce/
+に出すからみといてね。
+
+userdir-ldap and userdir-ldap-cgi using
+django[6] and django-ldapdb[7]とするそうな。
+
+まーとにかくやるこた多いので手伝ってくれとのこと。
+
+4.8 Debian joins Free & Open Source Software Outreach Program for Women
+
+FOSSの女性contributerを増やそうぜPJのこと。GSoCの女性向け判。
+ただ、こちらは若造限定ではない。
+一般向けアナウンス：
+https://wiki.gnome.org/OutreachProgramForWomen
+debian特化判アナウンス:
+http://wiki.debian.org/OutreachProgramForWomen 
+また、コーディングにかかわらずOK。
+
+4.9 GSoC 2013の呼びかけ
+採択されたPJは
+https://wiki.debian.org/SummerOfCode2013/Projects
+に掲載のとおり。
+また、GSoC側で応募者とメンターと、PJは、
+http://www.google-melange.com/gsoc/org/google/gsoc2013/debian
+に掲載中。
+
+4.14 DPL選挙結果が公開
+ Lucas Nussbaum(ID:lucas)が勝利。
+--->で、関係ないがDebian パッケージ化入門って、こいつの作品なのね。
+　　ヤヴァイ事に日本語判がない。
+
+4.16 bits from the DPL: March-April 2013
+zack最後の声明：
+
+[17]: http://bits.debian.org/
+の開始に謝辞をのべてるなぁ。
+
+Debianの法的問題の件のとてもよい資料↓
+http://upsilon.cc/~zack/talks/2013/20130404-fsfe-legal.pdf
+これは傑作だ。過去の法的問題で頭痛い件とコミュニティの動き
+についての秀作。すばらしい。
+
+debian-multimedia.orgのforkの件もここ。
+-->参考：patentの章にある
+http://www.debian.org/reports/patent-faq
+は日本語訳されてた...がっ、内容は相当にショッキングな内容だ...
+特許調べんなという内容だ...意外すぐる。
+
+TrademarksがDFSG 4掌と真っ向勝負とは...涙。
+
+※the usual suspects（思い当たる人々、すぐに頭に浮かぶもの）
+hysteria,FUD has won,
+ communities tend to avoid(only) the usual suspect
+
+-->false sense of security
+be lulled into a false sense of security
+（実は安心できないのに）安心してしまう.
+---> thou shalt not speak about
+Know thyself.(汝自身を知れ）とおなじで古語。
+thouはyouの古語。なので、「汝語ることなかれ」と言う感じ。
+
+
+
+SFLC 
+http://www.softwarefreedom.org/
+(Software Freedom Law Center)
+
+
+http://upsilon.cc/~zack/talks/2013/20130324-libreplanet.pdf
+はちょっと悲しい話だ。ドキュメントにnon-freeのプロダクトインストール
+を推奨する記載があるのでGNU的にはNGというのがなんとも...
+※free distributionを目指してとにかくnon-freeなものを全力分離したというのに
+
+http://upsilon.cc/~zack/talks/2013/20130320-nylug.pdf
+こちらの冒頭語句は情熱を感じるぜ。
+また、13page目は現在の使い方だ。
+うは、
+ apitude install devsripts;wnpp-alert
+の結果はショッキングだ。
+内容的にはDebianに参加してくれ（参加の仕方）を訴えるものだった。
+
+4.20
+Misc Developer News 
+>頑張るなぁ、Paul
+重複などを避けまくって、パッケージの大きさを減らそうという試み
+※他のパッケージが重複して持っているファイルはsymlinkしようぜっていう考え方
+ dedup.debian.net
+https://wiki.debian.org/dedup.debian.net
+http://subdivi.de/~helmut/debconf13-dedup.html
+
+debian/upstreamファイルの提案：
+説明：http://dep.debian.net/deps/dep12/
+
+wnpp-by-tags.debian.net[10] makes it easier to find packages to adopt, by
+ organising O/BA/RFA/RFH bug reports based on debtags. 
+ [10] http://wnpp-by-tags.debian.net/
+ [11] http://wnpp-by-tags.debian.net/tags/implemented-in/index.html
+ [12] http://wnpp-by-tags.debian.net/tags/uitoolkit/index.html
+ [13] http://wnpp-by-tags.debian.net/tags/field/index.html
+
+なるほど。
+--->このシステムのできた理由：http://wnpp-by-tags.debian.net/about.html
+
+4.20 Bits from the Lintian maintainers
+Lintianについてenhanceの内容のアナウンス。ちょっと物量があるので、ここでは割愛。
+
+4.24 Bits of Debian Blends
+
+linuxtageのプレゼン資料（ドイツ語）だけど、Debian Pure blendについてのよい資料だ。
+[1] http://people.debian.org/~tille/talks/201303_chem_gis/
+[2] http://www.linux-support.com/cms/jonas-smedegaard-debian-pure-blends-creating-sustainable-hacks/
+
+4.28 Bit from the 6th Debian Groupware Meeting
+
+Debian Groupware project:
+https://wiki.debian.org/Groupware
+
+こんなのもあるんだ...知らんかった。
+
+5.6 wheezyリリース
+
+5.9 Debating difficult development issues in essay form
+
+<http://wiki.debian.org/Debate>の件
+
+5.23 bits from the piuparts maintainers: the first million is the hardest
+
+pinuppartsの説明：
+About piuparts
+--------------
+piuparts [1] tests that .deb packages (as used by Debian) handle installation,
+upgrading, and removal correctly. http://piuparts.debian.org runs it on whole
+main Debian archive.
+
+New hardware
+------------
+
+Last week together with the help from the fine DSA folks I moved
+http://piuparts.debian.org away from the machine piatti.debian.org to the new
+cluster running at Bytemark [2]. Many thanks to the CS Department of the
+University of Helsinki for running piatti.debian.org since at least 2006!
+
+Today piuparts.debian.org runs as two systems: pejacevic.debian.org acts as
+the piuparts-master and serves the webpages, while piu-slave-bm-a.debian.org
+runs 4 slaves on its 4 cores. That VM also has 12gb of RAM so that basically
+all installs happen in a ramdisk, leading to piuparts run times of
+30-240 seconds. I'd say the setup is 12 times faster than the old.
+
+5.28 Debian GSoC 2013 Students Accepted!
+GSoC通過の若き天才ども↓
+http://bits.debian.org/2013/05/welcome-gsoc-students-2013.html
+
+5.31 [CTTE #698556] Creation of isdn devices by isdnutils
+
+要はisdnデバイスファイルを勝手に作るの止めると決めたisdnutils maintainer 
+の決定を覆すとのこと。
+--->次のリリースまでにisdnのデバイスどうするか決めてないため。
+
+whereasとは法律用語
+http://eng.alc.co.jp/newsbiz/hinata/2005/08/whereas.html
+--->かくかくしかじかの理由により、という意味。
+
+Resolution も判決?とかの意味か？
+
+5.31 config(config.sub/guess)がGPLv3になった件
+
+梱包するときゃライセンスに注意ねー
+
+6.5 DPL
+
+Handling the Debian trademarks -- help needed!
+-->2013/1/19以降そりゃもう大変。
+
+> be protected if we wish to have a TM
+> 2) Understand TM law (or are interested in putting the time to learn)
+> and willing to use the law to inform our decisions
+> 3) Understand the Debian community, and the overall issues that face
+> the Free Software community
+> 4) A desire to be with the team for some reasonable amount of time.
+> (I'd say a reasonable minimum tenure would look like 6-12 months)
+> 5) Having some amount of time to commit. The time commitment is very
+> difficult to factor at the moment, as the amount of emails trademark
+> gets seems to be growing pretty fast now that our policy has been
+> published, and the word about it's existence is spreading. Currently I
+> can keep up with the flow, but if it keeps growing, it may become
+> challenging. Also, at some point this may taper off.
+
+手伝い募集とのこと。
+
+ポリシー
+http://www.debian.org/trademark#policy
+ところで、Nominative Fair Use: 
+http://blogs.yahoo.co.jp/patentblog/13754039.html
+
+うほ、このマークつかって商売する場合は、
+
+ - Debianに寄付前提であることを明示し、
+ - さらに後で寄付しろ
+
+※実際に売っていてもcommercial useの解釈次第のような気がしますが...
+
+また、商標とドメインは密接な関係があるので、
+You cannot use Debian trademakirs in a domain name, with or without xxxx
+という条項がある。
+このあたりの常識の参考：http://www.jaipa.or.jp/hosting/column4.html
+
+さらに、いろいろ使用条件があるので、
+http://www.debian.org/trademark#policy
+を確認のうえ、わからんのであれば、
+
+Permission To Use
+When in doubt about the use of Debian trademarks, or to request permission for uses not allowed by this policy, please send an email to trademark@debian.org with subject Trademark Use Request; be sure to include the following information in the body of your message:
+
+Name of the User
+Name of the organization/project
+Purpose of Use (commercial/non-commercial)
+Nature of Use
+
+とのこと。うはー。
+
+Collecting ideas from the DPL campaign
+---> Debianこうした方がいいんじゃね？というアイデア募集
+    http://wiki.debian.org/Teams/DPL/Ideas
+
+注:campaignには作戦行動という意味もある。
+
+Discussion of Debian sponsoring
+Debianに寄付とかしてくれた人への報酬はどうするか？について
+http://wiki.debian.org/Fundraising
+
+debian-multimedia.orgはDebian側がtransferについて
+支援するとか所有者へオファーしたにもかかわらず、
+結局だれかよくわからん人が所有したらしい。
+
+7.3 Developer news
+参考：Developer newsのアーカイブ↓
+https://wiki.debian.org/DeveloperNews
+
+DSA Sprintの状況サマリ↓
+ [1] http://lists.debian.org/20130621180752.GA12975@valiant.palfrader.org
+ [2] http://lists.debian.org/20130622172644.GA32752@ftbfs.de
+
+Introducing sources.debian.net
+------------------------------
+
+ sources.debian.net[3] is a new service[4] that allows browsing the source
+ code of Debian packages on the web with syntax highlighting. 
+[3] http://sources.debian.net/
+[4] http://bits.debian.org/2013/07/introducing_sources.debian.net.html
+
+codesearch.d.n source code released
+[5] http://codesearch.debian.net
+[6] https://github.com/debiancodesearch/dcs
+
+
+7.9 DPL
+
+-New members in the trademark team ; logo registration
+ =====================================================
+ Following my call for help last month, Joe Healy and Richard Hartmann 
+ volunteered to join the Debian Trademark team, and have been mentored by
+ Brian Gupta since then.
+ 
+ってことで、サポータ増えたらしい。
+
+-Debian now a member of the Network Time Foundation
+ Debian has been invited to join the Nework Time Foundation[1]
+ [1] http://networktimefoundation.org/
+ ってことらしい。
+そこのサイトによれば、
+For too long, Network Time has been cared for by a small group of highly-skilled, dedicated and passionate volunteers. With the creation of Network Time Foundation there now exists a means for focused professional effort to be made for all 
+aspects of Network Time.
+
+ということでこれもボランティアかい！
+
+8.8 DPL
+
+Survey of new contributors
+新人contributorsへ聞いたそうな↓
+https://lists.debian.org/debian-project/2013/07/msg00010.html
+↓で得られる名簿から、
+http://udd.debian.org/cgi-bin/new-maintainers.cgi
+調査結果：
+https://lists.debian.org/debian-project/2013/08/msg00011.html
+
+ITWire interview
+Lucasのいろいろと物議を醸しそうな発言についていろいろ↓
+http://www.itwire.com/business-it-news/open-source/60564-new-debian-leader-seeks-more-innovation-within-project
+
+Logo registration as a trademark
+================================
+Following previous work on this topic [1,2], our trademark team worked
+very hard and forwarded everything needed (or at least we hope so!) to
+register the Debian logo as a US trademark to our legal counsel,
+Software Freedom Law Center (SFLC).
+
+[1] https://lists.debian.org/debian-project/2013/04/msg00082.html
+[2] https://lists.debian.org/debian-project/2013/06/msg00022.html
+
+すげえ。
+
+Debian representatives on the GNOME Advisory Board
+にDebian関係者らがjoinした。
+https://wiki.gnome.org/AdvisoryBoard
+
+8.25
+Bits from the Release
+
+アイデアベースだけどな
+We have some ideas on how to improve the Jessie development cycle.
+This includes a proposed change to the testing migration rules,
+automated removals, automated metrics for architecture
+(re-)qualification and doing a roll call for porters.
+
+Index:
+ * Changing testing migration (NEW-TEST)
+   - How you can help (NEW-TEST-HELP)
+ * Key-packages and automated removals (AUTO-RM)
+ * Automating Architecture (re-)Qualification (ARCH)
+ * Roll call for porters (ROLL-CALL)
+
+8.25 For those who care: testing Debian on jenkins.debian.net
+
+いつの間にjenkinsに。
+Debconf13の紹介ビデオ↓
+http://meetings-archive.debian.net/pub/debian-meetings/2013/debconf13/high/995_An_introduction_to_jenkins.debian.net.ogv
+※For those who care...関係者へってところか？
+
+9.11 Jessie Release goals 
+
+9/30締切りだってさ。ちなみに、wheezyに積み残したものはそのままJessieに
+引き継がれる仕組み。
+[WIKI] https://wiki.debian.org/ReleaseGoals
+[MA-GOAL] https://wiki.debian.org/ReleaseGoals/MultiArch
+
+9.11 DPL
+
+Follow-up: survey of new contributors
+-->
+apt-get install how-can-i-help
+------------------------------
+Following a discussion with Asheesh Laroia, I started working on the
+how-can-i-help package (currently available in experimental) that lists
+opportunities for contribution after each apt-get run.
+
+[1] https://wiki.debian.org/qa.debian.org/GiftTag
+
+encouraging maintainers to provide more info in ITPs
+----------------------------------------------------
+I filed #719067 on
+reportbug to improve the ITP template in reportbug to encourage
+maintainers to provide more information in their ITPs.
+-->そうなんだ。
+
+encouraging packaging questions on localized lists
+---> localized mailing lists (e.g.
+debian-devel-french@). See #719925 and #719926 for details.
+
+そうだろうね。
+
+Participation in OpenZFS initiative
+[1] http://open-zfs.org/
+
+Status of MariaDB for Debian
+https://wiki.debian.org/Teams/MySQL/MariaDBPlan
+-->これら２つはネタになるかな。
+
+Outreach Program for Women
+The next edition of Outreach Program for Women, an internships program
+organized by GNOME, will start soon. So far, I failed to find someone to
+volunteer to be the coordinator on the Debian side.
+[1] https://lists.debian.org/debian-women/2013/08/msg00052.html
+--->険しい
+
+ DPL Helpers and DPL TO-DO list (help needed!)
+
+("C:" means "current status:", "N:" means "Next action:")
+
+*** projects/ideas to help move forward / make sure it happens:
+**** new contributors related
+- Debian Welcome team (C: http://deb.li/ctX2 + BOF during DebConf -- can't
+  find the notes anymore!  N: ??)
+- how-can-i-help package (C: pkg in experimental.  N: upload to unstable,
+  doc on wiki.d.o/how-can-i-help)
+- packaging-tutorial package (N: upload new version, look at open bugs)
+- "recruit" some example packages to point prospective contributors
+  to. (N: send mail to -devel@, ping major teams)
+
+**** other
+- Debian Code of Conduct (C: http://deb.li/3wRWh  N: iterate with a
+  new version?)
+- binary-throw-away uploads -- related to reproducible builds (N: check
+  what was the consensus, check status)
+- debian-installer team (key team for swift releases) (C:
+  http://deb.li/b0tF  N: write and send call for help?)
+- package for dvd playing library (C: waiting for ftp-master review before
+  final SFLC review  N: reping? do our own review first?)
+- Debian PPA (would make transitions much easier to manage)
+  (C: implementation not started yet AFAIK  N: ?)
+- check status / aliveness of Debian events team (N: ping)
+- debbugs (C: team with low manpower  N: check status, write call for
+  help?)
+
+*** delegations
+- press team (C: someone stepped down.  N: update delegation)
+- release team (C: some notes from DebConf meeting  N: draft delegation,
+  iterate with team)
+
+*** various other things
+- dig mail archives to check status of Debian wrt OIN (Q from Simon Phipps
+  at DebConf)
+- enable donations via paypal (C: <20130505220527.GA4718@upsilon.cc>)
+  + generally improve donations infrastructure
+- write DPL part of DebConf13 final report. (C: http://deb.li/hHwh )
+- check that anti-harrassement is mentioned on Debian website
+
+--->この量はよくやるなぁ。すげえ。
+
+9.29 Automatic removal of packages from testing
+
+RCバグでtestingから自動で落ちそう(removal)なパッケージ一覧、
+→http://udd.debian.org/cgi-bin/autoremovals.cgi
+
+10.3 Debian's Google Summer of Code 2013 Wrap-up
+% wrap-upとは結果、ニュースの要約等の意味
+
+If you have any comments or suggestions, please drop us an email on our
+mailing list: 
+
+    http://lists.alioth.debian.org/cgi-bin/mailman/listinfo/soc-coordination
+
+Below is a small summary of the projects with their final reports:
+
+* Add OCRA Support to oath-toolkit and dynalogin
+by Fabian Grünbichler. Mentored by Daniel Pocock.
+...snip...
+* ZFS on Linux integration
+by Aron Xu. Mentored by Carlos Lopez, Liang Guo.
+
+    http://lists.alioth.debian.org/pipermail/soc-coordination/2013-September/001888.htm
+
+--->今年のGSoC終了と、作業ステータスのサマリが各PJごとに晒されてます。
+すばらしい！
+
+10.9 DPL
+
+Outreach Program for Women
+==========================
+Debian is participating in the GNOME Outreach Program for Women[1,2]. Many
+thanks to Brian Gupta and Paul Tagliamonte for volunteering as OPW
+coordinators. The list of proposed projects is available from Debian's OPW
+page[3]. Please apply!
+Also, a fundraising campaign will start in the very near future. Let's
+all try to get many Debian participants.
+
+[1] http://gnome.org/opw/
+[2] https://wiki.gnome.org/OutreachProgramForWomen
+[3] https://wiki.debian.org/OutreachProgramForWomen
+
+
+I gave my first talk as the DPL to the general public at Open World Forum
+2013[1]. Slides are available[2].
+
+[1] http://www.openworldforum.org
+[2] http://www.lucas-nussbaum.net/blog/?p=800
+
+http://www.lucas-nussbaum.net/blog/wp-content/uploads/2013/10/owf.pdf
+
+プレゼンの最後の章はよいかもしれない。
+
+how-can-i-helpパッケージはおもしろい試みだ。
 
 ------------------------------------
-
 
 --------debian announce ------------
 5/5のdebian-announce 
@@ -830,6 +1339,9 @@ Slide:http://womble.decadent.org.uk/talks/debconf13-kernel-news/
 　　Benは昼間はプロのソフト屋、夜はkernelのディベロッパという生活。
 
 
+=======
+debian womanおもろい。
+統計みると女性の割合が少なすぎて泣けてくる。
 
 ------------資料案--------------
 
@@ -845,4 +1357,14 @@ Slide:http://womble.decadent.org.uk/talks/debconf13-kernel-news/
     5: http://wiki.debian.org/ReleaseGoals
 
 ・OSS関係者として、GSoCは喋った方がいいかも。
+
+・DSAなど略語については略語表つくってもよいかも？
+　まー、多いこと多いこと。
+　　DSA Sprint ---> DSAチームの作業追い込み会
+
+・最後は
+http://www.lucas-nussbaum.net/blog/wp-content/uploads/2013/10/owf.pdf
+プレゼンの最後の章はよいかもしれない。
+how-can-i-helpパッケージはおもしろい試みだ。
+
 
