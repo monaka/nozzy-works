@@ -716,7 +716,7 @@ http://www.worldtrademarkreview.com/daily/detail.aspx?g=e4019b9e-5eec-4110-9660-
 debconf13スケジュール↓
 http://penta.debconf.org/dc13_schedule/
 
-FreedomBox.mp4
+*FreedomBox.mp4
 --->これはすごい考え方だ。しらんかった。
     FreedomBox ---> 
 http://www.freedomboxfoundation.org/
@@ -728,6 +728,106 @@ http://ja.wikipedia.org/wiki/FreedomBox
 Novenaというのは知らんかった（100% Freeのlaptopをつくろうプロジェクト)
 http://www.bunniestudios.com/blog/?p=2686
 http://www.kosagi.com/w/index.php?title=Novena_Main_Page
+
+*Bit From DPL
+----> 
+プレゼン資料：
+http://www.lucas-nussbaum.net/blog/wp-content/uploads/2013/08/bits.pdf
+※pentaのリンクは切れてる。
+基本的に毎度リリースの度に、期間は若干伸びる傾向にある。
+Wheezy Freeze->Releaseまでにかかった期間は44weekでetch以降最長
+チームでパッケージ群をメンテするのが最近の傾向。
+VCSはgit使いが急速に増えてる。また、VCS使ってないプロジェクトも結構ある。
+
+debhelperとはdhの事ではあるが、用はdh $@とするタイプのもの。
+現在急速にdh $@に移行しつつある。
+
+ふふ、20Dとは20 decimal
+20Hとは20 hex--->年齢のよくある冗談。20 hex--> 32歳
+
+upstreamと仲良くせよ---> 
+　debianでパッチ管理しているpatch-tracker.debian.orgなんてものがあるので、
+　こういったインフラも活用して、upstreamにパッチ遅れ。
+　--->実はDebianはFreeSoftのエコシステムを作っていたりする。
+
+クラウド時代になって、1度インストール何度もアップグレードという
+事もなくなりつつある。また、Cloud時代でも「自由」を確保するには
+どうすりゃいいんだ？というDebianの課題がある。
+IaaS向け--->サービス個別の設定ファイルを持つ複雑なパッケージとどう戦う?
+PaaS/SaaS向けパッケージ--->webアプリをどうパッケージするのか？
+puppetとかchefとかと相性よくするにはどうすりゃいい？
+Debconf13では、8つのCloudに関するセッションあるよ。
+
+Rolling releaseを採用しようぜ--->早いフィードバックが
+得られる（後でまとめてリリースするとその分報告が遅れる）
+UbuntuはDebianよりも早いペースでバグ報告が行われているぜ。
+これによりさらにユーザを惹きつけられる--->将来、Debianに貢献してくれる人たちですよ?
+
+新しい貢献してくれそうな人を見つけてこい
+---->慢性的なマンパワー不足です。
+--->Debianに貢献は実は大変な事です。
+---> 文章を書け、手続きをより簡単にしろ、個人レッスン/お試しで参加させる
+(internship)などをやってくれ。
+---->どうやったら、Debianが誰もの参加を歓迎できるかを考えてくれ。
+
+Debianプロジェクトを持続的にメンテナンスするのは大変
+--DPLの仕事のほとんどは時間食う、人に任せられない/仕事を分割しにくい/調整負荷の高い
+ものばかり
+--> DPLのサポータは必ずしも活発とはいいがたい（前回のミーティング参加者はわずか２名とか...)
+
+質疑応答では、Rolling Releaseに対する反響がすげえ。
+--->結構、どうすりゃいいんだよ？みたいな意見。
+lucusはFreezeの意味を調整するとかいってる。
+
+lucusすげえ。ベテラン開発者のツッコミに堂々と答えてるぜ。
+こいつ、DPLに選出されるだけある...天才か？すげえ。
+
+*What_new_in_the_Linux_kernel
+Slide:http://womble.decadent.org.uk/talks/debconf13-kernel-news/
+
+なにがwheezyにてnewなのかについてkernel maintainerからの話。
+
+--->kernelは頻繁にリリース& Updateされる。問題なのは、
+　　ユーザランドがそのままだと動かないものがある。
+
+--> bondingドライバ。
+     teamd/teamnlなどをユーザランドに用意しないと使えん。
+    libteamのITP
+　　http://bugs.debian.org/695850
+　　なので、OFFってるよ。
+
+---> Transcendent memory(通称tmem)はDebianではenableにしてない。
+     こちらも他のソフトの支援がいる。
+     で、今回OFFってるよ。
+
+     Transcendent memoryの件の良い解説記事↓
+　　　https://lwn.net/Articles/454795/
+     （Xen tmemの例/zcache/RAMster)
+
+　　　※tmemのわかりやすい話→http://en.wikipedia.org/wiki/Transcendent_memory
+　　　　 OracleのDanさんにより実装。
+　　　　　日本語でわかりやすいxenのtmem効果の説明とデモ
+　　　　　　　-->http://nkjmkzk.net/?p=1162
+　　　　　あと、tmemはOracleのossページにある。
+　　　　   http://oss.oracle.com
+　　　　　   tmem-->https://oss.oracle.com/projects/tmem/
+
+　　　　　 仮想環境におけるメモリの問題について
+　　　　　   https://oss.oracle.com/projects/tmem/dist/documentation/presentations/MemMgmtVirtEnv-LPC2010-Final.pdf
+　　　　　　--->ここで、ソリューションとしてtmemが紹介されてる。
+
+
+----> DRM/KMS(3.3-3.10)
+　　SecureBootやら、Xやら、ツールやらがまったく対応できてないので、OFFってるよ。
+
+　　　   
+----> Module Signing (3.7)
+
+    もSecureBootがしっかりしないので、OFFってるぜ。
+
+
+
+　　Benは昼間はプロのソフト屋、夜はkernelのディベロッパという生活。
 
 
 
