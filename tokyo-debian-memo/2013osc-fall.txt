@@ -1343,6 +1343,10 @@ Slide:http://womble.decadent.org.uk/talks/debconf13-kernel-news/
 debian womanおもろい。
 統計みると女性の割合が少なすぎて泣けてくる。
 
+---補足----
+笑ったのだが、kfreebsdもftp.jp.debian.org/debian/以下にパッケージがある。
+
+
 ------------資料案--------------
 
 ・大統一の件喋ってもいいかも？
