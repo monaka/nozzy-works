@@ -1,5 +1,3 @@
-dplより
-
 startは前回OSC Springで2/18まで喋ってるからそれ以降のトピックまで
 
 ＊2013/3/4
@@ -1267,7 +1265,7 @@ PaaS/SaaS向けパッケージ--->webアプリをどうパッケージするの�
 puppetとかchefとかと相性よくするにはどうすりゃいい？
 Debconf13では、8つのCloudに関するセッションあるよ。
 
-Rolling releaseを採用しようぜ--->早いフィードバックが
+testingをRolling releaseとして宣伝しようぜ--->早いフィードバックが
 得られる（後でまとめてリリースするとその分報告が遅れる）
 UbuntuはDebianよりも早いペースでバグ報告が行われているぜ。
 これによりさらにユーザを惹きつけられる--->将来、Debianに貢献してくれる人たちですよ?
@@ -1345,6 +1343,94 @@ debian womanおもろい。
 
 ---補足----
 笑ったのだが、kfreebsdもftp.jp.debian.org/debian/以下にパッケージがある。
+
+
+How to attract new developers for your team
+
+---> Debian Pure BlendsのDebian Medがどうやって新人のパッケージ
+構築を手助けするかという話。MoM(Mentor of the Month)/SoB(Sponsering of Blends)
+とかの独特の内容？
+slideは、
+http://people.debian.org/~tille/talks/20130815_mom/index_en.html
+にpdfで掲載。
+
+questionnaire ...アンケート
+veto ... 拒否権とか、差し止める。
+formalism ...極端な形式主義、形式論
+
+あんまし大した内容じゃないなぁ...
+
+Lightning talks
+
+1. Coqelicot
+https://coquelicot.potager.org
+(Coqelicotはフランス語でひなげしの花だそうな）
+いわゆるWebベースのファイル共有サービスのプログラムの話。
+特徴として、ファイルは全部暗号化されてストア（しかも暗号化キーはストアされない）、
+時間がたてば自動で消去、消去の時にはzeroで埋めるなどの
+特徴がある。ライセンスはAGPLだそうな。
+
+2. notmuch
+http://notmuchmail.org/
+大量のメールを高速に扱うためのソフトウェアの紹介。
+vim/emacsのフロントエンドなどもある。
+タグづけにも対応。
+
+3. messaging bus system for debian infrastracture
+http://www.fedmsg.com/en/latest/
+
+Fedora PJのインフラを支えるために作られたメッセージバスシステムの紹介。
+Debianにもいかが?という内容。
+debianを支えるいろいろなインフラ上の仕組み（ftpキューとか、bugreportとか)
+で発生する様々なイベントをこのバスシステムに流し込むと、いろいろなメディア
+に柔軟に接続することができる。
+（例：ftpキューでリジェクトされたら、WEBにも出るとかのシステムが作りやすく
+　なる）
+http://www.fedmsg.com/en/latest/topology/
+を観るとわかりやすい。
+また、繋げることができるようになったシステムの一覧↓
+http://www.fedmsg.com/en/latest/status/
+発表長すぎて司会（ドラ娘）に止められたのが残念。
+
+4.dedup.debian.netの紹介
+
+http://dedup.debian.net/
+バイナリパッケージ内部のファイルのmd5sumとかsha1とかのハッシュ
+をとり、他のバイナリパッケージに重複したものがあるかどうかを
+調べるサイトの紹介。例として、freefem++,calibreの
+パッケージについて、どの程度他パッケージにも含まれている
+ファイルがあるかをデモ。gzipされたファイルも元ファイルの
+md5sumなどを取って比較できる。
+例：http://dedup.debian.net/binary/freefem++
+    http://debdup.debian.net/compare/calibre/python-odf
+
+   (calibreとpython-odfは見てのとおり重複しまくり）
+　　http://dedup.debian.net/hash/sha512/7633623b66b5e686bb94dd96a7cdb5a7e5ee00e87004fab416a5610d59c62badaf512a2e26e34e2455b7ed6b76690d2cd47464836d7d85d78b51d50f7e933d5c
+　（GPL3.txtをどの程度パッケージが重複して含んでいるか?）
+
+5. Skarphed - Webmanagement system
+　　http://www.skarphed.org/
+　　Webサイトを非常に簡単に構築できるシステムを開発したとのことで、そのデモの紹介。  
+　　登録したサーバーに、非常に簡単にWebサイトを構築できる。
+　　AGPLで提供とのこと。
+　　-->上のサイト観るとDebconfでやっていたデモの正式デモのビデオがある。
+
+6. organaize of your life with org mode.
+   http://orgmode.org/ja/
+   emacsで動く、独特なテキスト文章作成環境のデモ。
+　 今回プレゼンすら、org modeでやった。
+   見ればわかりますが、TODO作成など、とても便利そうな印象を受けます。
+
+以下は時間なくなっちゃったので、めっちゃくちゃ簡単にlightning talkとなった。
+
+7. 動画切れてしまっていたので、なんだかちょっとわからず。
+
+8. openhatch
+https://openhatch.org
+fossの貢献者らのためのfossプロジェクトマッチングサービスの紹介。
+Web上で、fossに貢献するために必要な基本的なスキルトレーニングを
+つむ、難易度に応じたfossプロジェクトを紹介する、イベントを紹介する
+などのサービスが受けられる。
 
 
 ------------資料案--------------
