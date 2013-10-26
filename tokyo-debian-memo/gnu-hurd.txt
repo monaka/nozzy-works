@@ -1,0 +1,285 @@
+うーん、
+http://ftp.debian-ports.org/debian-cd/hurd-i386/current/
+
+にて、
+ cd-imageと、
+ KVMイメージ
+http://ftp.debian-ports.org/debian-cd/hurd-i386/current/debian-hurd.img.tar.gz
+
+※tar.gzのくせに中身は、1ファイルだけ。しかも展開すると、3GBytesもある...
+(sparseファイルのようで、実際は
+   du -h ./debian-hurd-20130504.img
+   でみると、808MBytes
+)
+が手に入る。さらに、インストール/起動方法などは、
+http://ftp.debian-ports.org/debian-cd/hurd-i386/current/YES_REALLY_README.txt
+にある。
+
+qemu-system-i386 -sdl -no-kvm-irqchip -drive file=./debian-hurd-20130504.img,cache=writeback
+
+で動くが遅い...
+
+amd64のもとで、
+kvm -sdl -no-kvm-irqchip -drive file=./debian-hurd-20130504.img,cache=writeback
+で動いた...
+qemu-system-x86_64 -enable-kvm -sdl -no-kvm-irqchip -drive file=./debian-hurd-20130504.img,cache=writeback
+でやってみた。
+--->なんで？（まあ、早いのう）
+
+
+ID: root
+でノーパスワードでログイン可能。
+
+なんかしらんが、ログインすると、gnuのアイコンがグラフィックででる。
+
+shutdown -h nowしてみたが、落ちない...
+
+よーわからんので、ホスト側でctl+Cしてみた。
+-->いろいろ壊れた。
+
+sync;sync;halt
+にしてみた。まあ、なんか止まった感じ。
+
+しかし、なんかいろいろ動かんかんじ。
+uptime/dfなどうごかん。
+
+さすがdebianだけあって、
+dpkg -l
+などは動く。
+xとか入ってる。
+
+rootだけど、startxしてみたら、
+なんかXが動いた。
+
+さらによーわからん、window managerが動く...
+(Ice WMだそうな）
+
+いろいろAccelarationが効いていないので、Xが遅い...
+※ただ、解像度がいくらなのかはわからんが、結構高い?
+---> /var/log/X.org.0
+
+笑ったのだが、
+
+ gnu hurdは、SMP未対応なんだそうな。あとmarchカーネルが
+遅いのが全体へ問題が波及しているらしい。
+
+ gnu hurdはlinuxでインストーラ動かして、
+ネットだとかファイルシステムだとかをlinuxに認識させて
+インストールする。結構原始的なインストールが行われるので、
+いろいろできそこないなため、grubを手動インストールしなきゃ
+いけないなどいろいろ足らん。
+
+取り急ぎ、動かしてからのチュートリアル
+http://www.gnu.org/software/hurd/users-guide/using_gnuhurd.html#Who-Should-Use-the-Hurd_003f
+
+まあ、ひととおり使い方が書いてあるので、必読。
+
+man settransは無いというのがなんとも硬派。
+
+ネットワークの基本設定。
+
+settrans -fgcap /servers/socket/2 /hurd/pfinet -i eth0 \
+     -a 192.168.0.5 -m 255.255.255.0 -g 192.168.0.1
+
+--->うお、
+qemu-system-x86_64 -enable-kvm -sdl -no-kvm-irqchip -drive file=./debian-hurd-20130504.img,cache=writeback
+の元では、ネットワークカードがないので、
+/hurd/pfinet: file_name_lookup eth0: No such file or directtory
+/hurd/pfinet: devince_open(eth0): (os/device) no such device
+となる。
+
+使えるハードは以下のとおり
+
+http://www.nongnu.org/thug/gnumach_hardware.html
+
+
+で結局試行錯誤してみたが、libvirtの設定は次のとおりだ...
+-----------------ここから----------------
+<domain type='kvm' id='4'>
+  <name>gnu-hurd</name>
+  <uuid>d193b655-bf36-4c62-8222-badcff4cc0fe</uuid>
+  <memory unit='KiB'>524288</memory>
+  <currentMemory unit='KiB'>524288</currentMemory>
+  <vcpu placement='static'>1</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-1.6'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='writeback'/>
+      <source file='/var/lib/libvirt/images/debian-hurd-20130504.img'/>
+      <target dev='hda' bus='ide'/>
+      <alias name='ide0-0-0'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+    <disk type='block' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <target dev='hdc' bus='ide'/>
+      <readonly/>
+      <alias name='ide0-1-0'/>
+      <address type='drive' controller='0' bus='1' target='0' unit='0'/>
+    </disk>
+    <controller type='usb' index='0'>
+      <alias name='usb0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
+    </controller>
+    <controller type='pci' index='0' model='pci-root'>
+      <alias name='pci.0'/>
+    </controller>
+    <controller type='ide' index='0'>
+      <alias name='ide0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
+    </controller>
+    <controller type='sata' index='0'>
+      <alias name='sata0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+    </controller>
+    <controller type='scsi' index='0'>
+      <alias name='scsi0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
+    </controller>
+    <interface type='bridge'>
+      <mac address='52:54:00:a8:00:05'/>
+      <source bridge='br0'/>
+      <target dev='vnet0'/>
+      <model type='rtl8139'/>
+      <alias name='net0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+    <serial type='pty'>
+      <source path='/dev/pts/2'/>
+      <target port='0'/>
+      <alias name='serial0'/>
+    </serial>
+    <console type='pty' tty='/dev/pts/2'>
+      <source path='/dev/pts/2'/>
+      <target type='serial' port='0'/>
+      <alias name='serial0'/>
+    </console>
+    <input type='mouse' bus='ps2'/>
+    <graphics type='vnc' port='5900' autoport='yes' listen='127.0.0.1'>
+      <listen type='address' address='127.0.0.1'/>
+    </graphics>
+    <video>
+      <model type='cirrus' vram='9216' heads='1'/>
+      <alias name='video0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+    </video>
+    <memballoon model='virtio'>
+      <alias name='balloon0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </memballoon>
+  </devices>
+  <seclabel type='none'/>
+</domain>
+-----------------ここから----------------
+ちょっとなんか遅い気もするが、こんなもんか？
+
+
+eth0-ethnは全部/dev/以下にファイルができている。
+
+hurd_20130501みると、e1000とかある...
+
+ps とったら、
+ /hurd/pfinet --interface=/dev/eth0 --address=10.0.2.15 --netmask=255.255.255.0 --gateway=10.0.2.2 -6 /servers/socket/26
+
+とかいやがりました。
+
+settranceコマンドはhurdパッケージに存在。
+
+どうも止めるときは、
+settrans -fgap /servers/socket/2
+で止められるらしい。
+
+で、件のqemuイメージにて、
+ net---> e1000
+ settrans -fgap /servers/socket/2
+ settrans -fgcap /servers/socket/2 /hurd/pfinet -i /dev/eth0 \
+     -a 192.168.0.5 -m 255.255.255.0 -g 192.168.0.1
+
+ってやってやると、
+ping 192.168.0.1
+でpingが帰るぜ。
+
+--> /etc/network/interfaceが有効なので、
+---------ここから------------
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto /dev/eth0
+iface /dev/eth0 inet static
+        address 192.168.0.5
+        netmask 255.255.255.0
+        gateway 192.168.0.1
+---------ここまで------------
+
+とやってあげると、そのとおりにeth0が設定される。
+
+どうも、どう設定されたかを見たくば、
+ps -auxww | fgrep eth
+とかやると、pfinetがその数だけ動いているのでわかる。
+
+
+serviceコマンド使えた。
+例：service ssh restartなど。
+
+/etc/apt/source.listの中身：
+deb http://cdn.debian.net/debian/ sid main
+deb-src http://cdn.debian.net/debian/ sid main
+
+deb http://ftp.debian-ports.org/debian unreleased main
+deb-src http://ftp.debian-ports.org/debian unreleased main
+
+まぢか...こいつsidだ。
+
+わー、aptもaptitudeも入ってやがる...
+
+さあ、aptitude updateしてみた。うお、何ら問題なくupdateできるぜ。
+aptitude full-upgradeしてみた。
+
+おおー、aptitude full-upgradeで、gnumach-1.4になるんだー。
+※gnu mach 1.4は2013/9リリース
+
+あれ？aptitudeが全部おとし終わって何故かフリーズ...なんじゃらほい。
+よくわからんので、killした。
+代わりにapt-get upgradeしてみた。
+
+df/free/topとかで、
+/procが無いいわれまくるので、ちょっと
+http://www.gnu.org/software/hurd/hurd/translator/procfs.html
+みてやってみた。
+
+settrans -ca proc procfs --compatible
+mount -t proc proc /proc
+ls /proc
+でいつものprocがみえる。
+
+http://www.gnu.org/software/hurd/hurd/translator/
+で、/hurd/以下の説明がみれる。
+
+http://www.gnu.org/software/hurd/hurd/
+で、hurdに関するいろいろが読める
+
+初学者は、
+http://www.gnu.org/software/hurd/hurd/documentation.html
+から読むべき？
+
+ちなみに、終わらせ方は、sync;sync;halt
+
+しまった、x上でhurdパッケージが入れ替わるようなアップデートしちゃいけなかった。
+理由：/hurd/が変わるということはデバイスドライバが変わるということです。なので、
+　　　あっチュー間にxがおかしくなる...
+
+
