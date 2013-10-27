@@ -282,4 +282,126 @@ http://www.gnu.org/software/hurd/hurd/documentation.html
 理由：/hurd/が変わるということはデバイスドライバが変わるということです。なので、
 　　　あっチュー間にxがおかしくなる...
 
+----
+とりあえず、インストールからやってみる。
+
+sudo qemu-img create -f raw /var/lib/libvirt/images/debian-hurd0 7G
+sudo virt-install --connect=qemu:///system -n debian-hurd0 --ram 512 --cdrom /home/nojima/prog/hurd-image/debian-hurd-2013-i386-NETINST-1.iso --disk /var/lib/libvirt/images/debian-hurd0,bus=ide,size=7,format=raw,cache=writeback --bridge=br0,model=e1000 --vnc --hvm --accelerate
+
+※qemu-imgしないとファイルがないというエラーに...
+
+で、以前はlinuxでブートしてインストーラが走るらしかったが、
+今回はhurdがそのまま走る。
+
+わー、LanguageはEnglishしかないぜ。
+countryはother->Asia->Japan
+Configure locales --> United States en_US.UTF-8
+Configure the keyboard --> American English
+NetworkConfigure Manually-->適当に
+Set up users and passwords--> rootのパスワード入れる
+Partition disks --> "Guided - use entire disk"
+
+しかし、Installing the base systemが遅せーっ。IDEだからか？i386だからか？
+(KVMなんだけどな)
+とにかくCPUも張り付くぜ。
+
+Configure the package managerでmirror countryをJapanに
+ftp.jp.debian.orgにて。
+
+しかしインストール遅いなー。IDEだからか？CPU一個しか使えないからか?
+ダウンロードなんて1Mbpsもあれば、はっきりいって誤差だな。
+大部分はインストーラの処理...orz
+AMD athron 64 x2 5600でもう1時間以上かかる。
+popconいれちゃった。
+
+おおー、software selectionが走った。
+
+デフォルトがssh server/standard system utitlities
+ということだ。わかってらっしゃる。
+だが断る！→Debian desktop environmentいれちゃうもんねー
+--->修羅の道に突入...
+
+あれ？Select and install softwareで...failした。
+
+今度は仕方ないので、"Debian desktop environment"をオフってみた。
+--->うまくいった。（だめじゃん！）
+
+grub2もインストールがはじまった...
+
+--->とりあえず無事にインストールが終了。
+
+勝手にブート。でも時刻がUTCだ...
+
+おおー、ftp.jp.debian.org/debian/がpoolに。ついでにいうとsidだ。
+
+あれ？cdromからインストールすると、loginのちのgnuのマークがでないのう。
+
+おお、procはちゃんとmountされるらしい。
+
+topは死亡する。
+
+nojima@debian-hurd0:~$ uname -a
+GNU debian-hurd0 0.5 GNU-Mach 1.3.99-486/Hurd-0.5 i686-AT386 GNU
+
+だそうな。
+
+なお、grubにてAdvanced options for Debian GNU/Hurd
+を押下しないと、mach-1.4は起動しない。
+
+とりいそぎ、mach-1.4を起動したときのuname -a
+nojima@debian-hurd0:/boot/grub$ uname -a
+GNU debian-hurd0 0.5 GNU-Mach 1.4-486/Hurd-0.5 i686-AT386 GNU
+
+/boot/grub/grub.cfgに起動に必要な事柄が入ってる。
+
+まずは、
+
+ Step 1. machの起動
+ Step 2. モジュールといわれる部分の起動
+
+おっと、インストール完了のちのディスク容量は
+714MBytes程度だった。
+※Xなし
+
+とりあえず、aptitude update/full-upgradeは動いた...
+tasksel にて、desktop選ぶと
+tasksel: apt-get failed (100)
+といわれてこける。
+
+nojima@debian-hurd0:~/prog/debian$ sudo apt-get install task-desktop
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ task-desktop : Depends: xserver-xorg-video-all but it is not going to be installed
+                Recommends: task-gnome-desktop but it is not going to be installed or
+                            task-kde-desktop but it is not going to be installed or
+                            task-lxde-desktop but it is not going to be installed or
+                            task-xfce-desktop but it is not going to be installed
+                Recommends: eject but it is not installable
+                Recommends: iw but it is not installable
+                Recommends: alsa-utils but it is not installable
+                Recommends: alsa-base but it is not going to be installed
+                Recommends: pm-utils but it is not going to be installed
+E: Unable to correct problems, you have held broken packages.
+
+とのことらしい。これが原因か。
+
+だめだ...desktop系はインストールできねー。
+sudo aptitude install xserver-xorg-video-allしたら依存関係満たせなくて死亡。
+
+とりあえず、
+aptitude install xserver-xorg-video-cirrus
+してみたら、うまくインストールがすすんでる...
+
+なんかようわからんが、さらに
+aptitude install task-lxde-desktop
+するとそれらしいものが入ってくる気がする...
+
 
