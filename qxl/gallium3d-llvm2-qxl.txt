@@ -526,7 +526,7 @@ http://packages.debian.org/search?keywords=weston&searchon=names&suite=all&secti
 藁。
 
 -----------------
-weston-1.1.1
+weston-1.1.1（今は、debianはtesting/sidはweston-1.3.0）
 
 westonのmain関数は、src/compositor.cにあるっぽい。
 
@@ -1288,4 +1288,34 @@ int main (int argc,char **argv)
 	exit(0);
 }
 ----------------取り急ぎ vt切り替えて、そこからキーボード奪うソースここまで-----------
+
+次の内容として、
+
+  - fb
+  - pixman
+  - waylandとwestonとアプリの間の通信
+  - gnomeのwaylandの連携方法
+  - xwaylandとの連携
+  - libmesaのOpenGL系の実装
+  - linux DRM/KMS絡み
+
+などに発展させればいいかな...
+
+うおっと、現在、westonはtesting/sidには入ってる。（waylandはもともと入ってる...)
+1.3.0-が最新判だ。upstreamも1.3.0だった。
+
+今のsidの場合、
+
+ /etc/groupのweston-launchグループに自分を付け加え、
+ログアウトー＞ログインして、
+export XDG_RUNTIME_DIR=/tmp
+weston-lauch -- --backend=fbdev-backend.so --log=weston.log -v
+とかして立ち上げればOKなのだが、落ちる。
+
+--> westonがweston-launchと通信するのでweston-launchは必須。
+
+
+
+
+
 

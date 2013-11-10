@@ -404,4 +404,35 @@ aptitude install xserver-xorg-video-cirrus
 aptitude install task-lxde-desktop
 するとそれらしいものが入ってくる気がする...
 
+インスコしたsparseなrawファイルのkvm用イメージは、gzipで圧縮して持ち込んだ場合
+以下のようにして展開するとsparseなまま展開できる。
 
+mkfifo tmp
+sudo cp --sparse=always tmp /var/lib/libvirt/images/debian-hurd0
+別窓で、
+zcat debian-hurd0.gz > tmp
+これで、
+sparseの最適化はcpが全力でやってくれる。
+
+ぐっは、caps押すと、caps押しっぱなしというモードに突入だ...
+virt-viewerのせいなのか？
+
+showtrans /servers/socket/1
+とかやると、ネットワーク設定が、
+showtrans /dev/tty1
+とかやると、端末設定が
+どうsettransしたかが出てくる。
+※まあ、psとってもいいわけだが...
+
+うおー、一体誰がコンソールを勝手にセットアップしてるんだ?
+
+っていうか、hurdって、マニュアルなさ過ぎ!
+
+ちきしょー、grub2から解析しないとわからんやんけーっ。
+
+うおー、grubって元はgnu hurdのmulti-bootを対応するために
+プロトタイプされたboot loaderなのかー。しらんかったぜ。
+(info grub 中、1.2章History of GRUBより)
+そしたら、FreeBSDにもいいやんけという事になり、そのままGRUB誕生とあいなる。
+
+grub2を勉強せんとなぁぁぁーっ
