@@ -1311,11 +1311,178 @@ int main (int argc,char **argv)
 export XDG_RUNTIME_DIR=/tmp
 weston-lauch -- --backend=fbdev-backend.so --log=weston.log -v
 とかして立ち上げればOKなのだが、落ちる。
+---> XDG_RUNTIME_DIRって最新のsidだとログイン後、勝手に定められる。
+     XDG_RUNTIME_DIR=/run/user/1000
+    こんな感じ。codesearch.debian.netでXDG_RUNTIME_DIRとかすると、
+　　systemdが定めてるっぽい。
+　　仕組み的には、
+     systemd-logindがもろもろ準備してXDG_RUNTIME_DIRを作る能力あり
+　　 systemdが用意する、pam_systemdがsystemd-logindと通信して、
+　　このあたりの準備をする。ちなみに、pam_systemdは/etc/pam.d/common-session
+    から呼び出される。See. man pam_systemdに記載あり。
+
 
 --> westonがweston-launchと通信するのでweston-launchは必須。
 
+debian-sidでcirrusfbでwestonが動かんので、仕方ないので、以下の方法
+でデバッグ中。
+
+sudo -s -u root -H
+cd /usr/bin/
+mv weston weston.bin
+cat > weston
+#!/bin/sh
+PATH=/bin:/usr/bin
+gdbserver localhost:8000 /usr/bin/weston.bin $@
+<Ctrl-D>
+chmod 755 weston
+
+で、virt-viewerから、
+weston-launch -- --backend=fbdev-backend.so --log=weston.log
+とすると、待機状態になる。
+
+どっかの窓から、
+ssh debian-sid0
+gdb /usr/bin/weston.bin
+(gdb) target remote localhost:8000
+(gdb) いきなりデバッグ可能。
+
+で、しらべると、
 
 
+WESTON_LAUNCHER_SOCKでこけてるらしい。
 
+2度目のデバッグは、
+再度virt-viewerで、
+weston-launch -- --backend=fbdev-backend.so --log=weston.log
+して止まったら、
+gdbのセッション上で、
+target remote localhost:8000
+とかすればOK。
 
+参考になるかはしらんが、
+ weston:
+  compositor.c:main 
+  compositor.c: backend_init
+3514		ec = backend_init(display, &argc, argv, config);
+
+     compositor-fbdev.c: backend_init
+      
+902 compositor-fbdev.c: 
+
+launcher-util.c:340
+334	struct weston_launcher *
+335	weston_launcher_connect(struct weston_compositor *compositor, int tty)
+
+compositor.c:2955 
+weston_environment_get_fd('WESTON_LAUNCHER_SOCK')
+
+うあああ、WESTON_LAUNCHER_SOCK未定義だー。
+ついでに、geteuid()!=0だぁぁ。(==1000だった...)
+
+weston-launch.c:launch_compositor()
+にて、root->ユーザ
+へわざわざ権限落としてる。
+で、gdbで
+(gdb)  print environ[0]
+〜
+(gdb)  print environ[18]
+=NULL
+
+までやってみたところ、weston-launcherで引き継がれるはずの
+WESTON_LAUNCHER_SOCKと、
+WESTON_TTY_FD
+の両方が未設定だー。
+
+まあ、これが原因かな...
+        child_argv[0] = wl->pw->pw_shell;
+        child_argv[1] = "-l";
+        child_argv[2] = "-c";
+        child_argv[3] = BINDIR "/weston \"$@\"";
+        child_argv[4] = "weston";
+        for (i = 0; i < argc; ++i)
+                child_argv[5 + i] = argv[i];
+        child_argv[5 + i] = NULL;
+
+        execv(child_argv[0], child_argv);
+
+つまり、bash経由なので、環境変数が全部初期化されちゃう...
+ああああ、なんてこった。--->嘘。envとったら、
+WESTON_TTY_FD=0
+WESTON_LAUNCHER_SOCK=4
+って指定されていたぜ。
+
+あれ？
+fbdev_compositor_create中で、
+p *environとかすると、
+WESTON_TTY_FD=0
+が指定されてた...
+
+あれ？ 
+compositor-fbdev.c:898でenvironしらべたら、
+WESTON_TTY_FD=0
+が消えていた...どこで消去されるんだ？
+
+最初の
+compositor-fbdev.c:884の
+ weston_launcher_connect()
+の呼び出しで消えちゃってた。
+
+こいつの原因は、weston_environment_get_fd()が原因。
+あああ、
+WL_EXPORT int
+weston_environment_get_fd(const char *env)
+{
+        char *e, *end;
+        int fd, flags;
+
+        e = getenv(env);
+        if (!e)
+                return -1;
+        fd = strtol(e, &end, 0);
+        if (*end != '\0')
+                return -1;
+
+        flags = fcntl(fd, F_GETFD);
+        if (flags == -1)
+                return -1;
+
+        fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
+        unsetenv(env);
+
+        return fd;
+}
+ということで、unsetenv(env)されてるぜ。
+
+compositor-fbdev.c:897〜907までがなんかおかしい。
+debianのパッチが悪さしてる?
+--->debian/patch以下にパッチはなかった。
+--->？するとupstreamか？
+
+ぐあああ、めちゃくちゃ手がかかるぜばろー。
+
+ああああ、
+http://cgit.freedesktop.org/wayland/weston/commit/src/compositor-fbdev.c?id=4f49917ec5a3e212d85b15c96a580116c3ef5a15
+みると、2013/2月ころのcommitなら問題ないぜ。問題はこの後のcommitだ...
+weston_launcher_connect
+が挿入された時点で多分おかしくなった。
+
+ってbugfixしてやがる。
+
+2013-10-15
+http://cgit.freedesktop.org/wayland/weston/commit/src/compositor-fbdev.c?id=1641d14b824df487bba23597aa128219c057df88
+
+うおおお。なんてこったぁ。
+
+とゆーことで、weston-1.3.1が最新（多分今回のバグフィックス入りだ)
+
+http://cgit.freedesktop.org/wayland/weston/snapshot/weston-1.3.1.tar.gz
+して、weston-1.3.1をgetだぜ。
+
+weston-1.3.0-1のパッケージのdebian/をパクったが、
+configure側のパッケージ依存で、
+libxcb-compsite0-dev
+が必要だから、debian/controlのbuild-dep:に付け加え。
+
+で、buildしたら、動いたーっ
 
