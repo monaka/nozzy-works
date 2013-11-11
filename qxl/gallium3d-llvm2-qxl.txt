@@ -1486,3 +1486,9 @@ libxcb-compsite0-dev
 
 で、buildしたら、動いたーっ
 
+http://lanyrd.com/topics/x-window-system/slides/
+はXの現状がわかって面白い。
+
+waylandが出来た本当の理由
+http://people.freedesktop.org/~daniels/lca2013-wayland-x11.pdf
+がXに対するdisりっぷりがすげえ。

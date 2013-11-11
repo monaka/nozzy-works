@@ -118,11 +118,67 @@
 \index{wayland}
 
 \subsection{wayland}
- waylandとは、Kristian Hogsbergさんが中心となって作っているディスプレイサーバーのプロトコルのことです。 
+ waylandとは、Kristian Hoegsbergさん(oeはストローク付きo)が中心となって作っているディスプレイサーバーのプロトコルのことです。waylandプロトコルを扱えるディスプレイサーバーとしてwestonがあります。 
 
- Unixで有名なディスプレイサーバーのプロトコルとしては、Xプロトコルがありますが、1984年頃のハードの状況を元に設計されているため、内部がいろいろつぎはぎだったり、コンポジット型の画面制御をするのがそもそも苦手だったりします。今ではそれでもなんとか改造が続いているようですが、元々の設計やら、今までつぎはぎしてきた使われないかもしれない機能の互換性を保ち続ける労力も馬鹿にならないため、いっそのことシンプルに作り直したディスプレイサーバーが必要となってきました。waylandはこれらの欠点を補うものとなります。
+ 従来からあるUnixで有名なディスプレイサーバーのプロトコルとしては、Xプロトコルがあり、Xプロトコルを扱えるディスプレイサーバーにXがあります。しかしながら、Xは1984年頃の設計から始まって、ずっとハードの進化にあわせてつぎはぎしてきたため、いろいろ実装と機能に無理が生じています。waylandは、Xに比べて、圧倒的に洗練された設計で、シンプルに、プロトコルとディスプレイサーバーを実現したものとなります\cite{real-wayland-X}。
 
-\subsection{waylandを動かしてみる}
+\subsection{westonを動かしてみる}
+
+ waylandプロトコルを扱えるディスプレイサーバーの実装としてwestonがあります。早速westonを動かしてみます。
+
+ まず、debian unstableをKVM上で動かします。なお、KVMホストOS側のdebian機のbr0はインターネットに接続できるように設定されているものとします。br0のセットアップについて、詳しくは\cite{kde-devel-debian}を参照してください。
+
+　まず、debianをKVMを使ってインストールします。
+
+\begin{commandline}
+# aptitude install libvirt-bin virtinst
+# qemu-img create -f raw /var/lib/libvirt/images/debian-sid0 10G
+# wget http://cdimage.debian.or.jp/7.2.0/multi-arch/iso-cd/debian-7.2.0-amd64-i386-netinst.iso
+# virt-install --connect=qemu:///system -n debian-sid0 --ram 512 \
+  --cdrom /home/yours/debian-7.2.0-amd64-i386-netinst.iso \
+  --disk /var/lib/libvirt/images/debian-sid0,bus=virtio,\
+  size=10,format=raw,cache=writeback \
+  --bridge=br0,model=virtio --vnc --hvm --accelerate
+\end{commandline}
+
+ なお、インストールの際の設定は表\ref{tab:inst-settings}のとおりを仮定します。
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{|l|p{5cm}|p{7cm}|l|}
+\hline 
+項番&設定項目&指定内容&備考\\
+\hline \hline
+1&select a language& Japanese& \\
+2&場所の選択&日本&\\
+3&ネットワークの設定&手動設定。 IP:192.168.0.2, Netmask:255.255.255.0, Gateway:192.168.0.1, Host名:debian-sid0& \\
+4&パッケージマネージャの設定&ミラー:日本,ミラーサイト:ftp.jp.debian.org, HTTPプロキシ：空欄&\\
+5&ソフトウェアの選択&SSHサーバー、標準システムユーティリティのみ選択。あとはすべて解除。& \\
+\hline
+\end{tabular}
+\caption{\label{tab:inst-settings}インストーラで選択する項目}
+\end{center}
+\end{table}
+
+ インストール完了したら、unstableへアップグレードします。
+
+\begin{commandline}
+debian-sid0にログインの後、
+debian-sid0 # cat > /etc/apt/sources.list
+deb http://ftp.jp.debian.org/debian/ sid main contrib non-free
+deb-src http://ftp.jp.debian.org/debian/ sid main contrib non-free
+<ctrl+d>を押下
+debian-sid0 # aptitude update;aptitude full-upgrade;aptitude clean
+\end{commandline}
+
+ 次に、fbsetを導入します。
+
+\begin{commandline}
+debian-sid0 # aptitude install fbset
+\end{commandline}
+
+ weston-launchが動くように、weston-launchグループにユーザを付与します。
+
 
 \subsection{westonの仕組み}
 
@@ -134,6 +190,19 @@
 
 \subsection{おわりに}
 
+\begin{thebibliography}{0}
+  \bibitem{real-wayland-X}
+    {\footnotesize{
+       Daniel Stone,``The real story behind Wayland and X'',linux.conf.au 2013,
+       \url{http://people.freedesktop.org/~daniels/lca2013-wayland-x11.pdf},
+       \url{http://www.youtube.com/watch?v=RIctzAQOe44}
+       }}
+  \bibitem{kde-devel-debian}
+    {\footnotesize{
+       野島 貴英,「Debian開発者のKDE環境あれこれ」,第85回東京エリアDebian勉強会資料,
+       \url{http://tokyodebian.alioth.debian.org/pdf/debianmeetingresume201202.pdf}
+       }}
+\end{thebibliography}
 
 %-------------------------------------------------------------------------------
 \dancersection{tramp入門}{上川純一}
