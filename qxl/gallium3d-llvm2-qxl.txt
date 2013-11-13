@@ -1540,6 +1540,45 @@ $ weston-launch
 
 もすかして、なんもせんでも
 weston動くかな...KVMで。
+--->ダメだった。
 
+non-freeのnvidiaドライバだと、eglが装備されてないため、mesaのeglが
+動き、バグるため、x11-backendの元でちゃんと表示がなされない。
+
+man westonにwayland-backendの件と、XWaylandの使い方出てる。
+
+XWayland対応のXサーバーのパッチは↓
+http://lists.debian.org/debian-x/2013/10/msg00205.html
+となっているようで、今絶賛開発中？
+今はXが -waylandを解釈出来ないのでXサーバーが落ちる落ちる...
+
+ところで、headless-backend.soは動くにゃ動くが、使い方が...よーわからん。
+
+weston --backend=headless-backend.so 
+すると待機状態になるので、別にsshした端末から、
+env WAYLAND_DISPLAY=wayland-0 weston-terminal
+とかすると動くような気配があるが、どうだかよくわからん...
+
+weston付属のモジュールで、
+ cms-colord.so
+ cms-static.so
+
+があるが、こちらはカラーマネージメントのための
+モジュール。実際、cms-colord.soは、
+
+colord
+http://www.freedesktop.org/software/colord/intro.html
+に接続してカラーマネージメントを行う。
+（gnome/kdeだとこれは普通にやる）
+※ハードのプロファイルは/usr/share/hwdata/pnp.ids
+とか見る。
+
+x11-backend.soでも、--use-pixmanで、pixmanを使い、
+デフォルトでは、EGLが利用される。
+
+drmでpixman使ってみたら、やっぱりSEGFaultでおちる。
+
+xkbcommonは別のライブラリだ...
+http://xkbcommon.org/
 
 
