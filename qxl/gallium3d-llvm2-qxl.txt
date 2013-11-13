@@ -1320,6 +1320,8 @@ weston-lauch -- --backend=fbdev-backend.so --log=weston.log -v
 　　 systemdが用意する、pam_systemdがsystemd-logindと通信して、
 　　このあたりの準備をする。ちなみに、pam_systemdは/etc/pam.d/common-session
     から呼び出される。See. man pam_systemdに記載あり。
+　　　最小限インストールだと、systemdが入ってなくてこちらが
+　　動かんので注意。
 
 
 --> westonがweston-launchと通信するのでweston-launchは必須。
@@ -1479,9 +1481,29 @@ http://cgit.freedesktop.org/wayland/weston/commit/src/compositor-fbdev.c?id=1641
 http://cgit.freedesktop.org/wayland/weston/snapshot/weston-1.3.1.tar.gz
 して、weston-1.3.1をgetだぜ。
 
+su
+aptitude build-dep weston/sid
+aptitude install libxcb-composite0-dev fakeroot
+exit
+mkdir weston weston-work
+cd weston
+apt-get source weston/sid
+cd ../weston-work
+wget -O weston_1.3.1.orig.tar.gz http://cgit.freedesktop.org/wayland/weston/snapshot/weston-1.3.1.tar.gz
+tar xzf ../weston/weston_1.3.0-1.debian.tar.gz
+cd debian; patch -p1 < xxxx.patch
+tar xzf weston_1.3.1.orig.tar.gz
+cd weston-1.3.1
+cp -a ../debian .
+env DEB_BUILD_OPTIONS='noopt nostrip' dpkg-buildpackage -rfakeroot -us -uc 2>&1 | tee ../build.log
+cd ..
+su
+dpkg -i ./weston
+
+
 weston-1.3.0-1のパッケージのdebian/をパクったが、
 configure側のパッケージ依存で、
-libxcb-compsite0-dev
+libxcb-composite0-dev
 が必要だから、debian/controlのbuild-dep:に付け加え。
 
 で、buildしたら、動いたーっ
@@ -1492,3 +1514,32 @@ http://lanyrd.com/topics/x-window-system/slides/
 waylandが出来た本当の理由
 http://people.freedesktop.org/~daniels/lca2013-wayland-x11.pdf
 がXに対するdisりっぷりがすげえ。
+
+うは、最小限インストールだと、XDG_RUNTIME_DIRを設定するpamのモジュールを持つ
+systemd-logindとか入ってないぜ。
+なので、誰が入れてんだかわからんが、XDG_SESSION_COOKIEだけ定義されてる。
+codesearch.debian.netでXDG_SESSION_COOKIE調べると、
+openssh/consolekitなどでガンガン定義しているようだ。
+apt-file search systemd-logindしらべると、systemdだ。
+
+DRM/KMS,FB,V4L2の説明でよい文章↓
+http://elinux.org/images/2/22/KMS_FB_and_V4L2_How_to_Select_a_Graphics_and_Video_API.pdf
+
+仮想環境では、一発で動くが、手元のベア環境で何故かsystemd-logindが
+動かん。そもそも、このデーモン誰がうごかしてんだ？-->謎
+
+あと、DRM/KMSって、普通に使われてたんだな...知らなかった。
+まあ、考えて見たら、汎用品のパソコンなんて、nvidiaかAMDか、intelだもんな、今は。
+
+というわけで、手元のVaioで動かすと、
+
+$ env XDG_RUNNTIME_DIR=/tmp
+$ weston-launch
+
+とかするとあっさりweston動いた。
+
+もすかして、なんもせんでも
+weston動くかな...KVMで。
+
+
+
