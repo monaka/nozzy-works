@@ -1537,6 +1537,8 @@ $ env XDG_RUNNTIME_DIR=/tmp
 $ weston-launch
 
 とかするとあっさりweston動いた。
+--->さらに凄いことに、ノートPCのVGA端子にも、westonが出力されていた。
+　　プレゼンで使えるじゃんかーっ
 
 もすかして、なんもせんでも
 weston動くかな...KVMで。
@@ -1580,5 +1582,4 @@ drmでpixman使ってみたら、やっぱりSEGFaultでおちる。
 
 xkbcommonは別のライブラリだ...
 http://xkbcommon.org/
-
 
