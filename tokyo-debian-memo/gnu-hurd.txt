@@ -436,3 +436,72 @@ showtrans /dev/tty1
 そしたら、FreeBSDにもいいやんけという事になり、そのままGRUB誕生とあいなる。
 
 grub2を勉強せんとなぁぁぁーっ
+
+info grubを読むと、
+4.3.1 GNU/Hurd
+に基本的なgrub.cfgの例と説明がちっとある。
+--->これがそのまま/boot/grub/grub.cfgに書かれている感じ。
+
+
+grub> multiboot /boot/gnumach.gz root=device:hd0s1
+grub> module  /hurd/ext2fs.static ext2fs --readonly \
+              --multiboot-command-line='${kernel-command-line}' \
+              --host-priv-port='${host-port}' \
+              --device-master-port='${device-port}' \
+              --exec-server-task='${exec-task}' -T typed '${root}' \
+               '$(task-create)' '$(task-resume)'
+grub> module /lib/ld.so.1 exec /hurd/exec '$(exec-task=task-create)'
+
+multibootという形式はgrubネイティブのフォーマットだそうな。
+
+$(task-create)とか誰が定めてんだ?
+
+
+
+
+
+info machということで、machカーネルのinfoファイルが読めるぜ。
+結構内容充実してんなー。
+
+GNU machって、info machの
+1.2 Features
+に記載されている事が本当なのか？
+特に眉唾：
+it's scalable
+     Mach is particularly well suited for SMP and network cluster
+     techniques.  Thread support is provided at the kernel level, and
+     the kernel itself takes advantage of that.  Network transparency at
+     the IPC level makes resources of the system available across
+     machine boundaries (with NORMA IPC, currently not available in GNU
+     Mach).
+
+あれ？SMP/threadって対応してたんだっけ？
+
+sudo aptitude install build-essential
+しないと、ソースパッケージ落としてきてもソースが展開されないぜ。
+dpkg-devが入らんので。
+
+info見ると面白いなぁ。configureで組み込むデバドラとか指定するんだ...Hurdって。
+SCSI結構充実してんじゃん。
+
+なんと、apt-get source hurdしたら、すごいいっぱいtar.gzが落ちるぜ。なんだこりゃ？
+----------------------
+$ls
+hurd_0.5.git20131101-1.debian.tar.bz2
+hurd_0.5.git20131101-1.dsc
+hurd_0.5.git20131101.orig-devnode.tar.bz2
+hurd_0.5.git20131101.orig-eth-filter.tar.bz2
+hurd_0.5.git20131101.orig-eth-multiplexer.tar.bz2
+hurd_0.5.git20131101.orig-libbpf.tar.bz2
+hurd_0.5.git20131101.orig-libddekit.tar.bz2
+hurd_0.5.git20131101.orig-libdde-linux26.tar.bz2
+hurd_0.5.git20131101.orig-libhurd-slab.tar.bz2
+hurd_0.5.git20131101.orig-libmachdev.tar.bz2
+hurd_0.5.git20131101.orig-procfs.tar.bz2
+hurd_0.5.git20131101.orig-random.tar.bz2
+hurd_0.5.git20131101.orig.tar.bz2
+$
+----------------------
+こんなことできるんだ...しらんかったぜ。
+
+ソースの大きさは全部で60MBytes程度
