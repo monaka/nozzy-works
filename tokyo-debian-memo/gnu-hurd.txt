@@ -573,4 +573,35 @@ machカーネルコンパイル時に指定するqemuとは、
 http://www.gnu.org/software/hurd/gnumach-doc/Configuration.html#Configuration
 みると、むちゃくちゃデバドラつんでんやんけーっ！
 
+すげえ、びっくりだが、gnumach-docみるとわかるが、
+基本的なOSの機能は全部IPCベースであらかじめmach側に用意されている。
+要はこちらをカスタムしまくるわけだ。
+
+kernel debugger搭載済みで、文法はadbよりちょっと賢いぐらいか？
+
+Hurdの名前の由来：
+Hurd stands for Hird of Unix-Replacing Daemons. And, then, Hird stands for Hurd of Interfaces Representing Depth.
+
+なんてこった、Hurdのadvantageって、
+1. FUSEが最初から使える！
+　settrans -a ftp\: /hurd/hostmux /hurd/ftpfs /
+　dpkg -i ftp://ftp.gnu.org/path/to/*.deb
+　いやー、只の器用貧乏ってかんじだ。
+
+アイデア募集だHurd↓
+http://www.gnu.org/software/hurd/community/weblogs/ArneBab/niches_for_the_hurd.html
+まあ、物は言いよう。あとMulti-coreな環境には向いてるのう。
+
+MIGって、
+Richard P. Draves, Michael B. Jones, Mary R. Thompson, MIG - THE MACH INTERFACE GENERATOR. ps, doc. November 1989. Department of Computer Science, Carnegie-Mellon University.
+の略なんだ。しらんかったぜ。
+
+ソースパッケージとしては、
+ 
+ - hurd
+ - gnumach
+
+の２つがあるのう。
+
+
 
