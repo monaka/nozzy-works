@@ -437,6 +437,7 @@ showtrans /dev/tty1
 
 grub2を勉強せんとなぁぁぁーっ
 
+
 info grubを読むと、
 4.3.1 GNU/Hurd
 に基本的なgrub.cfgの例と説明がちっとある。
@@ -455,9 +456,6 @@ grub> module /lib/ld.so.1 exec /hurd/exec '$(exec-task=task-create)'
 multibootという形式はgrubネイティブのフォーマットだそうな。
 
 $(task-create)とか誰が定めてんだ?
-
-
-
 
 
 info machということで、machカーネルのinfoファイルが読めるぜ。
@@ -505,3 +503,74 @@ $
 こんなことできるんだ...しらんかったぜ。
 
 ソースの大きさは全部で60MBytes程度
+
+ngHurd というのがある？
+http://www.gnu.org/software/hurd/hurd/ng.html
+Debianはどっちの技術だ？
+
+--->見ると、
+L4 Pistachioってなんだ？
+disってみた↓
+http://walfield.org/papers/200707-walfield-critique-of-the-GNU-Hurd.pdf
+
+See. info hurd 2.2 Server Bootstrap
+によると、GNU hurdってなんでもサーバーなのね。
+/hurd/init-->/hurd/proc,/hurd/auth
+          -->/ettc/hurd/runsystem.sh
+ついでに、core Hurdはパラレルに起動だって。sub-Hurdsとかもあるのか？
+
+recursive-bootstrapって機能ってすごくないか?？
+See. 2.2.1 Recursive Bootstrap (info hurdより）
+まあ、chrootとか、lxcとか言われたら話変わってくるが...
+parent Hurd -->invoke-->another Hurdを動かせる。抜けるには単にhaltとか/rebootとか。
+
+ぶ、2章でおわりかよ。
+
+4.章は何かのライブラリの説明だ...
+4.3読むと、いわゆるシステムコールはsoket越しのRPCによる実装なのか？ひょっとして。
+--->あー、もちっと低いレイヤーの話か？
+5.でやっとtranslatorの説明だ。
+いきなりプログラマ向けの話だ。
+--->5.2は簡単なtranslatorの場合のライブラリTrivfsの説明だ。
+
+んー、プログラマ向けの話多いなぁ。
+とおもったら、書きかけやんけーっ
+
+trust
+
+tcb
+---> http://www.gnu.org/software/hurd/tcb.html
+
+RPCはhurdの重要な部分を占めるが、ここはMIGというフレームワークを使う。
+なお、MIG無しのRPCのrawフォーマットは、
+http://walfield.org/pub/people/neal/papers/hurd-misc/mach-ipc-without-mig.txt
+に記載がある。
+
+translatorの良いポータル↓
+http://www.gnu.org/software/hurd/hurd/translator.html
+
+gnumachのrefernceman
+http://www.gnu.org/software/hurd/gnumach-doc/
+
+読んでみているが、以下の言葉は決まり文句だなぁ。
+
+it's free software
+Anybody can use, modify, and redistribute it under the terms of the GNU General Public License (see Copying). GNU Mach is part of the GNU system, which is a complete operating system licensed under the GPL. 
+it's built to survive
+As a microkernel, GNU Mach doesn't implement a lot of the features commonly found in an operating system, but only the bare minimum that is required to implement a full operating system on top of it. This means that a lot of the operating system code is maintained outside of GNU Mach, and while this code may go through a complete redesign, the code of the microkernel can remain comparatively stable. 
+it's scalable
+Mach is particularly well suited for SMP and network cluster techniques. Thread support is provided at the kernel level, and the kernel itself takes advantage of that. Network transparency at the IPC level makes resources of the system available across machine boundaries (with NORMA IPC, currently not available in GNU Mach). 
+it exists
+The Mach microkernel is real software that works Right Now. It is not a research or a proposal. You don't have to wait at all before you can start using and developing it. Mach has been used in many operating systems in the past, usually as the base for a single UNIX server. In the GNU system, Mach is the base of a functional multi-server operating system, the Hurd.
+
+なんだそうな。
+
+machカーネルコンパイル時に指定するqemuとは、
+‘qemu’ will include only the set of device drivers that is useful when using the resulting kernel binary to drive a Hurd system in the QEMU system emulator. This is only useful for reducing the kernel build time and the kernel image size.
+ということだそうで。要はコンパイル時間を削りましょーという意味。
+
+げえええ、
+http://www.gnu.org/software/hurd/gnumach-doc/Configuration.html#Configuration
+みると、むちゃくちゃデバドラつんでんやんけーっ！
+
+
