@@ -603,5 +603,114 @@ Richard P. Draves, Michael B. Jones, Mary R. Thompson, MIG - THE MACH INTERFACE 
 
 の２つがあるのう。
 
+----------------hurd0----------------
+nojima@debian-hurd0:~$ ps elf 
+    USER   PID  PPID TTY     TIME COMMAND
+    root     1     1   -  0:00.09 /bin/bash /etc/hurd/runsystem root=device:hd0s1
+       -     2     1   -  0:00.04 /hurd/init root=device:hd0s1
+       -     3     1   ?  0:00.20 root=device:hd0s1
+       -     4     2   ?  0:01.26 /hurd/proc
+       -     5     2   -  0:07.01 ext2fs --readonly --multiboot-command-line=root=device:hd
+       -     6     5   -  0:00.90 /hurd/exec
+       -     7     2   -  0:00.34 /hurd/auth
+    root     8     5   -  0:00.37 /hurd/term /dev/console device console
+    root     9     5   -  0:00.00 /hurd/magic tty
+    root    10     5   -  0:00.29 /hurd/pflocal
+    root    13     1   -  0:00.12 /hurd/mach-defpager
+    root    15     5   -  0:00.04 /hurd/storeio hd0s5
+    root    19     5   -  0:00.07 /hurd/storeio hd0s1
+    root    20     5   -  0:00.06 /hurd/storeio hd2
+    root    21     5   -  0:00.01 /hurd/storeio fd0
+    root    22     5   -  0:00.04 /hurd/storeio fd1
+       -    24     5   -  0:00.11 /hurd/null
+    root    25     5   -  0:00.04 /hurd/procfs --compatible
+       -    26    25   -  0:00.02 /hurd/mtab /
+    root    62     5   -  0:00.02 /hurd/streamio kmsg
+    root    92     5   -  0:00.02 /hurd/fifo
+    root    94     1   -  0:00.04 /usr/sbin/rsyslogd
+    root   100     1   -  0:00.01 /usr/sbin/anacron -s
+  daemon   104     1   -  0:00.02 /usr/sbin/atd
+    root   125     1   -  0:00.00 /usr/sbin/cron
+    root   134     5   -  0:00.04 /hurd/random --seed-file /var/spool/random-seed --fast
+messagebus 135     1   -  0:00.03 /usr/bin/dbus-daemon --system
+    root   378     5   -  0:00.25 /hurd/pfinet --interface=/dev/eth0 --address=192.168.0.6
+    root   379     5   -  0:00.04 /hurd/storeio --no-cache time
+    root   380     5   -  0:00.04 /hurd/devnode -M /dev/netdde eth0
+    root   381     5   -  0:04.73 /hurd/netdde
+    root   383     5   -  0:00.02 /hurd/random --seed-file /var/spool/random-seed
+Debian-exim 392    1   -  0:00.02 /usr/sbin/exim4 -bd -q30m
+    root   404     1   -  0:00.03 /usr/sbin/sshd
+    root   409     5   -  0:00.02 /hurd/term /dev/tty1 hurdio /dev/vcs/1/console
+    root   410     5   -  0:00.06 /hurd/console
+    root   414     1   -  0:00.09 /bin/console --daemonize -d current_vcs -c /dev/vcs -d vg
+    root   415     5   -  0:00.01 /hurd/storeio --no-cache mem
+    root   423     1   -  0:00.04 /sbin/runttys
+       -   424   423  co  0:00.01 /bin/bash -noprofile /bin/loginpr
+       -   425   423   1  0:00.01 /bin/bash -noprofile /bin/loginpr
+       -   426   423   2  0:00.03 /bin/bash -noprofile /bin/loginpr
+       -   427   423   3  0:00.03 /bin/bash -noprofile /bin/loginpr
+       -   428   423   4  0:00.01 /bin/bash -noprofile /bin/loginpr
+       -   429   423   5  0:00.02 /bin/bash -noprofile /bin/loginpr
+       -   430   423   6  0:00.01 /bin/bash -noprofile /bin/loginpr
+    root   431     5   -  0:00.03 /hurd/term /dev/tty2 hurdio /dev/vcs/2/console
+    root   432     5   -  0:00.02 /hurd/term /dev/tty3 hurdio /dev/vcs/3/console
+    root   433     5   -  0:00.03 /hurd/term /dev/tty4 hurdio /dev/vcs/4/console
+    root   434     5   -  0:00.03 /hurd/term /dev/tty5 hurdio /dev/vcs/5/console
+    root   435     5   -  0:00.02 /hurd/term /dev/tty6 hurdio /dev/vcs/6/console
+    root   436     5   -  0:00.01 /hurd/password
+    root   437   404   -  0:00.32 /usr/sbin/sshd -R
+  nojima   439   437   -  0:00.28 /usr/sbin/sshd -R
+    root   440     5   -  0:00.24 /hurd/term /dev/ptyp0 pty-master /dev/ttyp0
+  nojima   441   439  p0  0:00.89 -bash
+  nojima   531   441  p0  0:00.02 ps -elf
+----------------hurd0----------------
+という感じ。
+
+つまりは、/bin/bash /etc/hurd/runsystem root=device:hd0s1
+が起点。initがいつも１番だと思うなよ！
+
+runsystemのやること
+ -シングルユーザか、fastbootか、multiユーザモードか？を判定しそれぞれの処理する。
+ -localhost(127.0.0.1)作る。(/hurd/pflocal動かす)
+ -/etc/hurd/rc autobootとかする。（マルチユーザの時）
+  /etc/hurd/rcのみの時はfastboot
+
+で、
+/etc/hurd/rcの冒頭にあるが、
+　
+ /hurd/mach-defpagerってなんだ？？
+--->$(HURD_SRC)/mach-defpager/以下がソースだ。
+
+
+うお、
+ Step 1. /etc/rc.boot/S*を実行し、
+ Step 2. /etc/rc2.d/を決め打ち実行だった。
+（一応、/etc/inittabもdefault 2だけどな）
+
+/usr/sbin/login（?gettyとかか？）に相当するのは、/sbin/runttysというプロセスのようだ。
+
+pstree --argumentsするとプロセスの関係わかっていい感じ。
+
+あれ？/sbin/shutdown がある。
+
+dmesgがないので、/dev/klogを見るらしい。
+showtrans /dev/klogとかすると、
+/hurd/streamio kmsg
+なんだそうな。
+
+まあ、基本的にHurdは、/dev/以下のファイル---> 何かのDaemon
+に紐づくので、showtrans /dev/〜
+をするとプロセス名がわかるかんじ。
+
+/dev/eth0調べると、
+nojima@debian-hurd0:/usr/lib/hurd/console$ showtrans /dev/eth0 
+/hurd/devnode -M /dev/netdde eth0
+
+だそうな。
+
+trivfsって何かサーバーのパターンらしい。
+
+eth0なデバイス作る、denodeみると($(HURD_SRC)/devnode/devnode.c)
+
 
 
