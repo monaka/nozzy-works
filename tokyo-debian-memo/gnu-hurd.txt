@@ -679,7 +679,8 @@ runsystemのやること
 /etc/hurd/rcの冒頭にあるが、
 　
  /hurd/mach-defpagerってなんだ？？
---->$(HURD_SRC)/mach-defpager/以下がソースだ。
+--->$(HURD_SRC)/mach-defpager/以下がソースだ。どうも仮想メモリを扱う
+　　　デーモンらしい。さすがmicro kernel形式。なんでもユーザランドのDaemon。
 
 
 うお、
@@ -697,6 +698,8 @@ dmesgがないので、/dev/klogを見るらしい。
 showtrans /dev/klogとかすると、
 /hurd/streamio kmsg
 なんだそうな。
+--->どうもリングバッファっぽくて、catするとメッセージの最後にポインタ
+が移動しちゃうぜ。
 
 まあ、基本的にHurdは、/dev/以下のファイル---> 何かのDaemon
 に紐づくので、showtrans /dev/〜
@@ -709,8 +712,112 @@ nojima@debian-hurd0:/usr/lib/hurd/console$ showtrans /dev/eth0
 だそうな。
 
 trivfsって何かサーバーのパターンらしい。
+---> $(SRC_HURD)/libtrivfs/等にtrivfsについては手続きが実装済み。
+---> info hurdの5.2 Trivfs Library
+　　　に若干のドキュメントあり。
 
 eth0なデバイス作る、denodeみると($(HURD_SRC)/devnode/devnode.c)
 
+うーん、gnumach-1.4/doc/mach.infoとかを持つパッケージがない...
+なので、mach.infoが読めん。
 
+argp_parse()はlibcのライブラリ。
+---> info libcの25.3.1章参照。
 
+なんてこった、translatorについてのマニュアルが無いぜ。
+(info hurdにも説明が無い...)
+なので、translatorのソースみてオプションとか見るしかない。
+
+あ、嘘だ。$(SRC_HURD)/<translator名>/READMEに説明がある場合がある。
+
+1. /hurd/devnode
+
+/hurd/devnodeは、
+54 static const struct argp_option options[] =
+ 55 {
+ 56     {"name", 'n', "DEVICENAME", 0,
+ 57       "Define the device name used by clients in device_open()", 2},
+ 58     {"master-device", 'M', "FILE", 0,
+ 59       "Get a pseudo master device port", 3},
+ 60     {0}
+ 61 };
+
+だそうな。/hurd/devnode -M /dev/netdde eth0
+みたいな使い方をする。
+
+$(SRC_HURD)/devnode/main.c中
+
+ mach_task_self() --> info mach中7.2章のTask Interfaceに説明あり。
+
+336   task_get_bootstrap_port (mach_task_self (), &bootstrap);
+こちらは、Task Special Portsをbootstrapに返却する典型的コード。
+Task Special Portsが何なのか？はよくわからん。
+
+  if (master_device == MACH_PORT_NULL)
+341     {
+342       err = get_privileged_ports (0, &master_device);
+343       if (err)
+344         error (1, err, "get_privileged_ports");
+345     }
+
+何かの特権の必要そうなportを手に入れる。
+--->そもそもportって何だ?
+
+trivfs_startup() --> info hurd の5.2.1 Trivfs Startupに説明あり。
+
+port_classは、$(HURD_SRC)/libports/に定義あり。
+info hurdの3.2.1 Buckets and Classesに説明あり。
+---> port_class/ backetのペアらしい。
+
+いわゆるmachにとってのセッションって、mach_task_self()のようだ。
+
+関数の中で関数を宣言するケースがおおいなー＞hurd。
+
+例： $(HURD_SRC)/libports/manage-one-thread.c中の
+　　 ports_manage_port_operations_one_thread()とか。
+
+うは、devnodeって、libdde_linux26の仕組みよびだしてるぜ。
+例：
+　devnode/devnode.c-->ds_device_open-->device_open-->
+    libmachdev/net.c-->search_netdev()-->libdde_linux26/lib/src/mach_glue/net.c
+
+となってる。
+
+むー、基本的な考え方がよめんぞおおおお。
+
+demuxerはマルチプレクサの略か？
+
+hack the hurdな文章↓
+http://www.gnu.org/software/hurd/hacking-guide/hhg.html
+
+hurdの概要（結構良い文章)↓
+http://www.gnu.org/software/hurd/hurd-talk.html
+http://www.gnu.org/software/hurd/hurd-paper.html
+
+http://www.gnu.org/software/hurd/hacking-guide/hhg.htmlより、
+5. hurd interfaces
+You can find the interface definitions in the $(HURD)/hurd/*.defs files. Important are io.defs, password.defs, fsys.defs, fs.defs and auth.defs. The login.defs interface is nice, but not implemented so far and maybe it will never be. The *_reply.defs interfaces are — of course — for reply messages.
+
+devnodeって、main.cは↓
+http://www.gnu.org/software/hurd/hacking-guide/hhg.html
+の8.4 The main functionのまんまだぁーっ
+
+FAQが泣ける↓
+Q: Why should I learn about Mach if the Hurd switches to L4 soon?
+A: As of now, the Hurd uses Mach and you need to know Mach basics to do Hurd work. Maybe the Hurd will run on L4 in the future, but currently it's very, very far away from doing so.
+
+hurdのlibcって相当変？
+file_set_translator()が$(SRC_HURD)以下になかったので、
+codesearch.d.nしたら、なんと、libc0.3にあったぜ。
+
+hurd-libfuseってなんか自虐的じゃないのか？
+※なんで、fuseのI/Fが欲しいんだ？意味が分からんぞ。
+
+解決しないといけない疑問
+---> どうやってmachとtranslatorは通信してんだ？
+---> MIGの文法は？どういう仕組みでRPCしてんだ？
+---> libtrivfsとか、libfshelpとか、libnetfsとかの使い方は？
+---> linux26の使い方は？ddeってなに？
+---> そもそもどうやって、Hurdはハードを叩いてんだ?
+---> 動作を追いかける最もスマートな方法は？
+---> 移植はどうやるんだ？え？
