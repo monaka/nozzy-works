@@ -1,0 +1,334 @@
+debian pure blendsでもやるか。
+
+で、
+~/prog/debian-sid/debian-sid.imgを
+sudo cp ~/prog/debian-sid/debian-sid.img /var/lib/libvirt/debian-sid1
+→がああ、これsparceで作られたイメージなので、そのまんまコピーだと正常起動できなくて
+ だめだぁ。
+ cp --sparse=always /home/nojima/prog/debian-sid/debian-sid.img debian-sid1
+ が本当
+
+　--->とおもったら、関係ないやんけー。壊れてたぜ。このイメージ。
+
+~/prog/ sudo qemu-img create -f raw /var/lib/libvirt/images/debian-sid1 7G
+sudo virt-install --connect=qemu:///system -n debian-sid1 --ram 512 --cdrom /home/nojima/prog/debian-wheezy/debian-7.2.0-i386-amd64-source-DVD-1.iso --disk /var/lib/libvirt/images/debian-sid1,bus=virtio,size=7,format=raw,cache=writeback --bridge=br0,model=virtio --vnc --hvm --accelerate
+
+注: 5GじゃGNOME DESKTOPでは足らん。junior-game-glまで突っ込みたい場合は、10GBかつ、メモリも2Gぐらいないとダメ。また、5GBytesイメージにぶちこんでしまった場合の拡張法：
+   7Gに拡張したくば、
+   sudo -s -u root -H
+   cd /var/lib/libvirt/images
+   dd if=/dev/zero of=debian-sid1 conv=notrunc bs=1 seek=7G count=1
+   fdisk debian-sid1
+   > p
+   Device Boot      Start         End      Blocks   Id  System
+   ./debian-sid.img1   *        2048     9951231     4974592   83  Linux
+   ./debian-sid.img2         9953278    10483711      265217    5  Extended
+   ./debian-sid.img5         9953280    10483711      265216   82  Linux swap / Solaris
+   > d 5
+   > d 2
+   > d 1
+   > n
+   >> p
+   >> 1
+   >> 2048
+   >> +sizeで欲しいサイズを指定。
+   >> n
+   >> e
+   >> 全部指定
+   >> n
+   >> l
+   >> 5
+   >> 全部指定
+   > t 5
+   > 82 (Linux swap/Solaris)
+   > w
+   > quit
+   kpartx -av ./debian-sid1
+   e2fsck -y -f /dev/mapper/loop0p1
+   resize2fs /dev/mapper/loop0p1
+   mkswap /dev/mapper/loop0p5
+   ...UUIDでるので記録しておく。...
+   mkdir tmp
+   mount -t ext4 /dev/mapper/loop0p1 ./tmp
+   cd ./tmp/etc
+   vi fstab
+   UUID=f290a859-9446-42dd-b81b-533e74c75418 none            swap    sw              0       0
+   のUUID行を修正。
+　　cd ../../
+   umount ./tmp
+   kpartx -d ./debian-sid1
+
+して、
+
+-----------------debian-sid1.qxl-spice-acc.xmlここから------------------
+<domain type='kvm'>
+  <name>debian-sid1</name>
+  <memory unit='KiB'>524288</memory>
+  <currentMemory unit='KiB'>524288</currentMemory>
+<!--  <cpu mode='host-passthrough'/> -->
+  <vcpu placement='static'>1</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-1.5'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='writeback'/>
+      <source file='/var/lib/libvirt/images/debian-sid1'/>
+      <target dev='vda' bus='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+    </disk>
+    <disk type='block' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <target dev='hdc' bus='ide'/>
+      <readonly/>
+      <address type='drive' controller='0' bus='1' target='0' unit='0'/>
+    </disk>
+    <controller type='usb' index='0'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
+    </controller>
+    <controller type='pci' index='0' model='pci-root'/>
+    <controller type='ide' index='0'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
+    </controller>
+    <interface type='bridge'>
+      <mac address='52:54:00:a8:00:07'/>
+      <source bridge='br0'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <input type='mouse' bus='ps2'/>
+    <graphics type='spice' port='5900' autoport='no'>
+      <mouse mode='server'/>
+      <clipboard copypaste='yes'/>
+    </graphics>
+    <sound model='ac97'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
+    </sound>
+    <video>
+      <model type='qxl' ram='65536' vram='65536' heads='1'>
+        <acceleration accel2d='yes'/> 
+<!--        <acceleration accel3d='yes' accel2d='yes'/> -->
+      </model>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+    </video>
+    <memballoon model='virtio'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </memballoon>
+  </devices>
+</domain>
+
+-----------------debian-sid1.qxl-spice-acc.xmlここまで------------------
+
+を
+sudo virt define debian-sid1.qxl-spice-acc.xml
+したら、
+~/ sudo virsh start debian-sid0
+error: Failed to start domain debian-sid0
+error: Cannot check QEMU binary /usr/bin/kvm: No such file or directory
+
+とか言われてこける。
+
+sudo aptitude install qemu-kvm
+
+しないと、/usr/bin/kvmが入らんので、問題。
+まあ、/usr/bin/kvmの中身↓
+-----------------ここから-------------------------
+#! /bin/sh
+exec qemu-system-x86_64 -enable-kvm "$@"
+-----------------ここまで-------------------------
+
+ということで笑。
+
+で、simpleインスコのdebian-sid1を動かす。
+aptitude install spice-client-gtk
+
+sudo virsh start debian-sid1
+spicy -h 127.0.0.1 -p 5900
+
+でとりあえず、qxlは稼働。
+
+aptitude install sudo
+
+vi /etc/sudoers.d/nojima
+nojima	ALL=(ALL:ALL) NOPASSWD:ALL
+chmod 600 /etc/sudoers.d/nojima
+
+taskselはすでに導入済みとなるため、debian-jrを突っ込む。
+---> debian-jrの場合、最小限インスコはdebian desktopぐらいは
+　　　入れていないと辛い。
+
+どうやっても、taskselにEnd UserSectionなどは現れない。
+--->仕方ないので、taskselのsource落としたらなんと、
+    perlスクリプトだった...
+    で動作しらべると、taskselのメニューに何か出すには、
+     /usr/share/tasksel/descs/以下に*.descファイルが必要。
+     最初に導入されているのは、tasksel-dataパッケージに搭載されている、
+    /usr/share/tasksel/descs/debian-tasks.desc
+    のみ。
+
+apt-file search tasks.descしてみると案の上、
+debichem-tasks: /usr/share/tasksel/descs/debichem-tasks.desc
+education-tasks: /usr/share/tasksel/descs/debian-edu-tasks.desc
+ezgo-tasks: /usr/share/tasksel/ezgo-tasks.desc
+gis-tasks: /usr/share/tasksel/descs/debian-gis-tasks.desc
+junior-tasks: /usr/share/tasksel/debian-junior-tasks.desc
+med-tasks: /usr/share/tasksel/descs/debian-med-tasks.desc
+multimedia-tasks: /usr/share/tasksel/descs/debian-multimedia-tasks.desc
+science-tasks: /usr/share/tasksel/descs/debian-science-tasks.desc
+tasksel-data: /usr/share/tasksel/descs/debian-tasks.desc
+
+こんな感じで、pure blendsのdescファイルがわんさかと。
+
+sudo aptitude install junior-tasks
+
+してみた。
+が、まったくtaskselコマンド上には現れない...
+
+--->そりゃそうだ、何故かdebian-junior-tasks.descだけ、
+    /usr/share/tasksel直下にインスコされるため。
+　　--->BUGちゃう？
+　　cd /usr/share/tasksel/descs
+　　sudo ln -s ../debian-junior-tasks.desc .
+　　して、無理やりリンクはってみた。
+　　で、taskselしたら、ちゃんと、メニューが出た。
+
+が、なんかいろいろありすぎて何選べばよいかわからんぞ。
+
+なんとなく、Debian Jr. for GNOMEでも選ぶか...
+--->大したことなかった...
+    gcomprisと
+　　mathwar
+   gworldclock
+
+　が入っただけ。
+
+※しかもgnomeシステム用のパッケージは他一切入らん...
+---> まあ、junior-gnomeにはgnome desktopへの依存は一切はいってないからな。
+
+まあ、aptitudeの---tasksというところにも現れるぜ。
+
+むー、なんもかわらんのう。
+---->結局Xが入らんなど。ssh serverをOFFしたら、本当に
+     SSHがうごかんくなった。
+　　　しかたないので、debian desktopとssh serverも選ぶ。
+
+どうも、最初にインストールすべきベースシステムは、
+Debian デスクトップを選ぶ必要あり。で、Gnome立ち上がってから、
+junior-tasksを実行しないと、必要なものがまったく入らん。
+例：Xとか、gnomeとか...
+
+最小限でいれたら、面倒くさいので、
+
+  debian desktop task,
+  aptitude install xorg
+
+しないと、ダメでした。
+
+なんかもうびっくりですが、gnome-shellがfallbackせずに一発動作。
+なお、gnome-shellの画面は特におかしいうごきではない様子。
+--->ずいぶん進化したなーとおもったが、
+      メニュー→「設定」→電源にてブランクスクリーン設定は
+　　　　「しない」に設定しないと、動作がおかしくなる。
+
+
+-------------そもそもpure blendのモジュールってどう作るんだ?
+中身としては、
+
+1)単に入れたいパッケージを記載した、Recomends:を指定したパッケージ群を
+  作る。
+2) pure-blend名-taskというtasksel用のデータパッケージを作る
+というのが目的。
+
+ドキュメントとしてはふるいが、
+http://blends.debian.org/blends/
+が参考になる。
+
+一応、
+blends-0.6.16.4のREADMEにblends専用のディレクトリについて
+説明が入っている。
+
+が、debian-juniorでは本当につかわれてるのか？？
+
+dpkg-reconfigure med-common
+
+とかやるとメニューでるとか言ってるが、実際に探してみると、
+
+aptitude search med-
+
+...中略...
+v med-common
+...中略...
+
+とかいう感じで...この機能は利用されてんのか？実際に。
+
+具体的な作り方：
+http://blends.debian.org/blends/apb.html
+
+とりいそぎ、visual-novelをぶっこむmetaパッケージ作ってみる。
+sudo aptitude install blends-common blends-dev
+
+mkdir debian-visualnovel-1.0
+cd debian-visualnovel-1.0
+
+cp -a /usr/share/doc/blends-dev/examples/(config|debian|tasks) .
+
+ここで、_BLEND_をvisualnovelとします。
+pure blendの名前は：debian-visualnovel
+visualnovel-gameパッケージにてonscripter,renpy-thequestion
+が導入されるのを期待するとします。
+
+Step1. まず、tasks/以下のファイルを作る
+       task1をgameにリネームし、中身を書く。
+Step2. debian/changelog作る
+Step3. debian/control.stub作る
+　　　　なお、Package: visualnovel-tasks
+　　　　の定義を入れておく。
+Step4. make -f debian/rules gen-orig-source
+      すると、debian-visualnovel-tasks.descが作られ、
+　　　 debian/controlも作られる。
+Step5. debuildする。
+
+以上で、tasks/*で作るタスクファイルから統一的にPureBlend用メタパッケージが
+作れる。
+
+taskファイル群から、controlファイルの作成は
+/usr/share/blends-dev/blend-gen-control -s unstable -S -t -A > pkg-tasks.desc
+で作る。
+
+で、
+apt-cache -o=Dir::Etc::sourcelist=/etc/blends/sources.list.unstable -o=Dir::State=../tmp/apt/state -o=Dir::Cache=../tmp/apt/cache -o=Dir::State::Status=/dev/null -o=Debug::NoLocking=true -o=APT::Get::AllowUnauthenticated=true dump 
+で見つからないようなパッケージは全部suggestion扱い。
+
+で、なんと、
+/etc/blends/sources.list.unstable
+の中身が、
+deb http://ftp.debian.org/debian testing main
+という感じで、testingを向いているため、たまたまtestingに無い
+パッケージを指定すると、suggestion扱いになる。
+例: renpy-thequestionとか。
+
+
+参考：
+debian menuとかすげえ。
+　aptitude show menu
+debian menuシステムの詳しい事は
+http://www.debian.org/doc/packaging-manuals/menu.html/
+参照。まあ、blends本体にはあまり関係なさげ。
+

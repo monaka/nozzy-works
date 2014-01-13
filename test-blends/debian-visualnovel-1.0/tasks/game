@@ -1,0 +1,7 @@
+Task: game
+Description: Debian-visual novel games_
+ This metapackage will install Debian packages for use in 
+ game of Debian-visualnovel
+
+Depends: onscripter, renpy-thequestion
+

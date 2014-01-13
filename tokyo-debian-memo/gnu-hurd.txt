@@ -821,3 +821,14 @@ hurd-libfuseってなんか自虐的じゃないのか？
 ---> そもそもどうやって、Hurdはハードを叩いてんだ?
 ---> 動作を追いかける最もスマートな方法は？
 ---> 移植はどうやるんだ？え？
+---> gnumachの内部構造
+---> L4とは
+　http://en.wikipedia.org/wiki/L4_microkernel_family
+　http://www.l4hq.org/
+
+"hello world" translator
+--> 
+8.2 Implementing trivfs callback functions
+http://www.gnu.org/software/hurd/hacking-guide/hhg.html
+
+$(HURD_SRC)/trans/hello.c

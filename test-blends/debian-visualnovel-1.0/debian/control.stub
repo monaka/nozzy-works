@@ -1,0 +1,14 @@
+Source: debian-visualnovel
+Section: misc
+Priority: extra
+Maintainer: Takahide Nojima <nozzy123nozzy@gmail.com>
+Build-Depends-Indep: debhelper (>= 9),
+                     blends-dev (>= 0.6.16.4)
+Standards-Version: 3.9.4
+
+Package: visualnovel-tasks
+Architecture: all
+Depends: tasksel
+Description: Debian visualnovel for tasksel
+ This package provides Debian visualnovel tasks in tasksel. 
+
