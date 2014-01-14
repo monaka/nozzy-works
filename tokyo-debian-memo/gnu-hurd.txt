@@ -403,6 +403,14 @@ aptitude install xserver-xorg-video-cirrus
 なんかようわからんが、さらに
 aptitude install task-lxde-desktop
 するとそれらしいものが入ってくる気がする...
+→と思ったらxserver-xorg-video-allが失敗して結局うまくいってないぜ。
+
+
+もちろん、これだけだと面倒くさすぎるので
+aptitude install fluxbox xinit
+
+んで、sudo xinitして、現れたコンソールにて、fluxbox &
+とかしてしばらくすると、fluxboxなXが現れる。
 
 インスコしたsparseなrawファイルのkvm用イメージは、gzipで圧縮して持ち込んだ場合
 以下のようにして展開するとsparseなまま展開できる。

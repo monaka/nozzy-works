@@ -42,6 +42,7 @@ iptables -A OUTPUT -p tcp --dport 465 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 587 --syn -j ACCEPT
 # for armitage radio station in finland
 iptables -A OUTPUT -p tcp --dst 143.51.142.148 --dport 8040 --syn -j ACCEPT
+iptables -A OUTPUT -p tcp --dst 71.178.19.18 --dport 8010 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dst 216.59.35.34 --dport 8004 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dst 91.121.66.35 --dport 8004 --syn -j ACCEPT
 # for animaze radio station
@@ -104,6 +105,8 @@ iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
 # for sqex
 iptables -A INPUT --src 10.22.95.150 -j ACCEPT
 iptables -A OUTPUT --dest 10.22.95.150 -j ACCEPT
+# for vivain shinjuku
+iptables -A OUTPUT -p tcp --dest 192.168.2.1 --dport 1111 -j ACCEPT
 # another service
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
 iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input]'
