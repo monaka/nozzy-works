@@ -1,0 +1,2 @@
+1. Fix file permission of /var/games/xmris/xmris.score, currently 
+2. Fix disabling key repeat

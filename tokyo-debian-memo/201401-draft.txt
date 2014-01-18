@@ -332,3 +332,30 @@ debian menuシステムの詳しい事は
 http://www.debian.org/doc/packaging-manuals/menu.html/
 参照。まあ、blends本体にはあまり関係なさげ。
 
+flavor調べるためにdebian-eduを実際にソースから落としたら、泣いた。
+---> debian-edu-config凄すぎ。これpure blendsの作り方からみると相当異質かも。
+     カスタマイズの話でcfの件が出ているが、これかも...
+----------------------------------
+
+apt-cache search で調べて、まあ、利用できそうなPure Blend 一覧。
+
+debian med ---> med-
+debichem   ---> debichem-
+debian junior --> junior-
+debian edu --> education-
+               debian-edu-
+debian science --> science-
+debian ezgo --> ezgo-
+
+debianGIS --> gis-
+
+debian multimedia --> multimedia-
+
+debian accessibilityはPure Blendによる実装ではなくなったっぽいなぁ。
+これはちょっと異質。
+
+flavorを説明しようかとおもったが、実際にこの用語が使われている
+例がわからん。（debian eduのパッケージみても、flavorという言葉は
+使われておらん）
+
+

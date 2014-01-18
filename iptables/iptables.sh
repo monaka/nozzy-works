@@ -106,7 +106,7 @@ iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
 iptables -A INPUT --src 10.22.95.150 -j ACCEPT
 iptables -A OUTPUT --dest 10.22.95.150 -j ACCEPT
 # for vivain shinjuku
-iptables -A OUTPUT -p tcp --dest 192.168.2.1 --dport 1111 -j ACCEPT
+iptables -A OUTPUT -p tcp --dest 192.168.0.0/16 --dport 1111 -j ACCEPT
 # another service
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
 iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input]'
