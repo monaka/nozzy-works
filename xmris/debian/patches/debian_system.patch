@@ -126,25 +126,32 @@ Author: Takahide Nojima <nozzy123nozzy@gmail.com>
  #endif /* TRANSPUTER */
  /*}}}*/
  /*{{{  file locking*/
-@@ -168,7 +166,7 @@
+@@ -168,7 +166,6 @@
   */
  {
    FILE    *stream;
 -
-+  mode_t  prev_umask;
  #ifdef TRANSPUTER
    if(locking_file && !locks)
      /*{{{  attempt file lock*/
-@@ -233,7 +231,9 @@
-   if(uid != current_uid)
-     set_euid((current_uid = uid));
+@@ -208,7 +205,7 @@
+ 	{
+ 	  if(current_uid != effective_uid)
+ 	    set_euid((current_uid = effective_uid));
+-	  filed = open(locking_file, O_CREAT | O_EXCL, 0666);
++	  filed = open(locking_file, O_CREAT | O_EXCL, 0660);
+ 	  if(filed >= 0)
+ 	    break;
+ 	  if(errno == EINTR)
+@@ -259,7 +256,7 @@
+ #endif /* USELOCKFILE */
+ #ifndef TRANSPUTER
+   if(stream && flag & 4 && effective_uid == real_uid)
+-    chmod(name, 0666); /* not everyone has fchmod */
++    chmod(name, 0660); /* not everyone has fchmod */
+   if(current_uid != real_uid)
+     set_euid((current_uid = real_uid));
  #endif /* TRANSPUTER */
-+  prev_umask=umask(S_IWOTH);
-   stream = fopen(name, flag & 1 ? "w+" : "r+");
-+  umask(prev_umask);
-   if(!stream && !(flag & 2))
-     perror(name);
- #ifdef USELOCKFILE
 --- a/xmred.man
 +++ b/xmred.man
 @@ -1,13 +1,13 @@
