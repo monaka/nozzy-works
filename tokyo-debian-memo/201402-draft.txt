@@ -1,0 +1,193 @@
+corosyncやるかー。
+
+しょうがねーなー。
+
+くっそー、resolverが、/etc/resolv.confにないぞちくしょー。
+
+ぶっとびだが、ifupdownってnoweb-->cになった。
+bug #707209
+まあ、このバグレポのいうとおりだけどな。
+※メンテできねー。
+そのまま、shell scriptにしろよ。
+
+---> upstreamなんてクソ喰らえという変更はいった。
+
+なんかしらんが、
+apt-file search if-up.d
+したら、ぞろぞろとパッケージが出てくる出てくる...
+
+ごあああ、/etc/resolv.confって、手で修正しろよとさ。
+See. http://www.debian.org/doc/manuals/debian-reference/ch05.ja.html
+
+/etc/network/interfacesに記載している、
+dns-nameservers句
+は、ifupdownでは無視され、resolvconfパッケージで自動的に処理される。
+--->とおもったら、なんか/etc/resolv.confが入っていたよ?
+　　※俺がいれたのか？？
+　　　/etc/network/interfacesのdns-nameservers書き直してリブートしても、
+　　　/etc/resolv.confはちっとも変わらんかった。
+
+もうクソ面倒なので、GuestOS側はホストのdnsmasqを見に行くようにしよう！
+良い解説：http://d.hatena.ne.jp/kinneko/20090819/p2
+
+dnsmasqって、pxebootも、dhcpも、dnsもつんでるとわー。
+--->スイスアーミーナイフなんでこまるぜ。
+--->巷では、dnsmasq使ってpxeブートとかやってる人たくさんいる...
+
+dnsmasqをデバッグしてみた
+---> struct daemon *daemonは、struct daemon *dnsmasq_daemonだ。
+main関数の前半戦のdaemon->dhcpは全部NULLのため、すっとばされる。
+
+netlink_init()が呼ばれる。
+---> netlinkは特殊なsocket I/F。モジュールとの通信にsocketを使うという
+　　　のが本来の意味であるが、どうも、ネットワークのルーティングとか、
+     NICのアドレスとか入手するときにつかうようだ。
+　　　man 7 netlink, man 7 rtnetlink
+
+     netlinkを使うpidがポート番号として利用というのがすげえ。
+
+src/option.cのoption opts[]={}がロングオプション。
+bind-dynamic --> LOPT_CLVERBIND --> OPT_CLEVERBIND
+となる。
+
+※なお、CLEVERBINDは、net-ifが増えると勝手にそのI/FのIP addrでlistenする
+というもの。See. man dnqmasq
+
+OPT_NOWILDというのがあったので、こちら調べると、bind-interfaceオプション
+のことだった。で、さらにソース見ると、IN_ADDRANYでbindしないようにする
+動作のようだ。
+--->実際bind-interface有効にすると、
+　　interfaces=br0
+   bind-interface
+
+にて、きちんと、br0のip addrでlistenしてた。
+---> /etc/dnsmasq.confとか、man dnsmasq見ても分かりにくいのなんの。
+　　　説明が特別系の扱いのくせに、やってることは普通。
+　※ IN_ADDR_ANYで I/Fにbindすんのかとおもった。
+
+corosyncとpacemakerの良い文章：
+http://clusterlabs.org/doc/en-US/Pacemaker/1.1-crmsh/html/Clusters_from_Scratch/index.html
+
+基本、corosyncとpacemakerの組み合わせで2台のマシンのVIPのフェイルオーバは担当可能。
+RedHat側がn台の万能クラスタサポートしようとして、Clusterのフレームワーク
+(cmanとか,ricciとか)を用意しているような位置づけ。
+
+なので、2台の簡易的なVIPフェイルオーバであれば、上の文章で十分。
+
+corosync入れた。
+aptitude install corosync
+
+pacemaker入れた
+aptitude install pacemaker
+※一部ライブラリがexperimental由来のものを入れないとインスコが進まない。
+
+＃2台ならいらん
+# cman入れた
+# aptitude install cman
+
+corosyncって、debian-ha-maintainersというグループがメンテしてる。
+で、mailarchiveみたらSPAMだらけというオチ...orz
+
+で、cman使わんので、corosync.confだけ書きまくる。
+
+Step.1 /etc/hostsにお互いを入れる。
+pingでお互い確認できるとなお良い
+
+Step.2 rootユーザのsshのキーを作っておき、
+お互いログインできるようにする。
+※上の文章のやり方は野蛮すぎるので注意。
+
+Step 3. multi-castとして、239.255.1.1 4000とする。
+注：策定するばあい、
+See. http://clusterlabs.org/doc/en-US/Pacemaker/1.1-crmsh/html/Clusters_from_Scratch/_notes_on_multicast_address_assignment.html
+※うまいこと選ばんとCiscoの機材がばらまいてるMulticastとバッティングするんで。
+
+Step 3. /etc/corosync/corosync.confを手で記述。
+なお、corosync.confには、quorum無しのときは、quorumの設定無し
+でOKのようだ。
+
+がああ、debian のcrmshはpythonのpython-lxmlパッケージに依存しているくせに
+apt-cache dependsで、python-lxmlが入っていないので、速攻エラーに。
+※入れたら直った。
+あー出たよ出たよ。/etc/default/corosyncに
+START=no
+とあるので、service corosync startができず。
+--->直したら動いた。
+---->うっかり対向のサーバーに入れ忘れたので、floating-IPこけた。
+　　aptitude install python-lxmlして、service corosync stopしたらそのまま
+　　ハング...もいっちょservice corosync stopしたら無事死んだ。
+----> 再度立ち上げたら、無事フローティングIPがdebian-sid0についた。
+
+今度はpacemakerが、libhbclient.so.1が無くてこける
+--->嫌な予感大だが、libheartbeat2パッケージが要るようだ。
+/etc/init.d/pacemaker見ると、cmanも対応済みのinitファイルだ。
+まあ、/etc/cluster/cluster.confが無いので、cman経由のpacemakerが起動できん。
+--->環境変数で判別しているようだ。
+　　で、/etc/cluster/cluster.confを見付次第cman起動するらしい。
+
+で、libheartbeat2突っ込んでservice pacemaker startしたら
+今度は
+Feb 10 19:24:37 debian-sid0 pacemakerd[6864]:    error: mcp_read_config: We can only start Pacemaker from init if using version 1 of the Pacemaker plugin for Corosync.  Terminating.
+と言われてこけた。
+-->corosync経由の起動だとlibheartbeat2はいらんかったかも...
+
+---->結局debianの場合、/etc/corosync/corosync.confのコンフィグ使わないと
+　　pacemakerがまともに起動できない。
+　　この場合、corosync-->pacemakerを起動する仕組み。
+
+マニュアルどおり、
+crm_verify -L -V
+すると、
+   error: unpack_resources:     Resource start-up disabled since no STONITH resources have been defined
+   error: unpack_resources:     Either configure some or disable STONITH with the stonith-enabled option
+   error: unpack_resources:     NOTE: Clusters with shared data need STONITH to ensure data integrity
+Errors found during check: config not valid
+って言われるので、STONITHを潰しておく。
+crm configure property stonith-enabled=false
+こうすると、
+crm_verify -L
+しても何も言われなくなる。
+
+で、192.168.0.9をVIPにしてみた。
+debian-sid0# crm configure primitive ClusterIP ocf:heartbeat:IPaddr2 params ip=192.168.0.9 cidr_netmask=32 op monitor interfal=30s
+
+で動いたので、２ノードのため、
+crm configure property no-quorum-policy=ignore
+を投入してみる。
+
+
+-----------------haproxyの件---------------
+debianのmysql-serverって、
+/etc/mysql/my.cnfにて、
+bind-address=127.0.0.1
+してやがるので、デフォルトではネットワークでlistenしないから注意
+こちらをコメントアウトする必要あり。
+
+また、haproxyも、
+/etc/default/haproxy
+にて、
+ENABLED=0
+にしてあるので、sudo service haproxy startしても動かん。
+ここを
+ENABLED=1
+に変更してGO!
+
+ぐっは、br1作ってあわてて仮想環境つくったら、しらぬまに
+debian-sid1とdebian-sid2のeth1側のmacアドレスがバッティング。
+どこにも警告でなかったため、片方の疎通がとれると片方の疎通が
+とれないという超不可解な現象に。
+
+いつか、MACバッティングを警告させる方法をつかんでやる。
+
+haproxyの設定でdebianのデフォルトだと/var/lib/haproxyへchrootする
+ようになってるが、こいつのおかげで、/dev/logにアクセスできず、
+ログが吐けない。まあ、haproxyユーザになっているようであるので、
+chrootを外す対応でいくかんじか。
+
+くっそー、haproxyって、MODE_QUIETが、global.modeに指定されてると、
+ロガーにも吐かねー構造だ。また、chroot時にもなんとかできるように、
+chrootするまえに、/dev/log開くようだ。
+daemon指定されていると、MODE_QUIETが働く気がするが気のせいだろうか?
+
+
+　
