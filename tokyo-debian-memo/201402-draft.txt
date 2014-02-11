@@ -156,6 +156,32 @@ crm configure property no-quorum-policy=ignore
 を投入してみる。
 
 
+-----corosync注意点
+KVMで実験するとき、bridge作ってネットワークを作るが、
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-call-arptables = 0
+のworkaroundは必ず機能させておくこと。
+こちらがないとbridgeに刺さっているguest側の
+ネットワークがまったく疎通しない。
+
+corosync-keygenは/dev/randomみてるが、
+/dev/randomはそのVMの動作状態に依存するので、
+なんも負荷がかかってないようなVMだと、
+/dev/randomの生成が超遅くてなかなかおわらん。
+
+なんとなくだが、ソースみると、
+totem->private_keyにそのまま/etc/corosync/authkeyの
+中身がはいり、これが、instance->totem_config->secauth==1なら
+いろいろと暗号化が利用されるように見える。
+(See. exec/totemudp.c等）
+
+corosyncのring NIC I/Fであるが、この間に流れる
+パケットがちょっと多い。が、この間隔は固定値
+で0.1秒に設定されているため、これより下げることが出来ないかも？
+See. exec/totemudp.c 1956行あたり。
+
+
 -----------------haproxyの件---------------
 debianのmysql-serverって、
 /etc/mysql/my.cnfにて、
