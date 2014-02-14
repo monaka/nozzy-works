@@ -110,6 +110,9 @@ iptables -A OUTPUT -p tcp --dest 192.168.0.0/16 --dport 1111 -j ACCEPT
 # another service
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
 iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input]'
+# sqex dhcp
+iptables -A INPUT -p udp --dport 5353 --sport 5353 -i wlan0 -j ACCEPT
+iptables -A OUTPUT -p udp --dport 5353 --sport 5353 -o wlan0 -j ACCEPT
 iptables -A OUTPUT -p tcp -j LOG --log-prefix '[Drop output]'
 iptables -A OUTPUT -p udp -j LOG --log-prefix '[Drop output]'
 iptables -A INPUT -p tcp -j DROP 

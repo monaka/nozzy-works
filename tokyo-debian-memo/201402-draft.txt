@@ -155,6 +155,53 @@ debian-sid0# crm configure primitive ClusterIP ocf:heartbeat:IPaddr2 params ip=1
 crm configure property no-quorum-policy=ignore
 を投入してみる。
 
+くそう、Redhat系はpcsコマンド(pacemaker & corosyncなんとかというコマンド群）、
+Debianはcrm系（pacemaker付属）という違いがある。なので、
+crmで使い方覚えても、そもそもRedhat側にcrm（crmsh)は存在しない。
+
+--->単にcrmshが古かったので、pcsで置き換えた感じか？
+　　そんなきがする。なお、debianでもpcsをITPする話のようだが、
+　　途中でやめちゃったようだ。
+
+なお、ocf:pacemaker:pingでeth0/eth1がおかしくてもフェイルオーバー
+させるつもりで設定投入してみたが、うまく動かない...
+--->もうどう設定しても、ocf:heartbeat:IPaddr2の
+　　モニタ定義に先にひっかかり、それ以上すすまないので、
+　　フェイルオーバしないという罠。
+
+----- どうでも良いけど無線LAN
+
+ wpa2(AES) hidden ssidの組み合わせでwpa_supplicant経由
+（要は/etc/network/interfacesに直接無線LANの設定を書く場合、
+
+iface wlan_debian2 inet dhcp
+        wpa-ssid XXXX
+        wpa-psk XXXXX
+        wpa-ap-scan 1  <--重要
+        wpa-scan-ssid 1 <--重要
+
+ということだそうな。詳しくは、/usr/share/wpasupplicant/README.Debian.gz
+にて、hidden ssidで検索すると詳しい。
+
+なお、はまったら、
+
+　　wpa-logfile /tmp/wpa-log.log
+    wpa-debug-level 3
+
+とかを/etc/network/interfaceの定義に追加するとそりゃもう
+ガンガンログが/tmp/wpa-log.logに出まくるので、デバッグ可能。 
+詳しくは、/etc/wpa_supplicant/以下のshell scriptを嫁。
+
+※実は上の定義がないと、hidden ssidの元では、
+　wpa_supplicant(←ユーザランドの無線LANフレームワーク。bluezみたいなもん）
+がESSIDのビーコン探してssidと合致するものと通信しようとするので、
+ssid見つからないと思い込んだwpa_supplicantがまた探しにいく-->無限ループ
+という状況で大はまりする。
+
+ なお、ifupすると、wpa_supplicantがdaemon化して動き、
+/var/run/wpa_supplicant/wlan0とかにwpa_cliと通信して
+いろいろ設定するのが、debian流。
+（詳しくは/etc/wpa_supplicant/function.sh)
 
 -----corosync注意点
 KVMで実験するとき、bridge作ってネットワークを作るが、
@@ -180,7 +227,6 @@ corosyncのring NIC I/Fであるが、この間に流れる
 パケットがちょっと多い。が、この間隔は固定値
 で0.1秒に設定されているため、これより下げることが出来ないかも？
 See. exec/totemudp.c 1956行あたり。
-
 
 -----------------haproxyの件---------------
 debianのmysql-serverって、
@@ -215,5 +261,3 @@ chrootを外す対応でいくかんじか。
 chrootするまえに、/dev/log開くようだ。
 daemon指定されていると、MODE_QUIETが働く気がするが気のせいだろうか?
 
-
-　
