@@ -1,0 +1,226 @@
+aptitude install jmeterしたらメニューほぼ全部日本語でワロタ。
+
+
+fuel phpを jmeterでたたく。
+
+ fuelのDebianへの導入でイカスやりかた。
+See. 
+http://d.hatena.ne.jp/Kenji_s/20120518/fuelphp_quick_install
+
+sudo aptitude install git
+sudo aptitude install apache2 php5
+mkdir ~/bin
+cd ~/bin
+wget -O oil http://get.fuelphp.com/installer.sh
+chmod 755 ./oil
+
+くっそー、public_htmlがapach2で動かんとおもったら、
+phpいれただけじゃダメで、a2enmodしないとNG。
+デフォルト（入れただけ）の状態：
+
+sudo /usr/sbin/apache2 -l
+Compiled in modules:
+  core.c
+  mod_so.c
+  mod_watchdog.c
+  http_core.c
+  mod_log_config.c
+  mod_logio.c
+  mod_version.c
+  mod_unixd.c
+
+php5も、userdirもない。が、/etc/apache2/mods-enabled/php5.conf
+はある。なぜだ？
+---> とりあえず、/etc/apache2/mods-enabled/php5.conf中のuser_dirで
+     phpエンジンをoffにする設定をすべてコメントアウト。
+　　　sudo a2enmod userdir
+　　　で
+　　　wget -O- http://debian-sid2/public_html/my-work/publc/
+
+     で動作確認できた。
+
+
+達人出版の、「はじめてのフレームワークとしてのFuelPHP」買ってみたが、
+eclipseの記述がすでに古すぎて役に立たん...
+debian sidにくっついているeclipseは3.8なので、
+※なぜ4.x系列じゃないかは不明だが....
+PDTについては、
+http://wiki.eclipse.org/PDT/Installation_3.1.x
+をみて入れるのがよさげ。
+とおもったら、このリンクも古いやんけ...orz
+最新情報は
+http://www.eclipse.org/pdt/downloads/
+で、
+http://download.eclipse.org/tools/pdt/updates/nightly
+らしい。
+
+--->くそ、ここまで変遷が激しいと安心してつかえないやんけ...
+--->がああ、こちら指定したら、php pdt uiがないとか言われる...
+
+http://download.eclipseorg/tools/pdt/updates/release
+でも同様...orz
+いろいろダメだぁ。
+
+---> とりあえず、indigoリポジトリが有効化されていたので、
+　　　そこから、PDTを選んでインストールしてみた。
+　　　--->何故かうまくいった。
+
+おっと、そういえば、debianのphpって、昔から、
+
+ apache用 ---> /etc/php5/apache2/php.ini
+ cli用    ---> /etc/php5/cli/php.ini
+
+ってなってたな。そういや。
+
+eclipseでリモート環境のファイルを自然にエディットする方法は、
+http://docs.joomla.org/Configuring_Eclipse_IDE_for_PHP_development/Linux
+参考に、
+General PurposeのRemote Exploerいれて
+http://qiita.com/ukiuni@github/items/bc7d52dbc59af637bea5
+参考にremote_projectを作るのが正当らしい。
+---> create remote_projectでやってみたが、こいつもボロボロ。
+　　 一見うまく動くように見えるが、eclipse閉じて開いたら
+　　いろんなところで、eclipseがエラー吐いて復帰できず。
+　　結局リモートプロジェクトを削除するはめに。
+
+---->良い本ないか探したらeclipseは本がないのな。まぢかーっ。
+
+
+
+
+---------------------エラーここから----------------
+
+Cannot complete the install because one or more required items could not be found.
+  Software being installed: PHP Development Tools (PDT) JUnit Tests 3.1.2.201212211235 (org.eclipse.php.test.feature.group 3.1.2.201212211235)
+  Missing requirement: PDT Ui Unit Tests 3.1.2.201212211235 (org.eclipse.php.ui.tests 3.1.2.201212211235) requires 'bundle org.eclipse.dltk.core [4.0.0,5.0.0)' but it could not be found
+  Cannot satisfy dependency:
+    From: PHP Development Tools (PDT) JUnit Tests 3.1.2.201212211235 (org.eclipse.php.test.feature.group 3.1.2.201212211235)
+    To: org.eclipse.php.ui.tests [3.1.2.201212211235]
+---------------------エラーここまで----------------
+-------------------------------------
+3月アイデア
+
+とりあえず、狂気のexperimetalツアーとか？
+例：sidとexperimentalとの比較をやってみるとか。
+
+web develpmentフレームワークとしてのdebianとか。
+--->要は開発者向けでいいんだろ？
+
+どうでもよいが、
+sudo aptitude install ebook-dev-alp
+にて、電子書籍まであった...orz
+が、中身は、
+http://books.google.co.jp/books/about/Advanced_Linux_Programming.html?id=oRqqAVyXjwAC&redir_esc=y
+であり、2001年の出版なので、商品価値あんのかどうかわからんって感じ。
+
+
+-----------------libimobiledeviceの件
+
+結局libimobiledeviceは1.1.6でないと信頼できるデバイス質問ループから抜け出せない。
+インストールされているアプリのappidと一覧を手に入れる方法は、
+aptitude install ideviceinstaller
+して
+ideviceinstaller -l
+する。
+------------例-------------
+Total: 16 apps
+com.savysoda.documents2Free - Documents 2 7.3
+com.square-enix.occultmaiden - オカメン 1.0.4
+com.square-enix.gunsandsouls - GUNS 1.0.1
+jp.co.toylogic.ibis2 - アプリ彼女 1.4.0
+com.google.b612 - Google Earth 7.1.1
+jp.co.fenrir.sleipnirmobile - Sleipnir 3.1.4
+com.google.Maps - Google Maps 2.7.4.17774
+com.google.Authenticator - Authenticator 2.1.0.2212
+com.atebits.Tweetie2 - Twitter 6.2
+com.3rdkind.digdig - ディグディグ 1.6.1
+jp.co.infocity.BB2C10 - BB2C 1.3.43
+com.5pb.chaosheadnoah - CHAOS;HEAD NOAH(Lite) 1.2
+com.panoramicsoft.calcprofree - Calc Pro 5.1.2
+jp.gocro.SmartNews - SmartNews 1.6.2
+jp.ne.d2c.lostcrusade - ロスクル 1.0.2
+com.square-enix.drakerider-Ph-J - ドラグニル 1.0.3
+------------例-------------
+こんな感じ。
+
+また、システム側も全部欲しかったら、
+ideviceinstaller -l -o list_all
+とすると、
+----------例------------
+Total: 69 apps
+jp.gocro.SmartNews - SmartNews 1.6.2
+com.apple.MailCompositionService - MailCompositionService 1.0
+com.apple.stocks - Stocks 1.0
+com.square-enix.occultmaiden - オカメン 1.0.4
+com.apple.iad.iAdOptOut - iAdOptOut 1.0
+com.apple.appleaccount.AACredentialRecoveryDialog - AACredentialRecoveryDialog 1.0
+com.apple.mobilesafari - Safari 9537.53
+com.apple.social.remoteui.SocialUIService - SocialUIService 87
+com.apple.compass - com.apple.compass 1.0
+com.apple.weather - Weather 1.0
+com.apple.gamecenter - Game Center~iphone 2.0
+com.apple.AccountAuthenticationDialog - AccountAuthenticationDialog 1.0
+com.apple.webapp - Web 1.0
+com.apple.reminders - Reminders 1.0
+...中略...
+com.apple.mobilephone - Phone 36
+com.apple.nike - com.apple.nike 1.0
+com.apple.quicklook.quicklookd - quicklookd 1.0
+com.apple.mobiletimer - Clock 1.0
+com.google.Authenticator - Authenticator 2.1.0.2212
+com.apple.WebViewService - WebViewService 1.0
+com.apple.Copilot - Copilot 1.0
+com.apple.MobileSMS - Messages 1.0
+com.apple.AppStore - App Store 2.0
+com.apple.camera - Camera 43
+com.apple.gamecenter.GameCenterUIService - GameCenterUIService 2.0
+com.apple.Music - Music 1.0
+com.apple.mobilemail - Mail 53
+com.apple.WebContentFilter.remoteUI.WebContentAnalysisUI - WebContentAnalysisUI 1.0
+com.apple.uikit.PrintStatus - PrintStatus 1.0
+com.google.Maps - Google Maps 2.7.4.17774
+com.apple.PassbookUIService - PassbookUIService 1.0
+jp.ne.d2c.lostcrusade - ロスクル 1.0.2
+--------------------ここまで----------------------
+こんな感じ。
+
+Document2とかマウントしたくば、
+sudo ifuse --appid com.savysoda.documents2Free /media/nojima
+とかすると、Document2アプリのストレージ領域が/media/nojimaへマウントされる。
+あとは、
+sudo cp xxxx.pdf /media/nojima
+
+とかすると、無事Document2のフォルダにファイルが現れる。
+ディレクトリもmkdirで掘るとそのフォルダが現れる。
+
+usermod -a -G fuse nojima
+
+はいるかも。
+
+------------------3/2 のdoc-jaであった件
+
+知らんかったが、
+　- manpages-jaはupstreamは
+　　　 http://linuxjm.sourceforge.jp/download.html man-pages-ja-(.*)\.tar\.gz
+
+なので、
+
+　- manpages-3.58
+
+がupstreamではない。
+
+つまりは、JM-PJが最新に追従してくれんと、debianのマニュアルの訳はひどい
+ことになる。
+
+また、debianの訳語統一は、
+http://lists.debian.or.jp/debian-doc/201002/msg00005.html
+参照。なお、
+現行の「Debian JP Doc/WWW 対訳表」
+はゴタゴタがあって、いろいろ古い。
+
+jman-PJのprocpsは3.2.5を元にしているらしい。
+See. http://linuxjm.sourceforge.jp/manual/procps/translation_list
+
+とりあえず、procpsは3.2.xを最後に3.3.xへprocps-ngとしてアップグレード
+したので、こちらの訳に差し替える。
+
