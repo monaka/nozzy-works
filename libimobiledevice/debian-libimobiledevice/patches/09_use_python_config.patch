@@ -1,0 +1,16 @@
+--- a/m4/ac_python_devel.m4
++++ b/m4/ac_python_devel.m4
+@@ -152,12 +152,7 @@
+ 	#
+ 	AC_MSG_CHECKING([for Python include path])
+ 	if test -z "$PYTHON_CPPFLAGS"; then
+-		python_path=`$PYTHON -c "import distutils.sysconfig; \
+-			print(distutils.sysconfig.get_python_inc());"`
+-		if test -n "${python_path}"; then
+-		   	python_path="-I$python_path"
+-		fi
+-		PYTHON_CPPFLAGS=$python_path
++		PYTHON_CPPFLAGS=`$PYTHON-config --includes`
+ 	fi
+ 	AC_MSG_RESULT([$PYTHON_CPPFLAGS])
+ 	AC_SUBST([PYTHON_CPPFLAGS])

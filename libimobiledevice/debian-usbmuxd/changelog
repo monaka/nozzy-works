@@ -1,0 +1,5 @@
+usbmuxd (1.0.8-4~a1) unstable; urgency=medium
+
+  * Split out libusbmuxd to other packages
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Sun, 30 Mar 2014 22:10:00 +0900

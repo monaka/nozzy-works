@@ -1,8 +1,8 @@
-libimobiledevice (1.1.6-1~a1) unstable; urgency=low
+libimobiledevice (1.1.6-1~a2) unstable; urgency=low
 
-  * update latest upstream
+  * update to latest upstream
 
- -- Takahide Nojima <nozzy123nozzy@gmail.com>  Fri, 28 Feb 2014 01:42:21 +0900
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Tue, 25 Mar 2014 10:13:00 +0900
 
 libimobiledevice (1.1.5-2) unstable; urgency=low
 

@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+    DEB_CFLAGS_MAINT_APPEND = -O0
+else
+    DEB_CFLAGS_MAINT_APPEND = -O2
+endif
+
+%:
+	dh $@ --with autoreconf
+

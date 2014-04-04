@@ -1,0 +1,151 @@
+ifuse (1.1.3-0~a1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Wed, 02 Apr 2014 23:23:14 +0900
+
+ifuse (1.1.2-0.1) experimental; urgency=low
+
+  * Non-maintainer upload with maintainer ack; closes: #721560.
+  * New upstream release; closes: #718255.
+    - Build-dep on libplist-dev since upstream now directly links to it.
+    - Drop libglib2.0-dev build-dep; obsoleted in this release; also add
+      mising pkg-config build-dep as this was pulled by libglib2.0-dev.
+    - Update download URL in debian/copyright to point at new
+      http://www.libimobiledevice.org/ site.
+    - Drop debian/ifuse.1 and debian/ifuse.manpages but list usr/share/man in
+      ifuse.install as man page was merged upstream.
+    - Drop patch 01_DSO_libplist, merged upstream.
+    - Drop patch 99_autoreconf, now unneeded.
+  * Drop unused DEB_HOST_GNU_TYPE and DEB_BUILD_GNU_TYPE from debian/rules.
+  * CFLAGS and LDFLAGS were set in debian/rules, but were ineffective; switch
+    to debhelper compatibility level 9 to fix this and to support distro-set
+    LDFLAGS and CPPFLAGS.
+    - Bump debhelper build-dep to 9~.
+    - Bump debian/compat to 9.
+    - Drop CFLAGS definition from rules; debhelper 9 already sets this
+      correctly.
+    - Rename LDFLAGS to DEB_LDFLAGS_MAINT_APPEND.
+  * New patch, Updated-for-libimobiledevice-1.1.5, cherry-pick from upstream's
+    9ac32aa in github:libimobiledevice/ifuse.git; fixes a type error with
+    libimobiledevice >= 1.1.5 breaking ifuse on 64-bits arches.
+    - Use dh_autoreconf to autoreconf the source-tree after applying patches:
+      build-dep on dh-autoreconf and call dh with --with autoreconf.
+    - Add patch Fix-name-of-PKG_CHECK_MODULES-test-for-limd-1.1.5 to fix
+      libimobiledevice 1.1.5 check in configure.ac; sent upstream.
+  * Bump Standards-Version to 3.9.4; no change needed.
+
+ -- Loïc Minier <lool@debian.org>  Sun, 01 Sep 2013 23:23:14 +0200
+
+ifuse (1.1.1-2.1) experimental; urgency=low
+
+  * Non-maintainer upload.
+
+  [ Salvatore Bonaccorso ]
+  * Change Depends on fuse-utils to fuse as the transitional package is gone.
+    (Closes: #698126) 
+
+ -- Andreas Beckmann <anbe@debian.org>  Sat, 24 Aug 2013 15:02:00 +0200
+
+ifuse (1.1.1-2) experimental; urgency=low
+
+  * debian/patches:
+   - 01_DSO_libplist.patch: Really add linking to fix DSO linking. Thanks
+     Angel Abad for the initial patch (Closes: #612089)
+   - 99_autoreconf.patch: Refresh.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Sun, 13 Feb 2011 23:22:18 +0100
+
+ifuse (1.1.1-1) experimental; urgency=low
+
+  * New upstream release.
+  * debian/watch:
+   - Update with the new location on libimobiledevice.org.
+  * debian/ifuse.docs:
+   - Add NEWS.
+  * debian/control:
+   - Build-depends on libimobiledevice-dev (>= 1.1.0) to enable file sharing.
+   - Update Homepage.
+   - Remove dupplicates section field.
+   - Add mention of debug in the short description of ifuse-dbg.
+  * debian/ifuse.1:
+   - Update with --appid option.
+   - Some fixes.
+  * debian/rules:
+   - Remove additional CFLAGS to pass correct flags.
+   - Add additional LDFLAGS.
+   - Use filter instead of findstring to find noopt.
+  * debian/patches:
+   - 01_DSO_libplist.patch: Add linking to libplist to fix DSO linking.
+   - 99_autoreconf.patch: Run autoreconf to refresh build system with
+     01_DSO_libplist.patch.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Wed, 12 Jan 2011 22:33:10 +0100
+
+ifuse (1.0.0-2) experimental; urgency=low
+
+  * debian/watch:
+   - Fix using githubredir.debian.net, thanks Paul McEnery.
+  * debian/control:
+   - Wrap build-depends and depends.
+   - Bump Standards-Version to 3.9.1.0 (no change needed).
+   - Bump build-depends on debhelper to (>= 7.0.50~) for overrides. 
+  * debian/rules:
+   - Reduce by using dh7.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Thu, 14 Oct 2010 01:10:16 +0200
+
+ifuse (1.0.0-1) unstable; urgency=medium
+
+  * Urgency set to medium to fix RC bug (#577322)
+  * New upstream release.
+   - Update to new libimobiledevice API (Closes: #577322)
+  * debian/control:
+   - Depends on fuse-utils (Closes: #571583)
+   - Bump build-depends on libimobiledevice-dev to (>= 1.0.0)
+  * Switch to dpkg-source 3.0 (quilt) format
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Fri, 16 Apr 2010 18:03:28 +0200
+
+ifuse (0.9.7-1) unstable; urgency=low
+
+  * New upstream release (Closes: #568133)
+  * debian/control
+   - Replace build-depends on libiphone-dev by libimobiledevice-dev.
+   - Bump Standards-Version to 3.8.4 (no change needed).
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Tue, 09 Feb 2010 23:22:21 +0100
+
+ifuse (0.9.5-1) unstable; urgency=low
+
+  * New maintainer. Thanks Bradley Smith for his work. Closes: #548593
+  * New upstream release.
+  * debian/ifuse.install: Only install usr/bin
+  * debian/control:
+   - Update build-depends on libiphone-dev to (>= 0.9.5)
+   - Remove VCS fields.
+   - Standards-Version to 3.8.3 (no change needed).
+  * debian/ifuse.{1,manpages}: Add man page.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Thu, 17 Dec 2009 00:26:54 +0100
+
+ifuse (0.9.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fix ifuse-dbg section.
+  * Add watch file.
+
+ -- Bradley Smith <bradsmith@debian.org>  Tue, 12 May 2009 18:44:54 +0100
+
+ifuse (0.1.0~git+20090323-1) experimental; urgency=low
+
+  * New upstream snapshot.
+  * Update Standards-Version to 3.8.1. (No changes).
+
+ -- Bradley Smith <bradsmith@debian.org>  Mon, 23 Mar 2009 20:42:00 +0000
+
+ifuse (0.1.0~git+20090210-1) experimental; urgency=low
+
+  * Initial release. Closes: #500326
+
+ -- Bradley Smith <bradsmith@debian.org>  Tue, 10 Feb 2009 12:37:31 +0000

@@ -1,0 +1,11 @@
+--- a/libimobiledevice-1.0.pc.in
++++ b/libimobiledevice-1.0.pc.in
+@@ -6,7 +6,7 @@
+ Name: libimobiledevice
+ Description: A library to communicate with services running on Apple iPhone/iPod Touch devices.
+ Version: @VERSION@
+-Requires: libplist >= @LIBPLIST_VERSION@ libusbmuxd >= @LIBUSBMUXD_VERSION@ @ssl_requires@
++Requires.private: libplist >= @LIBPLIST_VERSION@ libusbmuxd >= @LIBUSBMUXD_VERSION@ @ssl_requires@
+ Libs: -L${libdir} -limobiledevice
+ Cflags: -I${includedir}
+ 

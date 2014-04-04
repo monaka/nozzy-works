@@ -104,7 +104,9 @@ iptables -A OUTPUT -p tcp --dport 43 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
 # for sqex
 iptables -A INPUT --src 10.22.95.25 -j ACCEPT
+iptables -A INPUT --src 10.22.95.24 -j ACCEPT
 iptables -A OUTPUT --dest 10.22.95.25 -j ACCEPT
+iptables -A OUTPUT --src 10.22.95.24 -j ACCEPT
 # for vivain shinjuku
 iptables -A OUTPUT -p tcp --dest 192.168.0.0/16 --dport 1111 -j ACCEPT
 # another service

@@ -1,0 +1,47 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -4,3 +4,6 @@
+ 
+ udevrulesdir = /lib/udev/rules.d
+ udevrules_DATA = udev/39-usbmuxd.rules
++
++systemdsystemdir = /lib/systemd/system
++systemdsystem_DATA = systemd/usbmuxd.service
+--- a/configure.ac
++++ b/configure.ac
+@@ -84,6 +84,7 @@
+ Makefile
+ src/Makefile
+ udev/39-usbmuxd.rules
++systemd/usbmuxd.service
+ ])
+ 
+ echo "
+--- a/udev/39-usbmuxd.rules.in
++++ b/udev/39-usbmuxd.rules.in
+@@ -1,7 +1,12 @@
+ # usbmuxd ("Apple Mobile Device" muxer listening on /var/run/usbmuxd)
+ 
+-# Initialize iOS devices into "deactivated" USB configuration state and run usbmuxd
++# Check for systemd running as pid 1
++TEST=="/run/systemd/system/", ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="05ac", ATTR{idProduct}=="12[9a][0-9a-f]", ENV{USBMUX_SUPPORTED}="1", ATTR{bConfigurationValue}="0", OWNER="usbmux", TAG+="systemd", ENV{SYSTEMD_WANTS}="usbmuxd.service", RUN+="/usr/bin/pkill -x -SIGUSR2 usbmux" GOTO="usbmuxd_systemd_end"
++
++# Legacy udev
+ ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="05ac", ATTR{idProduct}=="12[9a][0-9a-f]", ENV{USBMUX_SUPPORTED}="1", ATTR{bConfigurationValue}="0", OWNER="usbmux", RUN+="@prefix@/sbin/usbmuxd -u -U usbmux"
+ 
++LABEL="usbmuxd_systemd_end"
++
+ # Exit usbmuxd when the last device is removed
+ ACTION=="remove", SUBSYSTEM=="usb", ENV{PRODUCT}=="5ac/12[9a][0-9a-f]/*", ENV{INTERFACE}=="255/*", RUN+="@prefix@/sbin/usbmuxd -x"
+--- /dev/null
++++ b/systemd/usbmuxd.service.in
+@@ -0,0 +1,9 @@
++[Unit]
++Description=iOS USB multiplexing daemon
++
++[Service]
++Type=simple
++GuessMainPID=false
++PIDFile=/var/run/usbmuxd.pid
++ExecStart=@prefix@/sbin/usbmuxd -f -u -U usbmux
++ExecStop=@prefix@/sbin/usbmuxd -X

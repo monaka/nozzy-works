@@ -1,6 +1,5 @@
 aptitude install jmeterしたらメニューほぼ全部日本語でワロタ。
 
-
 fuel phpを jmeterでたたく。
 
  fuelのDebianへの導入でイカスやりかた。
@@ -84,9 +83,6 @@ http://qiita.com/ukiuni@github/items/bc7d52dbc59af637bea5
 　　結局リモートプロジェクトを削除するはめに。
 
 ---->良い本ないか探したらeclipseは本がないのな。まぢかーっ。
-
-
-
 
 ---------------------エラーここから----------------
 
@@ -197,6 +193,290 @@ usermod -a -G fuse nojima
 
 はいるかも。
 
+idevice_id ... udid確認
+idevicebackup ... backup/restoreにてDIRECTORYをバックアップ/リストア
+idevicebackup2 ... backup/restoreだが、いろいろできるようだ。
+idevicedate ... デバイスの時刻をいじる。
+idevicedebugserverproxy ... lldbと繋ぐ
+idevicediagnostics ... diagnostics I/Fとつなぐらしい。
+ideviceenterrecovery ... デバイスをrecoveryモードにする
+ideviceimagemounter ... デバイスへディスクイメージをマウント
+（実際には、指定されたイメージファイルをafc使って特定のiphoneデバイス上
+の特定位置へアップロードして、mountコマンドをiphoneへ送り込むという動作）
+
+ideviceinfo ... デバイスの情報を表示
+idevicename ... デバイスの名前を設定したり、取ったりする。
+idevicepair ... デバイスとコンピュータをペアリングする。
+ideviceprovision ... provisioning profileをデバイスで管理
+idevicescreenshot ... スクショとるが、別途developer disk imageがいるらしい
+--->実際developer disk image無しだと何も起きない。
+idevicesyslog ... デバイスのsyslogを転送。
+
+idevicepairのソースみたとき、systembuidをどうやってとってんのか?
+ちょっとわからんかったが、単に
+/var/lib/lockdown以下のデータ読んでるだけだった...orz
+-----------ここから-----------
+ls /var/lib/lockdown
+/etc/dbus-1/system.d/ ls -l /var/lib/lockdown
+合計 12
+-rw-r--r-- 1 root root  266  2月 28 01:53 SystemConfiguration.plist
+-rw-r--r-- 1 root root 7817  3月  5 02:48 eb9c8e8cd0f866926b0f20cb588688c6988f9181.plist
+------------ここまで------------------
+中身見るとただのxmlファイルだ。ついでにいうと、
+idevicepair systembuid ---> /var/lib/lockdown/SystemConfiguration.plistを読む
+
+誰がこのファイル群を作ってるのか?
+
+とおもたら、idevicepairが作ってた...orz
+common/userpref.c: userpref_get_system_buid()
+が値なければジェネリックする。
+
+うお、乱数つかって、systembuidをジェネリックしてるぜ。
+
+なお、eb9c8e8cd0f866926b0f20cb588688c6988f9181.plistの方は、
+（<udid>.plistですね）
+libimobiledevice-1.1.6/common/userpref.c
+にて、userpref_device_record_set_keys_and_certs()がストア。
+なお、この中にある証明書は
+libimobiledevice-1.1.6/common/userpref.cの
+userpref_device_record_gen_keys_and_cert()
+で作成。
+※例えば、idevice_idとかが無けりゃ勝手に作る。
+--->あれ？lockdown のpairingではhost id/root certificateを入手してた。
+
+libimobiledevice-1.1.6/tools/ideviceinfo.cにて、
+-d オプションつけると、やりとりを可視化できるとのことらしい。
+---> -dつけたけど何も出てこないぜ。
+
+plistはxml形式と、バイナリ形式の２つがあるらしい...
+※plistとはproperty listのことらしい...
+
+idevicepair listとやると、/var/lib/lockdown/xxxxxxxxxxxxxxx.plist
+を単に読むだけ。どうも、過去に繋いだデバイスのidのキャッシュらしい。
+See. common/userpref.cのl.460からのコメント参照。
+
+usbmuxの付属文章のREADMEがイカス。なんか一気にiphoneの
+プロトコルのいろいろが見えた感じ...
+
+afcという言葉はApple File Connectionの意味らしい
+See. http://theiphonewiki.com/wiki/AFC
+usbmuxは
+http://theiphonewiki.com/wiki/Usbmux
+とのこと---->この解析っぷりがスゲエ。--->あれ？libimobiledeviceが元ネタか？
+Wiki上のResourceがlibimobiledeviceだ...
+This document was originally part of wikee.iphwn.org, which no longer seems to exist.
+って書いてあった。
+lockdownプロトコルってのもあるが、usbmuxの章にある。
+--->基本的に
+http://www.libimobiledevice.org/docs/html/include_2libimobiledevice_2lockdown_8h.html#details
+を担当。
+つまりは：Manage device preferences, start services, pairing and activation.
+ということ。
+なお、plistのxml形式をやりとりが基本。まあ、iphone5のusb側の総合窓口プロトコルみたいなもん。
+
+なお、lockdownプロトコルにてsession開始後は、sslで対応する。
+
+このプレゼンはすばらしい。もー、リバースエンジニリアリングの賜物だーっ
+http://2013.hackitoergosum.org/presentations/Day3-04.Hacking%20apple%20accessories%20to%20pown%20iDevices%20%E2%80%93%20Wake%20up%20Neo!%20Your%20phone%20got%20pwnd%20!%20by%20Mathieu%20GoToHack%20RENARD.pdf
+ちきしょー。libimobiledeviceまわり全部かかれちゃってるぜぇぇ。
+
+このあたり実は2010ころからhackが続いているようだ。
+
+pp7のプレゼンであるが、idevicepair pairで一旦pairingしてから、
+lockdown protocolで認証するというのがスタンダードらしい。
+
+lockdownd protocolってなんかいろいろできんのな？
+RequestにSetValueとか流すとそちらを受けとるらしい。
+
+
+あー、iproxy.cは自分でローカルにANY_ADDRでlistenし、
+その結果をusbmuxdのlocal socketめがけてplist形式で投げ込む。
+あとはひたらすら受け取り投げ込みという事を繰り返す。
+See. usbmuxd-1.0.8/tools/iproxy.c中run_ctos_loop()
+
+usbmuxdはlibusb_init()でまずusbデバイスをイニシャライズ。
+---> usbmuxd-1.0.8/daemon/usb-linux.cの手続きをふんでいるので、ひょっとして
+     linux specificな操作をおこなうのか？
+usbmuxdはとにかくusbにapple製品ぶら下がっていないかを調べる。
+usbmuxdはudevと連携して、apple製品ぶら下がっているかどうかを調べる事が可能。
+※一応、定期的にusbデバイスをチェックしてapple製品ぶらさがってないか調べてる。
+（See. usbmuxd-1.0.8/daemon/usb-linux.c中、usb_process(void)中、
+　usb_discover()の呼び出し）
+
+ぐほ、usbmuxdって、usbへ流し込んでいるデータはtcpプロトコルの変種のようだ。
+See. usbmuxd-1.0.8/daemon/device.c中、send_packet()。
+　　　わざわざtcpヘッダくっつけてusbデバイスへ流し込んでる。
+　　　（変なのは、src_ipもdest_ipもない。port番号だけ指定）
+
+　　　つまり、iproxyとかであれば、
+　　　　tcp_headr+plistによるデータ
+　　　というデータを流し込んでる。
+
+用は、usbmuxdって、usbポートにぶら下がったappleデバイスに対して、
+ローカルのUNIX DOM soketへappleデバイス上のport番号で示される
+tcpプロトコルもどきを出現させるproxyのような動作。
+
+--->つまりは、tcpdumpとかで覗けないかな...?pcapってunix domainソケットに
+有効だったりするかな...?どうだろう。ncとかでつながったりするかな？
+
+usbmuxdが暇しているときは、常にusb_discover()を呼んでいるようだ。
+
+usbmuxdには、usbmux.pyというライブラリと、tcprelay.pyというコマンド２つの
+pythonスクリプトが付属。iproxy.cも同様の動きをする。
+
+どうも、usbmuxdはいわゆるtcpのようなデータが流れる。だから、
+iphone側でlistenしてるアプリがいたりすると、こちらのtcp portに
+接続が可能になる。
+
+
+http://lists.alioth.debian.org/pipermail/pkg-gtkpod-devel/
+がパッケージメンテナのMLらしいが、もうspamだらけだぜー。
+libimobildevice1.1.6についてはノーコメントのようだ。
+
+ぐは、ifuseはチョー小さいプログラムだ...
+---> libimobiledevice側にsrc/afc.cというafcを操るapiがあるため。
+
+com.apple.mobile.house_arrestを使うと、
+iphone側のappidで示されるアプリのdocumentディレクトリへのafcアクセスが手に入る。
+で、fuse使って、read/writeなどの手続きを全部afc経由で行うという
+しろもの。
+
+まあ、
+fuse <---> ifuse <---> libimobiledevice <--> libusbmux <---> usbmuxd <--> libusb <--> USB HARDWARE <--> iphone5
+という感じですな。ifuseでマウントした時にDocumentとか見えたら、
+これはifuseが勝手にそういうディレクトリを見せているだけ。
+
+なお、appid指定しないときは、VendContainerにNULLが渡るのだが、
+この時マウントされるものは何だろう？？
+
+
+libimobiledevice/中で、
+git diff 1.1.5 HEAD
+してみてみた。
+
+diffった結果、lockdown protocolの変更に追従しているような感じである。
+
+さあ、以下は3/15以降の悪夢：
+
+なんかしらんが、ノートパソコン変えたらiphoneの
+sudo ifuse --appid com.savysoda.documents2Free /media/nojima
+が失敗（途中でアボート）するようになった。
+ifuseとかgdbで調べるとどうも、lockdownの途中でアボートしちゃうようだ。
+で、いつのまにやら、libimobiledevice-1.0.6がlibusbmuxdの1.0.9を必要
+とし、調べまくると、
+
+upstream --->http://marcansoft.com/blog/iphonelinux/usbmuxd/
+だったものが、いつのまにやら
+https://github.com/libimobiledevice/usbmuxd
+へ移動して独自進化を遂げていた...orz
+
+そしたらいろいろupgradeしないといけなくなった...orz
+(configure.acにバリバリライブラリアップグレードの跡が...)
+
+-----------ここからlibplistのアホー--------------
+libplistなんて、1.11になったら脱Cmakeしてた...
+一応、quiltでパッチ作りなおして、buildしてみる。
+--->くっそー、doxygenのdoxygen.cfgがないとか言いやがる..
+状況こっから：
+make[1]: ディレクトリ `/home/nojima/prog/libimobiledevice/libplist-1.11' に入り
+ます
+dh_auto_build
+doxygen doxygen.cfg
+error: configuration file doxygen.cfg not found!
+Doxygen version 1.8.6
+Copyright Dimitri van Heesch 1997-2013
+
+ってゆーか、doxygen.cfgって、configureが完了しないとできんやんか。
+dh $@ --with python2,autoreconf
+とかしないとconfigureが走らずダメだー
+
+あー、configure.acみるとわかるけど、libplist.so.2Xだー（ズガーン！）
+つまり今gitでcloneしたバージョンは2系列が本当。つまり、libplist-2.0.0-rc1とかだ...orz
+
+まあ、怒るまえに、
+git tag -n
+してgit diff 1.11しろよ。でも、なんかしらんが、ほとんど差がないぜ。
+
+ごあああ、buildがfailするんで、確認したら、なんと、libplist.soが1系列から、
+2系列になっていた..orz
+
+さらに、改めてlibplistをpackages.debian.orgでしらべると、libplist2が
+すでにできていた...orz
+
+というわけで本試みはしゅーりょー
+
+---->調べたら、3/25にunstableにアップロードされたばかりだぜ。
+
+.fin.
+------------------
+
+libusbmuxdは1.0.9でusbmuxd-1.0.8から分離して進化中。
+こちらについて、
+
+git clone ssh+git://git.debian.org/git/pkg-gtkpod/packages/libusbmuxd.git libusbmuxd-1.0.9
+
+こんな感じでclone。で、
+
+ Step 1. mv libusbmuxd-1.0.9/debian debian-libusbmuxd
+ Step 2. tar cJf libusbmuxd_1.0.9.orig.tar.xy libusbmuxd-1.0.9
+ Step 3. cp -a debian-libusbmuxd libusbmuxd-1.0.9/debian
+ Step 4. cd libusbmuxd-1.0.9/
+ Step 5. debuild -uc -us 2>&1 | tee ../build.log
+
+したらできた。
+
+　で、出来上がったlibusbmuxd2_1.0.9をいんすこしようとしたら、
+usbmuxd-1.0.8-3(元libusbmuxd2込みパッケージ）をぶっ壊すかも？という
+警告でいんすこできず...orz
+
+　ためしに、
+ git clone ssh+git://git.debian.org/git/pkg-gtkpod/packages/usbmuxd.git usbmuxd
+して中身確認したら、libusbmux付きの1.0.8-3バージョンだった。（2014/03/)
+
+ usbmuxd-1.0.8のgit版は、なんとlibimobiledevice-devを必要としてた。
+なので、libimobiledevice4/libimobiledevice-devをlibplist2の元で作る。
+が、そのままだと、usbmuxdをlibimobiledevice4が必要としているという
+循環系の依存関係になっちゃうので、libimobildevice4からusbmuxdの依存を
+外してリコンパイル。
+
+usbmuxdのビルドで大ハマリなので、
+env DH_VERBOSE=1 fakeroot dh_auto_install
+してみたら、びっくりで、
+	make -j1 install DESTDIR=/home/nojima/prog/libimobiledevice/usbmuxd-1.0.8/debian/usbmuxd AM_UPDATE_INFO_DIR=no
+
+とかしてやがりました。おかげで、ビルド場所がdh_installと整合しない。e
+
+
+
+---------------
+debianパッケージデバッグテクニック
+
+なんかよくわからんことでひっかかり、dh_auto_buildとかがどうMakeを呼び出している
+かとかは
+
+ env DH_VERBOSE=1 fakeroot dh_xxxxx
+
+とかするとコマンド呼び出しを全部アウトプットしてくれるので、便利。
+(See.man debhelper)
+
+------vim
+
+netrwにて、いつのまにやら、ディレクトリトラバースすると、
+Error detected while processing function <SNR>19_NetrwBrowseChgDir..<SNR>19_Netr
+wOptionRestore:
+line   69:
+E354: Invalid register name: '*'
+とか言われるようになったが、これは、
+/usr/share/vim/vim74/autoload/netrw.vim
+中のNetrwOptionRestoreにて、
+let @*=hoge
+とかやってる部分で、*レジスタに代入が禁止されているのに代入しようとして吹っ飛ぶ
+のが原因。
+
+なお、vimのスクリプトエラーを調べたけりゃ、
+:set verbose=20
+とかして事象を起こすとトレースがとれる。
+
 ------------------3/2 のdoc-jaであった件
 
 知らんかったが、
@@ -223,4 +503,119 @@ See. http://linuxjm.sourceforge.jp/manual/procps/translation_list
 
 とりあえず、procpsは3.2.xを最後に3.3.xへprocps-ngとしてアップグレード
 したので、こちらの訳に差し替える。
+
+--------------debian界隈
+
+クイズネタ：
+
+2014 GSoCのネタがアグレッシブでおもろい。
+
+サマリ：https://wiki.debian.org/SummerOfCode2014/Projects
+
+-------------以下は抜粋--------------------------
+AppStream/DEP-11 for the Debian Archive
+http://www.freedesktop.org/wiki/Distributions/AppStream/
+http://www.freedesktop.org/software/appstream/docs/
+
+Archive built with asan
+asanって↓
+http://clang.llvm.org/docs/AddressSanitizer.html
+利用例↓
+http://sylvestre.ledru.info/blog/2013/01/12/some_more_cool_stuff_with_llvm_clang
+
+Bootstrappable Debian
+こりゃまたすげえ。GSoCの賜物らしい。
+ build profiles, 
+　　https://wiki.debian.org/BuildProfileSpec
+
+multiarch-->これはいつもの奴
+
+cross-toolchains--->emDebianの壮大な計画のようだ。
+
+botch--->よくわからねー
+autobootstrap --->よくわからねー
+
+https://bootstrap.debian.net/
+---> multiplathomeを邪魔する状況を打破するサイト
+
+Debian built with clang
+とかあるんだ...
+
+Debian Continuous Integration
+もあった。
+http://ci.debian.net/
+
+Debian metrics portal
+Zackかよ。
+
+Get Muon ready
+muonというkubuntuのツールがあるんだ。しらんかったぜ。
+
+Improve Configuration Upgrade Mechansim with Elektra
+http://www.libelektra.org
+
+Integrate Debian with Android
+Lil'debのようなもの。
+
+libc++-based Debian
+すげー、頑張るのう。
+
+Linux hardware support for one mobile device
+ネイティブブートを目指すらしい
+
+...などなど...
+
+-------------以下は抜粋--------------------------
+
+Debian France's new contributor game
+http://wiki.debian.org/DebianFrance/NewContributorGame
+GSoCクローンだそうな。こういう話はいつもFrance。さすがだ。
+RaphaelHertzog すげー。
+-->狙いはDebianの活動をメンター付きで新人に知ってもらうというのが
+　狙い。
+
+Christian Perrierがまたバグ当てコンテストやってるぜ。
+bug #740000 [26] was
+reported on February 24 by Miguel Landaeta, 3 months and 4 days after
+bug #730000 [27].
+だそうな。
+
+OpenRISCプロジェクトにて、Debianを稼働させることに注力中とのこと。
+
+Debian Services Census PJが始動
+目的はDebian Communityにより運営されているソフトウェアサービス
+をwikiにまとめるという事。
+---> See. 
+https://wiki.debian.org/Services
+もーしらんようなサービスがガツガツ稼働中。
+
+DPL選挙はじまりましたー。
+スケジュールは以下に
+| Period     | Start                    | End
+|
+|------------+--------------------------+--------------------------|
+| Nomination | Monday, March  3th, 2014 | Sunday, March  9th, 2014 |
+| Campaign   | Monday, March 10th, 2014 | Sunday, March 30th, 2014 |
+| Vote       | Monday, March 31st, 2014 | Sunday, April 13th, 2014 |
+
+
+あー、現状の立候補は
+Lucas Nussbaum [lucas@debian.org] [nomination mail] [platform]
+Gergely Nagy [algernon@debian.org] [nomination mail]
+Neil McGovern [neilm@debian.org] [nomination mail]
+の３名ですなぁ。声明はLucusのみだ。
+See. http://www.debian.org/vote/2014/platforms/lucas
+
+
+
+
+
+...途中...
+
+
+
+-----どうでも良い話
+
+gitoriusすげー。サイト本体がGNU AGPLだ。
+まずい、debian関係者が使っていないなんてまずすぎる
 
