@@ -115,6 +115,11 @@ iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input
 # sqex dhcp
 iptables -A INPUT -p udp --dport 5353 --sport 5353 -i wlan0 -j ACCEPT
 iptables -A OUTPUT -p udp --dport 5353 --sport 5353 -o wlan0 -j ACCEPT
+# test for sip
+iptables -A OUTPUT -p udp --dport 3478  -j ACCEPT
+# test for animetop
+iptables -A OUTPUT -p tcp --dport 8716  -j ACCEPT
+
 iptables -A OUTPUT -p tcp -j LOG --log-prefix '[Drop output]'
 iptables -A OUTPUT -p udp -j LOG --log-prefix '[Drop output]'
 iptables -A INPUT -p tcp -j DROP 
