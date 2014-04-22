@@ -444,9 +444,51 @@ env DH_VERBOSE=1 fakeroot dh_auto_install
 してみたら、びっくりで、
 	make -j1 install DESTDIR=/home/nojima/prog/libimobiledevice/usbmuxd-1.0.8/debian/usbmuxd AM_UPDATE_INFO_DIR=no
 
-とかしてやがりました。おかげで、ビルド場所がdh_installと整合しない。e
+とかしてやがりました。おかげで、ビルド場所がdh_installと整合しない。
 
+libusbmuxd2とか、usbmuxdがバージョンupしてたので、そのままupgradeした。
 
+が、usbmuxdが
+もはやメンテされていない
+http://marcansoft.com/blog/iphonelinux/usbmuxd/
+版のせいで、libimobiledevice4とか全部userpref_read_system_buid()の
+手続きでnullポ渡されて死亡。
+
+がああ、github側のusbmuxdはlibimobiledevice4のライブラリを吸い込んでいるが、
+問題なのは、libimobiledevice-1.1.6にて、common/*.cをライブラリにまとめた
+libinternalcommon.laがstaticでの提供しかないため、dynamic側のライブラリに梱包されて
+おらず、こいつが原因で、
+ aptitude install libimobiledevice-dev
+しても、static用ライブラリには
+plist_read_from_filename
+plist_write_from_filename
+のシンボルがあるくせに、dynamic側ライブラリにはシンボルが存在しない。
+つまり、unstableのlibimobiledevice4は少なくともusbmuxdをビルドするには、バッギーだ。
+--->とおもったら、libinternalcommon.laは共有libでも、staticlibでも使えるようだ。
+で、nm libimobiledevice.so.4.0.1したら、
+0000000000015a80 t plist_read_from_filename
+0000000000015b20 t plist_write_to_filename
+という感じで一応、export?されている。なので、usbmuxdのmake途中を確認したほうが良いとなる。
+--->でも、nm -Dでは出てこないので、dynamic symbolとしては扱われていないような感じ。　
+　　なんでこうなった？
+があああ、
+libimobiledevice-1.1.6+dfsg梱包の
+のdebian/patches/Use-symbol-script-to-exclude-private-symbols.patchが
+悪さしている気がするぞ...orz
+-->やっとわかった。上のpatchに含まれている
+src/libimobiledevice-symbols.txtで、exportされるべきシンボルが抑圧されていた。
+この中にplist_read_from_file/plist_write_from_fileが無い。
+が、libimobiledevice内部のコマンドのtools/idevicebackup*.cで
+staticで再定義してやがる。
+--->バグか？
+
+quiltだが、
+/usr/share/quiltの多数のbashスクリプト
+を起動してごにょごにょする構造のようだ。
+
+--------------今日あらためて知った
+update-alternative ---config </etc/alternatives/以下のリンク名>
+で設定変更できるぞ。
 
 ---------------
 debianパッケージデバッグテクニック

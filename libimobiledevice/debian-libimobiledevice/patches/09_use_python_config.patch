@@ -1,5 +1,13 @@
---- a/m4/ac_python_devel.m4
-+++ b/m4/ac_python_devel.m4
+Description: Use python-config to find headers.
+   * 09_use_python_config.patch: Use python-config to find the python
+     include paths, and fix the build failure with multi-arched python.
+Author: Adam Conrad <adconrad@ubuntu.com>
+Forwarded: no
+
+Index: libimobiledevice/m4/ac_python_devel.m4
+===================================================================
+--- libimobiledevice.orig/m4/ac_python_devel.m4	2014-03-26 00:53:01.011204751 +0800
++++ libimobiledevice/m4/ac_python_devel.m4	2014-03-26 00:53:36.485043013 +0800
 @@ -152,12 +152,7 @@
  	#
  	AC_MSG_CHECKING([for Python include path])

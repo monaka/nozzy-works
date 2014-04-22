@@ -1,4 +1,4 @@
-usbmuxd (1.0.8-4~a1) unstable; urgency=medium
+usbmuxd (1.0.8-6~a1) unstable; urgency=medium
 
   * Split out libusbmuxd to other packages
 

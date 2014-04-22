@@ -1,0 +1,633 @@
+2014/04ネタ
+
+vargrantやら、dockerとか出て来たからこのあたりやろうかな？
+
+
+lshw -shortとかやって、結果みてみた。
+~/ sudo lshw -short
+------------ここから-----------------
+H/W path       Device     Class          Description
+====================================================
+                          system         2324HU6 (LENOVO_MT_2324)
+/0                        bus            2324HU6
+/0/1                      processor      Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz
+/0/1/3                    memory         32KiB L1 cache
+/0/1/4                    memory         256KiB L2 cache
+/0/1/5                    memory         3MiB L3 cache
+/0/2                      memory         32KiB L1 cache
+/0/7                      memory         4GiB System Memory
+/0/7/0                    memory         4GiB SODIMM DDR3 Synchronous 1600 MHz (0.6 ns)
+/0/7/1                    memory         DIMM [empty]
+/0/d                      memory         128KiB BIOS
+/0/100                    bridge         3rd Gen Core processor DRAM Controller
+/0/100/2                  display        3rd Gen Core processor Graphics Controller
+/0/100/14                 bus            7 Series/C210 Series Chipset Family USB xHCI Host 
+/0/100/16                 communication  7 Series/C210 Series Chipset Family MEI Controller
+/0/100/16.3               communication  7 Series/C210 Series Chipset Family KT Controller
+/0/100/19      eth0       network        82579LM Gigabit Network Connection
+/0/100/1a                 bus            7 Series/C210 Series Chipset Family USB Enhanced H
+/0/100/1b                 multimedia     7 Series/C210 Series Chipset Family High Definitio
+/0/100/1c                 bridge         7 Series/C210 Series Chipset Family PCI Express Ro
+/0/100/1c/0               generic        MMC/SD Host Controller
+/0/100/1c.1               bridge         7 Series/C210 Series Chipset Family PCI Express Ro
+/0/100/1c.1/0  wlan0      network        Centrino Advanced-N 6205 [Taylor Peak]
+/0/100/1c.2               bridge         7 Series/C210 Series Chipset Family PCI Express Ro
+/0/100/1d                 bus            7 Series/C210 Series Chipset Family USB Enhanced H
+/0/100/1f                 bridge         QM77 Express Chipset LPC Controller
+/0/100/1f.2               storage        7 Series Chipset Family 6-port SATA Controller [AH
+/0/100/1f.3               bus            7 Series/C210 Series Chipset Family SMBus Controll
+/0/0           scsi0      storage        
+/0/0/0.0.0     /dev/sda   disk           128GB C400-MTFDDAK128M
+/0/0/0.0.0/1   /dev/sda1  volume         100MiB Windows NTFS volume
+/0/0/0.0.0/2   /dev/sda2  volume         15EiB Windows FAT volume
+/0/0/0.0.0/3   /dev/sda3  volume         1812MiB Linux swap volume
+/0/0/0.0.0/4   /dev/sda4  volume         37GiB EXT4 volume
+/1                        power          45N1023
+/2             vnet0      network        Ethernet interface
+------------ここまで-----------------
+
+なんか、分かり易いのう。lspciより便利かも。
+※まあ、dmidecode使えよという話しもある。
+
+--------------debian
+
+Desktop EnvironmentでいれたGNOME3では、日本語変換エンジンは、
+i A mozc-data                             - Mozc input method - data files                 
+i A mozc-server                           - Mozc 入力メソッドのサーバ                      
+i A mozc-utils-gui                        - GUI utilities of the Mozc input method         
+i A uim-mozc                              - uim 用 Mozc エンジン - Mozc 入力メソッドのクラ
+となるようだ。
+--------------
+
+--------------emacs
+
+emacs24いれたが、いろいろ違う。
+まず、ディスプレイフォントが違いすぎ。
+
+また、.emacsが違う。
+
+$(HOME)/.emacs.d/init.el
+とかして、init.elに書くのが流行りのようだ。
+
+で今の設定は次の通り。
+---------------------init.el-------------
+(set-language-environment "Japanese")
+(prefer-coding-system 'utf-8)
+(keyboard-translate ?\C-h ?\C-?)
+---------------------init.el-------------
+あと、最近のbobcatは次のとおりのようだ。
+bobcat.elのかわりに、keyboard-translateで入替えのようだ。
+
+うは、emacs24入れてみたが、日本語まわりはleimか？これ滅茶苦茶頭悪そうな
+連分節変換だ。Ctl-Kでカタかな変換とか。
+leimがうごいて面倒臭いのでチェンジする。
+---> sudo aptitude install emacs-mozc emacs-mozc-bin
+    .emacs.d/init.elに
+
+(require 'mozc)
+(setq default-input-method "japanese-mozc")
+;; (setq mozc-candidate-style 'overlay)
+
+であり、C-SPCで日本語変換起動を抑圧するため、
+.Xresourcesあたりに
+Emacs*UseXIM: false
+をいれておく。
+
+あれ？候補が結局オーバーレイになったぞ？
+日本語変換の頭の良さは格段に向上したぞ？
+すげえ。一応、
+xrdb -merge .Xresources
+した効果が効いているようで、Ctrl-SPCしても、XIMは
+起動しないので助かる。
+
+mozc系は
+https://wiki.archlinux.org/index.php/Mozc_%28%E6%97%A5%E6%9C%AC%E8%AA%9E%29
+が秀逸。また、archlinuxかー。
+
+しらんかったが、バッファーのフォントサイズは、C-x C-+(拡大), C-x C--（縮小）という感じのようだ。
+面倒だが、こちらの設定で変更するようにしよう。
+
+
+--------------conky
+
+ubuntuのデスクトップの背景にシステムモニタっぽいものがでてたけど、
+これってconkyか？
+
+-------------thinkpad x230-
+
+thinkpad x230というわけではないが、ssdやら、symnaptic touchpadとかいろいろ周辺機器だらけ
+で妙な感じだ。
+
+http://skalldan.wordpress.com/2011/09/25/debian-wheezy-on-thinkpad-e220s-2/
+とか見ていろいろ発見ありまくり。
+
+一応、touchpadは有効にしてみて、sudo aptitude install gpoint-device-settings
+とかツール使うとネイティブの対応が可能っぽいんだけど、windowsに比べてXの方の
+出来が悪いようで、使い勝手が全く良くない。なんか、touchpadの反応が敏感すぎて泣く。
+https://wiki.debian.org/SynapticsTouchpad
+もみてくれ。
+
+trackpointについて、
+http://www.thinkwiki.org/wiki/How_to_configure_the_TrackPoint
+も結構良い文章。
+
+なので、gnome-settingsでtouchpadはoffった。
+
+まあ、関係ないが、lshwとかあるのな。thinkpad x220まわりで調べてたらでてきた。
+thinkpad x220まわりでsynapticドライバの関係は面白いかな？
+
+現在SSDがついているので、
+http://www.webupd8.org/2013/01/enable-trim-on-ssd-solid-state-drives.html
+で紹介されているオプティマイズを行う。
+
+なお、TRIMとは
+http://www.intel.com/jp/support/ssdc/hpssd/sb/CS-031846.htm
+
+
+sudo hdparm -I /dev/sda | fgrep TRIM
+とすると、TRIM機能があるので、こちらを有効にする。
+
+util-linux付属のfstrimを使い、cronで定期的にガベコレ？するようにしてみる。
+
+/etc/cron.daily/trimを作り、
+-----------trim-------------
+#!/bin/sh
+
+/sbin/fstrim -v / | logger -t fstrim
+-----------trim-------------
+を記載。
+
+vagrantネタ
+
+とりあえず、vagrant入れてみる。
+で、default providerがvirtualboxなので、KVMへチェンジする方法
+を模索。
+
+debianパッケージは
+http://www.vagrantup.com/downloads.html
+で落とせるが、一応、debian unstableでは、apt-get install vagrant
+で入れることができた。
+
+vagrant plugins list
+
+でインストール済み検証可能。
+
+で、気分よくして、
+
+~/ vagrant plugin install vagrant-kvm 
+Installing the 'vagrant-kvm' plugin. This can take a few minutes...
+/usr/lib/ruby/1.9.1/rubygems/installer.rb:562:in `rescue in block in build_extensions': ERROR: Failed to build gem native extension. (Gem::Installer::ExtensionBuildError)
+
+        /usr/bin/ruby1.9.1 extconf.rb
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require': cannot load such file -- mkmf (LoadError)
+	from /usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+	from extconf.rb:1:in `<main>'
+
+Gem files will remain installed in /home/nojima/.vagrant.d/gems/gems/ruby-libvirt-0.4.0 for inspection.
+Results logged to /home/nojima/.vagrant.d/gems/gems/ruby-libvirt-0.4.0/ext/libvirt/gem_make.out
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:540:in `block in build_extensions'
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:515:in `each'
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:515:in `build_extensions'
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:180:in `install'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:297:in `block in install'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:270:in `each'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:270:in `each_with_index'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:270:in `install'
+	from /usr/share/vagrant/plugins/commands/plugin/action/install_gem.rb:65:in `block in call'
+	from /usr/share/vagrant/plugins/commands/plugin/gem_helper.rb:42:in `block in with_environment'
+	from /usr/lib/ruby/1.9.1/rubygems/user_interaction.rb:40:in `use_ui'
+	from /usr/share/vagrant/plugins/commands/plugin/gem_helper.rb:41:in `with_environment'
+	from /usr/share/vagrant/plugins/commands/plugin/action/install_gem.rb:52:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/warden.rb:34:in `call'
+	from /usr/share/vagrant/plugins/commands/plugin/action/bundler_check.rb:20:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/warden.rb:34:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/builder.rb:116:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/runner.rb:69:in `block in run'
+	from /usr/lib/ruby/vendor_ruby/vagrant/util/busy.rb:19:in `busy'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/runner.rb:69:in `run'
+	from /usr/share/vagrant/plugins/commands/plugin/command/base.rb:17:in `action'
+	from /usr/share/vagrant/plugins/commands/plugin/command/install.rb:27:in `execute'
+	from /usr/share/vagrant/plugins/commands/plugin/command/root.rb:56:in `execute'
+	from /usr/lib/ruby/vendor_ruby/vagrant/cli.rb:38:in `execute'
+	from /usr/lib/ruby/vendor_ruby/vagrant/environment.rb:484:in `cli'
+	from /usr/bin/vagrant:127:in `<main>'
+となった。
+
+一応、気になったので、
+less /home/nojima/.vagrant.d/gems/gems/ruby-libvirt-0.4.0/README
+読んだら、
+------ここから------------
+ruby-libvirt
+============
+
+Ruby bindings for libvirt (http://libvirt.org)
+------------------------
+みたいな内容だったので、ひょっとして、
+aptitude install ruby-libvirtする必要あり？
+
+念のため、
+ rm -rf .vagrant.d
+してみて、
+sudo aptitude install ruby-libvirt
+したが、
+
+~/ vagrant plugin install vagrant-kvm
+Installing the 'vagrant-kvm' plugin. This can take a few minutes...
+/usr/lib/ruby/1.9.1/rubygems/installer.rb:562:in `rescue in block in build_extensions': ERROR: Failed to build gem native extension. (Gem::Installer::ExtensionBuildError)
+
+        /usr/bin/ruby1.9.1 extconf.rb
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require': cannot load such file -- mkmf (LoadError)
+	from /usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+	from extconf.rb:1:in `<main>'
+
+
+Gem files will remain installed in /home/nojima/.vagrant.d/gems/gems/ruby-libvirt-0.4.0 for inspection.
+Results logged to /home/nojima/.vagrant.d/gems/gems/ruby-libvirt-0.4.0/ext/libvirt/gem_make.out
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:540:in `block in build_extensions'
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:515:in `each'
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:515:in `build_extensions'
+	from /usr/lib/ruby/1.9.1/rubygems/installer.rb:180:in `install'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:297:in `block in install'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:270:in `each'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:270:in `each_with_index'
+	from /usr/lib/ruby/1.9.1/rubygems/dependency_installer.rb:270:in `install'
+	from /usr/share/vagrant/plugins/commands/plugin/action/install_gem.rb:65:in `block in call'
+	from /usr/share/vagrant/plugins/commands/plugin/gem_helper.rb:42:in `block in with_environment'
+	from /usr/lib/ruby/1.9.1/rubygems/user_interaction.rb:40:in `use_ui'
+	from /usr/share/vagrant/plugins/commands/plugin/gem_helper.rb:41:in `with_environment'
+	from /usr/share/vagrant/plugins/commands/plugin/action/install_gem.rb:52:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/warden.rb:34:in `call'
+	from /usr/share/vagrant/plugins/commands/plugin/action/bundler_check.rb:20:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/warden.rb:34:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/builder.rb:116:in `call'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/runner.rb:69:in `block in run'
+	from /usr/lib/ruby/vendor_ruby/vagrant/util/busy.rb:19:in `busy'
+	from /usr/lib/ruby/vendor_ruby/vagrant/action/runner.rb:69:in `run'
+	from /usr/share/vagrant/plugins/commands/plugin/command/base.rb:17:in `action'
+	from /usr/share/vagrant/plugins/commands/plugin/command/install.rb:27:in `execute'
+	from /usr/share/vagrant/plugins/commands/plugin/command/root.rb:56:in `execute'
+	from /usr/lib/ruby/vendor_ruby/vagrant/cli.rb:38:in `execute'
+	from /usr/lib/ruby/vendor_ruby/vagrant/environment.rb:484:in `cli'
+	from /usr/bin/vagrant:127:in `<main>'
+
+となっちゃうようで。
+
+ruby1.9.1-dev: /usr/lib/ruby/1.9.1/mkmf.rb
+だそうな。
+なので、
+aptitude install ruby1.9.1-dev
+してリトライ。
+~/.vagrant.d/gems/gems/ vagrant plugin install vagrant-kvm                 
+Installing the 'vagrant-kvm' plugin. This can take a few minutes...
+/usr/lib/ruby/1.9.1/rubygems/installer.rb:562:in `rescue in block in build_extensions': ERROR: Failed to build gem native extension. (Gem::Installer::ExtensionBuildError)
+
+        /usr/bin/ruby1.9.1 extconf.rb
+*** extconf.rb failed ***
+Could not create Makefile due to some reason, probably lack of
+necessary libraries and/or headers.  Check the mkmf.log file for more
+details.  You may need configuration options.
+
+Provided configuration options:
+	--with-opt-dir
+	--without-opt-dir
+	--with-opt-include
+	--without-opt-include=${opt-dir}/include
+	--with-opt-lib
+	--without-opt-lib=${opt-dir}/lib
+	--with-make-prog
+	--without-make-prog
+	--srcdir=.
+	--curdir
+	--ruby=/usr/bin/ruby1.9.1
+	--with-libvirt-include
+	--without-libvirt-include
+	--with-libvirt-lib
+	--without-libvirt-lib
+	--with-libvirt-config
+	--without-libvirt-config
+	--with-pkg-config
+	--without-pkg-config
+extconf.rb:83:in `<main>': libvirt library not found in default locations (RuntimeError)
+
+とかいわれたので、libvirt-devインストール。
+
+aptitude install libvirt-dev
+
+おおー、再度やったら、
+~/ vagrant plugin install vagrant-kvm
+Installing the 'vagrant-kvm' plugin. This can take a few minutes...
+Installed the plugin 'vagrant-kvm (0.1.5)'!
+と言われてはいったぞなもし。
+
+どうも、
+/home/nojima/.vagrant.d/gems/gems
+みると、
+~/.vagrant.d/gems/gems/ ls -la
+合計 16
+drwxr-xr-x 4 nojima nojima 4096  4月  7 16:07 .
+drwxr-xr-x 6 nojima nojima 4096  4月  7 16:00 ..
+drwxr-xr-x 5 nojima nojima 4096  4月  7 16:07 ruby-libvirt-0.4.0
+drwxr-xr-x 7 nojima nojima 4096  4月  7 16:07 vagrant-kvm-0.1.5
+とのことで、ruby-libvirt-0.4.0がインスコされるようだ。
+
+全ては、
+https://github.com/adrahon/vagrant-kvm
+をみよということか？
+
+export VAGRANT_DEFAULT_PROVIDER=kvm
+で、plugins vagrant-kvmの元では、デフォのproviderがkvm化するらしい。
+
+vagrant init precise64 http://files.vagrantup.com/precise64.box
+やってみっか。
+
+なんかパーミッションで/var/run/libvirt/libvirt-socketに書けんとかの
+エラーぶっこかれたので、
+sudo usermod -a -G libvirt nojima
+してログイン・ログアウトする。
+
+で、
+export VAGRANT_DEFAULT_PROVIDER=kvm
+して
+vagrant upとかしたら、
+勝手に、
+Bringing machine 'default' up with 'kvm' provider...
+[default] Box 'precise64' was not found. Fetching box from specified URL for
+the provider 'kvm'. Note that if the URL does not have
+a box for this provider, you should interrupt Vagrant now and add
+the box yourself. Otherwise Vagrant will attempt to download the
+full box prior to discovering this error.
+Downloading box from URL: http://files.vagrantup.com/precise64.box
+Progress: 61% (Rate: 2427k/s, Estimated time remaining: 0:01:01)
+
+とか言われて勝手にprecise64.boxがダウンロードされたぜ。
+が、警告のとおりで、
+The box you attempted to add doesn't match the provider you specified.
+
+Provider expected: kvm
+Provider of box: virtualbox
+
+とか言われてしゅーりょー。あーあ。
+
+で、調べると、virtualboxのboxイメージをkvm化する必要があるのだが、
+こちらをやれるpluginsが、mutateというものがあるらしい。
+
+で、早速インストール。
+
+vagrant plugin install vagrant-mutate
+
+だそうな。
+
+やってみた：
+~/ vagrant plugin install vagrant-mutate
+Installing the 'vagrant-mutate' plugin. This can take a few minutes...
+Installed the plugin 'vagrant-mutate (0.2.5)'!
+
+あっさり。では、こんばーとだぁ。
+
+qemu-imgがいるらしいが、まあ、入ってるんで許す。
+
+やってみた。
+
+~/ vagrant mutate http://files.vagrantup.com/precise64.box kvm
+You have qemu 1.7.1 installed. This version cannot read some virtualbox boxes. If conversion fails, see below for recommendations. https://github.com/sciurus/vagrant-mutate/wiki/QEMU-Version-Compatibility
+Downloading box precise64 from http://files.vagrantup.com/precise64.box
+Progress: 16% (Rate: 2206k/s, Estimated time remaining: 0:02:08)
+
+とのことで、qemuのバージョン悪いとコンバートに失敗するらしいぞ。
+
+失敗しやがりました。
+
+~/ vagrant mutate http://files.vagrantup.com/precise64.box kvm
+You have qemu 1.7.1 installed. This version cannot read some virtualbox boxes. If conversion fails, see below for recommendations. https://github.com/sciurus/vagrant-mutate/wiki/QEMU-Version-Compatibility
+Downloading box precise64 from http://files.vagrantup.com/precise64.box
+Extracting box file to a temporary directory.remaining: 0:00:01)
+Converting precise64 from virtualbox to kvm.
+qemu-img: 'image' uses a vmdk feature which is not supported by this qemu version: VMDK version 3
+qemu-img: Could not open '/home/nojima/.vagrant.d/tmp/d20140407-6514-1vc2l6n/box-disk1.vmdk': Could not open '/home/nojima/.vagrant.d/tmp/d20140407-6514-1vc2l6n/box-disk1.vmdk': Wrong medium type
+Getting information about the disk image via qemu-info failed
+
+で、
+https://github.com/sciurus/vagrant-mutate/wiki/QEMU-Version-Compatibility
+によると、
+https://github.com/erik-smit/one-liners
+で配布されている、qemu-img.vmdk3.hack.sh使ってvmdk3--> vmdk2へ
+パッチワークせよとのこと。
+
+でも、やり方がよーわからんので、
+
+http://liquidat.wordpress.com/2014/03/03/howto-vagrant-libvirt-multi-multi-machine-ansible-and-puppet/
+見る。
+
+どうやってもダメっぽいので、改造を検討するしかー。
+
+vagrant-mutateが、qemu-img >1.6で、vmdk3をサポートしとらん...orz
+...どうもvmdkってVmwareのファイルフォーマット？で、ver3はopenな規格じゃないそうな。
+　　だから、qemu-imgもサポートしないことにしたらしい...死ねよVMWare!
+
+Vmwareにて、2013/11頃に
+http://kb.vmware.com/selfservice/microsites/search.do?language=en_US&cmd=displayKC&externalId=2064959
+がアップデートされ、そこら中のqemu-img関係者が醸した模様。
+
+>[Qemu-devel] [PATCH v2 0/2] vmdk: Allow version 3 read only open
+http://lists.gnu.org/archive/html/qemu-devel/2013-11/msg03651.html
+
+がああ、debianではsidでもqemu-utlsで
+バージョン: 1.7.0+dfsg-6
+とのことで。2x系列は当分さきだーぁ。
+pkg-qemu-devel(https://lists.alioth.debian.org/mailman/listinfo/pkg-qemu-devel)で状況をつかもうとしたら、メンバーONLYだった。
+※spam避けか？
+
+まあ、いろいろ仕方ないので、ちょっと細工する。
+
+まず、
+~/.vagrant.d/gems/gems/vagrant-mutate-0.2.5/lib/vagrant-mutate/qemu.rb
+では、qemu-imgのインスコを確認してるだけなのでパス。
+
+要は、./lib/vagrant-mutate/converter/converter.rbの
+qemu-img convert
+をオーバーライドできればOK.ちゅーことで、
+qemu-img.vmdk3.hack.sh
+を${HOME}/binに導入。
+
+で、$HOME/bin/にqemu-imgというbashishなシェルスクリプトを用意し、
+---------------ここから-------------
+#!/bin/bash
+
+PATH=/bin:/usr/bin
+
+logfile=/tmp/qemu-log.log
+echo $@ >> ${logfile}
+if [ x"$1"x == x"convert"x ]; then
+	argv=($@)
+	origin_file=${argv[-2]}
+	case $origin_file in 
+	*vmdk)
+		echo qemu-img.vmdk3.hack.sh $origin_file >> ${logfile}
+		qemu-img.vmdk3.hack.sh $origin_file;;
+	esac
+fi
+
+echo /usr/bin/qemu-img $@ >> ${logfile}
+echo XXXXXXXXXXXXXXXXXXX >> ${logfile}
+/usr/bin/qemu-img $@
+---------------ここまで-------------
+とかしたら、
+
+~/ vagrant mutate http://files.vagrantup.com/precise64.box kvm
+You have qemu 1.7.1 installed. This version cannot read some virtualbox boxes. If conversion fails, see below for recommendations. https://github.com/sciurus/vagrant-mutate/wiki/QEMU-Version-Compatibility
+Downloading box precise64 from http://files.vagrantup.com/precise64.box
+Extracting box file to a temporary directory.remaining: --:--:--)
+Converting precise64 from virtualbox to kvm.
+qemu-img: 'image' uses a vmdk feature which is not supported by this qemu version: VMDK version 3
+qemu-img: Could not open '/home/nojima/.vagrant.d/tmp/d20140410-5970-104y0bp/box-disk1.vmdk': Could not open '/home/nojima/.vagrant.d/tmp/d20140410-5970-104y0bp/box-disk1.vmdk': Wrong medium type
+Getting information about the disk image via qemu-info failed
+
+で、未だに死ぬるので、調べた。
+/tmp/qemu-log.logの中身
+----------------ここから--------------
+info /home/nojima/.vagrant.d/tmp/d20140410-5970-104y0bp/box-disk1.vmdk
+/usr/bin/qemu-img info /home/nojima/.vagrant.d/tmp/d20140410-5970-104y0bp/box-disk1.vmdk
+XXXXXXXXXXXXXXXXXXX
+----------------ここまで--------------	
+というわけで、qemu-img infoが走って死亡...orz
+
+くっそー。ところで、vagrant mutateはurlの代わりにファイル名を定めることが
+できたりする。
+
+vagrant mutate /home/nojima/.vagrant.d/tmp/boxecdd3228590f6607fb74677f2bf5ffaac09326ab kvm
+とかね。
+
+うほ、残骸からなんとかconvertできたぞ！
+
+んー、kvm providerの起動に成功した。が、わかったことが...
+
+ 要は
+
+ 1. カレントディレクトリにVagrantfileという定義ファイルが作られ、ここに記載された
+    方法で起動する。vagrant init xxxx urlというのはこのファイルを作るのが目的。
+
+ 2. なので、vagrant upとだけすると、このurlからboxファイル（中身はいろいろ書かれた只の
+　　定義ファイル）からコピってきてセットアップして起動。
+
+ 3. なんかよーわからんが、NFSが勝手にマウントされそうだったぞ。
+
+要は、wgetしてboxローカルにもってきて、vargrant mutateでkvmイメージになんとか
+コンバート。あとは、こいつをurlとしてvagrant initして、vagrant upすればOK。
+...まあ、簡単すぎて鼻血でるかもな...
+　
+-----------------やりかた---------------
+You have qemu 1.7.1 installed. This version cannot read some virtualbox boxes. If conversion fails, see below for recommendations. https://github.com/sciurus/vagrant-mutate/wiki/QEMU-Version-Compatibility
+Downloading box precise64 from http://files.vagrantup.com/precise64.box
+Extracting box file to a temporary directory.remaining: --:--:--)
+Converting precise64 from virtualbox to kvm.
+qemu-img: 'image' uses a vmdk feature which is not supported by this qemu version: VMDK version 3
+qemu-img: Could not open '/home/nojima/.vagrant.d/tmp/d20140410-5402-1eqlsxc/box-disk1.vmdk': Could not open '/home/nojima/.vagrant.d/tmp/d20140410-5402-1eqlsxc/box-disk1.vmdk': Wrong medium type
+Getting information about the disk image via qemu-info failed
+
+っていわれたら、
+
+-----------なんかしらんが、勉強会近づいてまいりましたので、debianquizのチェーック
+debian announce
+なし
+（2014/2/15の6.0.9リリースが最後だ...)
+
+debian-newsは
+http://www.debian.org/News/weekly/
+で確認が可能。
+
+3/17 http://www.debian.org/News/weekly/2014/05/
+
+DebConfがドイツに決まる。
+http://blog.debconf.org/blog/debconf15/rh_dc15-in-germany-dc13-final-report-20140309.dc
+
+Debconf13のレポート：
+http://media.debconf.org/dc13/report/DebConf13-final-report.en.pdf
+参加者のNo1の国：1.ドイツ 2.フランス 3スイス 4イギリス 5アメリカ
+ちなみに日本は8番目。（不詳というのがNo.1なのは放っておいて)
+
+DPL選挙
+
+ Lucas Nussbaum, current DPL, and Neil McGovern. 
+立候補２名で自薦かよ。結局。
+
+3/31
+http://www.debian.org/News/weekly/2014/06/
+
+Debian Installer Jessie Alpha 1 release(3/19)
+Debian Installer teamがリリースをアナウンスしました。
+
+clang3.4によるdebianパッケージ再構築検証の結果：
+21204中2193パケージが失敗。（clang3.3の去年の実験よりは
+大幅にパッケージ増えてるおり、18854パッケージしかなかったが、
+今回は大幅増量の21204パッケージ中となる）
+詳しくは、
+http://sylvestre.ledru.info/blog/2014/03/21/rebuild-of-debian-using-clang
+本件ポータルサイト：http://clang.debian.net/
+
+Jason Kridner(beagleboardの設立者）によれば、
+みんな大好きbeagleboardが将来のバンドルOSをDebianにする予定らしい。
+http://opensource.com/life/14/3/interview-jason-kridner-beagleboard
+
+http://www.debian.org/News/weekly/2014/07/
+
+DPL elections
+Lucas Nussbaumが再度当選。
+2014/4/17-2015/4/17までが任期。
+対抗馬はNeil McGovern。
+
+※要は2名しか立候補しなかった。
+
+zackがやったソースの統計解析。
+http://sources.debian.net/stats/
+
+CAcert removed from Debian
+2005年からCAcertのroot証明を配布していたが、2014年3月中旬にて配布物から
+外された。発端としてはMozillaがCAを監査したところ結局CACertが認められなかった
+ことが引き金。賛否両論の議論は続いたものの、結局、ca-certificates
+パッケージから、CAcertはメンテナーにより外された。
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=718434#129
+
+https://lwn.net/Articles/590879/にCAcertが外されることとなった
+件についてサマリが載っている。
+
+fully functional RTC/VoIP client for Jessie
+
+現在debianをデフォルトの状態でインストールすると、empathyが
+標準のコミュニケーションツールとしてインストールされるが、
+empathyよりもJitsiの方が良いのでは？という話。現在議論中。
+
+debianの派生ディストリビューションで、torのネットワークを
+活用するツールを備えたTailsがリリースされたそうな。
+https://tails.boum.org/
+
+ついにaptがv1.0をリリース。実に１６年かかったらしい。が、
+aptの最初のリリースも、v1.0のリリースのアナウンスも
+4/1なので、少々疑心暗鬼だが、嘘じゃないらしい。
+
+暗号技術を用いて、インフラ主催側にすら記録を残させないようにする
+メッセージングサービスの実装である、Off-the-Record messaging
+(以下OTR)のグループがDebianにできたそうな。
+https://lists.debian.org/debian-devel-announce/2014/04/msg00000.html
+OTR本家：
+https://otr.cypherpunks.ca/
+
+
+https://lists.debian.org/debian-security-announce/2014/msg00082.html
+（LWN
+http://lwn.net/Articles/595426/rss）
+によると、本来であれば2014/5/31にてサポートが終了するはずの
+Debian 6.0(Squeeze)にLTSが適用されることが決定し、結果２年延長された。
+（2016/2月まで引き伸ばされる。）ただ、
+squeezeに含まれていた全部のパッケージをサポートするわけではないとのこと。
+
+
+
+
+-----------関係ないけど
+http://opensource.com/
+のblenderのpJがすげえ。
+
+------------勉強会ネタ------------------
+hhvmとか凄そう。
+dockerもいいなぁ。
+どれにするかなー。

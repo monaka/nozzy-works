@@ -1,0 +1,96 @@
+box2dとliquid Funあたりでもやろうかな...
+
+box2d
+http://box2d.org/
+
+box2dのdebianの有り様：
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=496991
+
+liquid Funは
+https://github.com/google/liquidfun
+
+GDC2014あたりでもでたわけだし。
+
+-------------
+debian-sidだと
+~/ aptitude search box2d
+p　　 libbox2d-dev                    - 2D physics engine - development files     
+p   libbox2d-doc                    - 2D physics engine - documentation         
+p   libbox2d2.3.0                   - 2D physics engine                         
+p   libbox2d2.3.0-dbg               - 2D physics engine - debugging symbols     
+p   python-box2d                    - Python Bindings for the 2D Physics Engine 
+p   python-box2d-doc                - Python Bindings for the 2D Physics Engine 
+v   python2.6-box2d                 -                                           
+v   python2.7-box2d          
+
+というわけで、box2d.2.3.xまではでてるなぁ。
+
+ヤヴァイ、こいつでかいぜ。>liquidFun
+
+LisenceはNOTICEにある。まあ、なんというかOSSなのかなぁ。
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+claim that you wrote the original software. If you use this software
+in a product, an acknowledgment in the product documentation would be
+appreciated but is not required.
+
+2. Altered source versions must be plainly marked as such, and must not bemisrepresented as being the original software.
+
+3. This notice may not be removed or altered from any source distribution.
+
+ということだし。
+
+ビルドの方法は、
+Readme.mdにあるとおり、
+/liquidfun/liquidfun/Box2D/Documentation/Building
+以下のファイルに記載。
+
+
+sudo apt-get install cmake
+sudo apt-get install libglapi-mesa
+sudo apt-get install libglu1-mesa-dev
+
+が前準備。
+
+で、インストールしてみたら、
+
+[ 27%] Building C object freeglut/CMakeFiles/freeglut.dir/src/fg_callbacks.c.o
+In file included from /home/nojima/prog/liquidfun/liquidfun/freeglut/src/fg_internal.h:193:0,
+                 from /home/nojima/prog/liquidfun/liquidfun/freeglut/src/fg_callbacks.c:29:
+/home/nojima/prog/liquidfun/liquidfun/freeglut/src/x11/fg_internal_x11.h:42:35: fatal error: X11/extensions/XInput.h: そのようなファイルやディレクトリはありません
+ #include <X11/extensions/XInput.h>
+                                   ^
+compilation terminated.
+make[2]: *** [freeglut/CMakeFiles/freeglut.dir/src/fg_callbacks.c.o] エラー 1
+make[1]: *** [freeglut/CMakeFiles/freeglut.dir/all] エラー 2
+make: *** [all] エラー 2
+
+でこけた。
+
+なので、
+sudo aptitude install libxi-dev
+した。
+
+一応、コンパイルとおったので、
+~/prog/liquidfun/liquidfun/liquidfun/Box2D/ g++ --version
+g++ (Debian 4.8.2-17) 4.8.2
+Copyright (C) 2013 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+ということだ。
+
+んで、出来上がったバイナリを動かしてみた。
+/liquidfun/liquidfun/Box2D/Testbed/Release/Testbed
+
+まあ、いろいろと面白いDemoが。
+
+一発通しだったのでなんとも。とりあえず。
+
+
+
+
+

@@ -1,5 +1,7 @@
---- a/src/Makefile.am
-+++ b/src/Makefile.am
+Index: libimobiledevice/src/Makefile.am
+===================================================================
+--- libimobiledevice.orig/src/Makefile.am	2014-03-26 00:46:14.493995895 +0800
++++ libimobiledevice/src/Makefile.am	2014-03-26 00:46:37.690896988 +0800
 @@ -1,7 +1,7 @@
  AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)
  
@@ -9,14 +11,3 @@
  
  lib_LTLIBRARIES = libimobiledevice.la
  libimobiledevice_la_LIBADD = $(top_builddir)/common/libinternalcommon.la
---- a/tools/Makefile.am
-+++ b/tools/Makefile.am
-@@ -1,7 +1,7 @@
- AM_CPPFLAGS = -I$(top_srcdir)/include
- 
- AM_CFLAGS = $(GLOBAL_CFLAGS) $(libgnutls_CFLAGS) $(libtasn1_CFLAGS) $(libgcrypt_CFLAGS) $(openssl_CFLAGS) $(libplist_CFLAGS) $(LFS_CFLAGS)
--AM_LDFLAGS = $(libgnutls_LIBS) $(libtasn1_LIBS) $(libgcrypt_LIBS) $(openssl_LIBS) $(libplist_LIBS)
-+AM_LDFLAGS = $(libgnutls_LIBS) $(libtasn1_LIBS) $(libgcrypt_LIBS) $(openssl_LIBS) $(libplist_LIBS) $(libgcrypt_LIBS)
- 
- bin_PROGRAMS = idevice_id ideviceinfo idevicename idevicepair idevicesyslog ideviceimagemounter idevicescreenshot ideviceenterrecovery idevicedate idevicebackup idevicebackup2 ideviceprovision idevicedebugserverproxy idevicediagnostics
- 

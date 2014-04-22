@@ -1,5 +1,7 @@
---- a/libimobiledevice-1.0.pc.in
-+++ b/libimobiledevice-1.0.pc.in
+Index: libimobiledevice/libimobiledevice-1.0.pc.in
+===================================================================
+--- libimobiledevice.orig/libimobiledevice-1.0.pc.in	2014-03-26 00:28:14.389278737 +0800
++++ libimobiledevice/libimobiledevice-1.0.pc.in	2014-03-26 00:29:02.991123141 +0800
 @@ -6,7 +6,7 @@
  Name: libimobiledevice
  Description: A library to communicate with services running on Apple iPhone/iPod Touch devices.

@@ -1,0 +1,254 @@
+From: Chow Loong Jin <hyperair@debian.org>
+Date: Mon, 14 Apr 2014 01:54:05 +0800
+Subject: Use symbol script to exclude private symbols
+
+---
+ dev/Makefile.am                  |   2 +-
+ src/Makefile.am                  |   2 +-
+ src/libimobiledevice-symbols.txt | 216 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 218 insertions(+), 2 deletions(-)
+ create mode 100644 src/libimobiledevice-symbols.txt
+
+--- a/dev/Makefile.am
++++ b/dev/Makefile.am
+@@ -19,7 +19,7 @@
+ afccheck_SOURCES = afccheck.c
+ afccheck_CFLAGS = -I$(top_srcdir) $(AM_CFLAGS)
+ afccheck_LDFLAGS = $(AM_LDFLAGS)
+-afccheck_LDADD = $(top_builddir)/src/libimobiledevice.la
++afccheck_LDADD = $(top_builddir)/src/libimobiledevice.la $(top_builddir)/common/libinternalcommon.la
+ 
+ filerelaytest_SOURCES = filerelaytest.c
+ filerelaytest_CFLAGS = $(AM_CFLAGS)
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -5,7 +5,7 @@
+ 
+ lib_LTLIBRARIES = libimobiledevice.la
+ libimobiledevice_la_LIBADD = $(top_builddir)/common/libinternalcommon.la
+-libimobiledevice_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBIMOBILEDEVICE_SO_VERSION) -no-undefined
++libimobiledevice_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBIMOBILEDEVICE_SO_VERSION) -no-undefined -export-symbols libimobiledevice-symbols.txt
+ libimobiledevice_la_SOURCES = idevice.c idevice.h \
+ 		       service.c service.h\
+ 		       property_list_service.c property_list_service.h\
+--- /dev/null
++++ b/src/libimobiledevice-symbols.txt
+@@ -0,0 +1,218 @@
++afc_client_free
++afc_client_new
++afc_client_new_from_house_arrest_client
++afc_client_start_service
++afc_dictionary_free
++afc_file_close
++afc_file_lock
++afc_file_open
++afc_file_read
++afc_file_seek
++afc_file_tell
++afc_file_truncate
++afc_file_write
++afc_get_device_info
++afc_get_device_info_key
++afc_get_file_info
++afc_make_directory
++afc_make_link
++afc_read_directory
++afc_remove_path
++afc_rename_path
++afc_set_file_time
++afc_truncate
++debug_level
++diagnostics_relay_client_free
++diagnostics_relay_client_new
++diagnostics_relay_client_start_service
++diagnostics_relay_goodbye
++diagnostics_relay_query_ioregistry_entry
++diagnostics_relay_query_ioregistry_plane
++diagnostics_relay_query_mobilegestalt
++diagnostics_relay_request_diagnostics
++diagnostics_relay_restart
++diagnostics_relay_shutdown
++diagnostics_relay_sleep
++file_relay_client_free
++file_relay_client_new
++file_relay_client_start_service
++file_relay_request_sources
++file_relay_request_sources_timeout
++heartbeat_client_free
++heartbeat_client_new
++heartbeat_client_start_service
++heartbeat_receive
++heartbeat_receive_with_timeout
++heartbeat_send
++house_arrest_client_free
++house_arrest_client_new
++house_arrest_client_start_service
++house_arrest_get_result
++house_arrest_send_command
++house_arrest_send_request
++idevice_connect
++idevice_connection_disable_ssl
++idevice_connection_enable_ssl
++idevice_connection_receive
++idevice_connection_receive_timeout
++idevice_connection_send
++idevice_device_list_free
++idevice_disconnect
++idevice_event_subscribe
++idevice_event_unsubscribe
++idevice_free
++idevice_get_device_list
++idevice_get_handle
++idevice_get_udid
++idevice_new
++idevice_set_debug_level
++instproxy_archive
++instproxy_browse
++instproxy_client_free
++instproxy_client_get_path_for_bundle_identifier
++instproxy_client_new
++instproxy_client_options_add
++instproxy_client_options_free
++instproxy_client_options_new
++instproxy_client_start_service
++instproxy_install
++instproxy_lookup_archives
++instproxy_remove_archive
++instproxy_restore
++instproxy_uninstall
++instproxy_upgrade
++lockdownd_activate
++lockdownd_client_free
++lockdownd_client_new
++lockdownd_client_new_with_handshake
++lockdownd_client_set_label
++lockdownd_data_classes_free
++lockdownd_deactivate
++lockdownd_enter_recovery
++lockdownd_get_device_name
++lockdownd_get_device_udid
++lockdownd_get_sync_data_classes
++lockdownd_get_value
++lockdownd_goodbye
++lockdownd_pair
++lockdownd_query_type
++lockdownd_receive
++lockdownd_remove_value
++lockdownd_send
++lockdownd_service_descriptor_free
++lockdownd_set_value
++lockdownd_start_service
++lockdownd_start_session
++lockdownd_stop_session
++lockdownd_unpair
++lockdownd_validate_pair
++misagent_client_free
++misagent_client_new
++misagent_client_start_service
++misagent_copy
++misagent_get_status_code
++misagent_install
++misagent_remove
++mobile_image_mounter_free
++mobile_image_mounter_hangup
++mobile_image_mounter_lookup_image
++mobile_image_mounter_mount_image
++mobile_image_mounter_new
++mobile_image_mounter_start_service
++mobile_image_mounter_upload_image
++mobilebackup2_client_free
++mobilebackup2_client_new
++mobilebackup2_client_start_service
++mobilebackup2_receive_message
++mobilebackup2_receive_raw
++mobilebackup2_send_message
++mobilebackup2_send_raw
++mobilebackup2_send_request
++mobilebackup2_send_status_response
++mobilebackup2_version_exchange
++mobilebackup_client_free
++mobilebackup_client_new
++mobilebackup_client_start_service
++mobilebackup_receive
++mobilebackup_receive_restore_application_received
++mobilebackup_receive_restore_file_received
++mobilebackup_request_backup
++mobilebackup_request_restore
++mobilebackup_send
++mobilebackup_send_backup_file_received
++mobilebackup_send_error
++mobilebackup_send_restore_complete
++mobilesync_acknowledge_changes_from_device
++mobilesync_actions_add
++mobilesync_actions_free
++mobilesync_actions_new
++mobilesync_anchors_free
++mobilesync_anchors_new
++mobilesync_cancel
++mobilesync_clear_all_records_on_device
++mobilesync_client_free
++mobilesync_client_new
++mobilesync_client_start_service
++mobilesync_finish
++mobilesync_get_all_records_from_device
++mobilesync_get_changes_from_device
++mobilesync_ready_to_send_changes_from_computer
++mobilesync_receive
++mobilesync_receive_changes
++mobilesync_remap_identifiers
++mobilesync_send
++mobilesync_send_changes
++mobilesync_start
++np_client_free
++np_client_new
++np_client_start_service
++np_observe_notification
++np_observe_notifications
++np_post_notification
++np_set_notify_callback
++plist_read_from_filename
++plist_write_to_filename
++restored_client_free
++restored_client_new
++restored_client_set_label
++restored_get_value
++restored_goodbye
++restored_query_type
++restored_query_value
++restored_reboot
++restored_receive
++restored_send
++restored_start_restore
++sbservices_client_free
++sbservices_client_new
++sbservices_client_start_service
++sbservices_get_home_screen_wallpaper_pngdata
++sbservices_get_icon_pngdata
++sbservices_get_icon_state
++sbservices_get_interface_orientation
++sbservices_set_icon_state
++screenshotr_client_free
++screenshotr_client_new
++screenshotr_client_start_service
++screenshotr_take_screenshot
++service_client_factory_start_service
++service_client_free
++service_client_new
++service_disable_ssl
++service_enable_ssl
++service_receive
++service_receive_with_timeout
++service_send
++syslog_relay_client_free
++syslog_relay_client_new
++syslog_relay_client_start_service
++syslog_relay_receive
++syslog_relay_receive_with_timeout
++syslog_relay_start_capture
++syslog_relay_stop_capture
++webinspector_client_free
++webinspector_client_new
++webinspector_client_start_service
++webinspector_receive
++webinspector_receive_with_timeout
++webinspector_send

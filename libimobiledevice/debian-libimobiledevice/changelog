@@ -1,8 +1,29 @@
-libimobiledevice (1.1.6-1~a2) unstable; urgency=low
+libimobiledevice (1.1.6+dfsg-2~a1) unstable; urgency=medium
 
-  * update to latest upstream
+  * export plist_read_from_filename/plist_write_to_filename
 
- -- Takahide Nojima <nozzy123nozzy@gmail.com>  Tue, 25 Mar 2014 10:13:00 +0900
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Tue, 22 Apr 2014 21:47:00 +0900
+
+libimobiledevice (1.1.6+dfsg-1) unstable; urgency=medium
+
+  * Team upload
+  * [51f7f7a] Imported Upstream version 1.1.6
+  * [ed48bf8] Update build-dependencies
+  * [052c1b3] Bump Standards-Version to 3.9.5 (no changes required)
+  * [b89ebca] Refresh patches
+  * [dbe83f7] Build-dep on libtasn-1-6-dev instead of libtasn-1-3-dev
+    (Closes: #731707)
+  * [09293bb] Downgrade usbmuxd dependency to recommends and suggest
+    libusbmuxd-tools
+    (Closes: #658541)
+  * [0a602f1] Use symbol script to hide private symbols
+  * [f85dcf3] Update symbols file.
+    Drop private symbols, and add new symbols
+  * [7338f73] Drop unused patches
+  * [99e4676] Exclude jquery.js
+  * [64e7829] Update copyright file
+
+ -- Chow Loong Jin <hyperair@debian.org>  Mon, 14 Apr 2014 02:22:41 +0800
 
 libimobiledevice (1.1.5-2) unstable; urgency=low
 

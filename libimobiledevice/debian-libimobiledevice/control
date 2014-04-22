@@ -3,17 +3,17 @@ Section: libs
 Priority: optional
 Maintainer: gtkpod Maintainers <pkg-gtkpod-devel@lists.alioth.debian.org>
 Uploaders: Julien Lavergne <julien.lavergne@gmail.com>
-Standards-Version: 3.9.4.0
+Standards-Version: 3.9.5
 Build-Depends: debhelper (>= 9),
                libgnutls-dev (>= 1.6.3),
                libusb-1.0-0-dev (>= 1.0.3) [linux-any],
                libglib2.0-dev (>= 2.14.1),
-               libplist-dev (>= 1.8-2~),
-               libplist++-dev (>= 1.8-2~),
+               libplist-dev (>= 1.11),
+               libplist++-dev (>= 1.11),
                python-all-dev (>= 2.6.6-3~),
                cython (>= 0.17.0),
-               libusbmuxd-dev (>= 1.0.8),
-               libtasn1-3-dev (>= 1.1),
+               libusbmuxd-dev (>= 1.0.9),
+               libtasn1-6-dev (>= 1.1),
                libreadline-dev,
                python-plist (>= 1.8-2~),
                dh-autoreconf
@@ -28,7 +28,9 @@ Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends},
-         ${misc:Depends}
+         ${misc:Depends},
+Recommends: usbmuxd
+Suggests: libusbmuxd-tools
 Conflicts: libiphone0
 Replaces: libiphone0, libimobiledevice1, libimobiledevice0
 Description: Library for communicating with the iPhone and iPod Touch
@@ -93,8 +95,7 @@ Package: libimobiledevice-utils
 Architecture: any
 Section: utils
 Depends: ${shlibs:Depends},
-         ${misc:Depends},
-         usbmuxd
+         ${misc:Depends}
 Description: Library for communicating with iPhone and iPod Touch devices
  libimobiledevice is a library that talks the native Apple USB protocols that
  the iPhone and iPod Touch use. Unlike other projects, libimobiledevice does
