@@ -32,6 +32,8 @@ iptables -A OUTPUT -p tcp --dport 443 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 22 --syn -j ACCEPT
 iptables -A OUTPUT -p udp --dport 123 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 123 --syn -j ACCEPT
+# spdy for google
+iptables -A OUTPUT -p tcp --dport 5222 --syn -j ACCEPT
 # for usb0 ethernet for nook color
 iptables -A OUTPUT -p udp --dport 67:68 -o usb0 -j ACCEPT
 # for eth0 ethernet for eth0
@@ -41,10 +43,7 @@ iptables -A OUTPUT -p tcp --dport 993 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 465 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 587 --syn -j ACCEPT
 # for armitage radio station in finland
-iptables -A OUTPUT -p tcp --dst 143.51.142.148 --dport 8040 --syn -j ACCEPT
-iptables -A OUTPUT -p tcp --dst 71.178.19.18 --dport 8010 --syn -j ACCEPT
-iptables -A OUTPUT -p tcp --dst 216.59.35.34 --dport 8004 --syn -j ACCEPT
-iptables -A OUTPUT -p tcp --dst 91.121.66.35 --dport 8004 --syn -j ACCEPT
+iptables -A OUTPUT -p tcp --dst 198.27.80.17 --dport 8010 --syn -j ACCEPT
 # for animaze radio station
 iptables -A OUTPUT -p tcp --dst 72.233.93.160 --dport 10007 --syn -j ACCEPT
 # Netraji
@@ -135,6 +134,6 @@ if [ "X${ppp_enable}X" != "XX" ]; then
 	iptables -A FORWARD -i ppp0 -o br0 -j ACCEPT
 fi
 
-/etc/init.d/iptables-persistent save
-/etc/init.d/iptables-persistent start
+service netfilter-persistent save
+service netfilter-persistent start
 exit 0

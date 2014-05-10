@@ -486,6 +486,185 @@ quiltだが、
 /usr/share/quiltの多数のbashスクリプト
 を起動してごにょごにょする構造のようだ。
 
+とりあえず、libimobiledevice4も無事意図どおりのexportが
+行われ、無事にusbmuxd-1.0.8もコンパイルが完了。
+
+全部一気にうまくいって、idevicepair pairも通る。
+が、ifuse --documents がうまく動かん。
+
+で、調べるとhousearrestで、gnutls_record_sendして-53(GNUTLS_E_PUSH_ERROR)が
+返却されて死亡。なんでだぁぁ？
+--->なんか、connection->ssl_data->sessionが爆撃？
+    gnutls_record_send()後にconnection->ssl_dataが読み出せなくなる...
+
+/home/nojima/prog/libimobiledevice/libimobiledevice-1.1.6+dfsg/src/idevice.c
+の410行目前後で、突然connection構造体がぶっ壊れる感じ。
+(gdb) s
+idevice_connection_send (connection=0x6502c0, data=data@entry=0x7fffffffe4d0 "", 
+    len=4294960340, sent_bytes=0x7fffffffe4d4) at idevice.c:401
+401		if (!connection || !data || (connection->ssl_data && !connection->ssl_data->session)) {
+(gdb) p connection
+$41 = (idevice_connection_t) 0x6502c0
+(gdb) p connection->ssl_data
+$42 = (ssl_data_t) 0x656c80
+(gdb) p connection->ssl_data->session
+$43 = (gnutls_session_t) 0x654210
+(gdb) 
+410			ssize_t sent = gnutls_record_send(connection->ssl_data->session, (void*)data, (size_t)len);
+(gdb) disas
+Dump of assembler code for function idevice_connection_send:
+   0x00007ffff7989800 <+0>:	test   %rdi,%rdi
+   0x00007ffff7989803 <+3>:	je     0x7ffff7989870 <idevice_connection_send+112>
+   0x00007ffff7989805 <+5>:	test   %rsi,%rsi
+   0x00007ffff7989808 <+8>:	je     0x7ffff7989870 <idevice_connection_send+112>
+   0x00007ffff798980a <+10>:	push   %rbp
+   0x00007ffff798980b <+11>:	mov    %rcx,%rbp
+   0x00007ffff798980e <+14>:	push   %rbx
+   0x00007ffff798980f <+15>:	mov    %edx,%ebx
+   0x00007ffff7989811 <+17>:	sub    $0x8,%rsp
+   0x00007ffff7989815 <+21>:	mov    0x18(%rdi),%rax
+   0x00007ffff7989819 <+25>:	test   %rax,%rax
+   0x00007ffff798981c <+28>:	je     0x7ffff7989840 <idevice_connection_send+64>
+   0x00007ffff798981e <+30>:	mov    0x8(%rax),%rdi
+   0x00007ffff7989822 <+34>:	test   %rdi,%rdi
+   0x00007ffff7989825 <+37>:	je     0x7ffff7989887 <idevice_connection_send+135>
+=> 0x00007ffff7989827 <+39>:	mov    %edx,%edx
+   0x00007ffff7989829 <+41>:	callq  0x7ffff7988660 <gnutls_record_send@plt>
+   0x00007ffff798982e <+46>:	cmp    %ebx,%eax
+   0x00007ffff7989830 <+48>:	jne    0x7ffff7989860 <idevice_connection_send+96>
+   0x00007ffff7989832 <+50>:	mov    %eax,0x0(%rbp)
+   0x00007ffff7989835 <+53>:	xor    %eax,%eax
+   0x00007ffff7989837 <+55>:	add    $0x8,%rsp
+   0x00007ffff798983b <+59>:	pop    %rbx
+   0x00007ffff798983c <+60>:	pop    %rbp
+   0x00007ffff798983d <+61>:	retq   
+   0x00007ffff798983e <+62>:	xchg   %ax,%ax
+   0x00007ffff7989840 <+64>:	cmpl   $0x1,0x8(%rdi)
+   0x00007ffff7989844 <+68>:	jne    0x7ffff7989880 <idevice_connection_send+128>
+   0x00007ffff7989846 <+70>:	mov    0x10(%rdi),%rdi
+   0x00007ffff798984a <+74>:	callq  0x7ffff79886a0 <usbmuxd_send@plt>
+   0x00007ffff798984f <+79>:	test   %eax,%eax
+   0x00007ffff7989851 <+81>:	js     0x7ffff7989880 <idevice_connection_send+128>
+   0x00007ffff7989853 <+83>:	add    $0x8,%rsp
+   0x00007ffff7989857 <+87>:	xor    %eax,%eax
+   0x00007ffff7989859 <+89>:	pop    %rbx
+   0x00007ffff798985a <+90>:	pop    %rbp
+   0x00007ffff798985b <+91>:	retq   
+   0x00007ffff798985c <+92>:	nopl   0x0(%rax)
+   0x00007ffff7989860 <+96>:	movl   $0x0,0x0(%rbp)
+   0x00007ffff7989867 <+103>:	mov    $0xfffffffa,%eax
+   0x00007ffff798986c <+108>:	jmp    0x7ffff7989837 <idevice_connection_send+55>
+   0x00007ffff798986e <+110>:	xchg   %ax,%ax
+   0x00007ffff7989870 <+112>:	mov    $0xffffffff,%eax
+   0x00007ffff7989875 <+117>:	retq   
+   0x00007ffff7989876 <+118>:	nopw   %cs:0x0(%rax,%rax,1)
+   0x00007ffff7989880 <+128>:	mov    $0xfffffffe,%eax
+   0x00007ffff7989885 <+133>:	jmp    0x7ffff7989837 <idevice_connection_send+55>
+   0x00007ffff7989887 <+135>:	mov    $0xffffffff,%eax
+   0x00007ffff798988c <+140>:	jmp    0x7ffff7989837 <idevice_connection_send+55>
+End of assembler dump.
+(gdb) n
+412			if ((uint32_t)sent == (uint32_t)len) {
+(gdb) p send
+$44 = {<text variable, no debug info>} 0x7ffff7568e80 <__libc_send>
+(gdb) n
+416			*sent_bytes = 0;
+(gdb) p sent
+$45 = -53
+(gdb) p connection
+$46 = (idevice_connection_t) 0xffffffcb
+(gdb) p connection->ssl_data
+Cannot access memory at address 0xffffffe3
+(gdb) p *connection
+Cannot access memory at address 0xffffffcb
+オプティマイザのしわざか？
+ま、いいや。
+
+--->5/1本日、iphone刺してgnome-shellのポップアップを全部OFFり、
+    そのまま、
+　　　　ifuse --container com.readdle.ReaddleDocsIPad `pwd`/tmp
+   したら、tmp/以下にDocuments/,Libs/などなどがそのままmountされた。
+　　　--->いままで、idevicepair pairを改めてやっていたが、こいつが原因
+　　　　　でうまくいかんかったのかも...
+　　ところで、なんだろう？---container。
+　　　---> man ifuseによれば、sandbox rootだそうな。
+
+まあ、usbmuxd-1.0.8もまあ、ちゃんとコンパイルできるようになったので、
+bugrepoしとくか。
+
+bugfixしてしまった件をdebianでbug reportするのはツール経由ではクソ面倒
+なので、手で送ってやる。
+
+ -----------------まず、src:libimobiledeviceからだ。-----------------
+To: submit@bugs.debian.org
+Subject: src:libimobiledevice: Could you export more 2 symbols?
+
+Package: src:libimobiledevice
+Version: 1.1.6+dfsg-1
+Severity: minor
+Tags: patch
+
+Dear Maintainer,
+
+ I found that 2 symbols are not exported so-lib included libimobiledevice4 pkg.
+     -plist_read_from_filename
+     -plist_write_to_filename
+
+ Those symbols are necessary to compile new version of usbmuxd downloaded from https://github.com/libimobiledevice/usbmuxd. 
+
+ Could you export those symbols?
+
+ FYI: 
+  - I will attached a patch to export those symbols.
+  - I've already applied this patch to libimobiledevice src pkg in my debian box(jessie/sid).And I've succeeded to compile the latest version of usbmuxd downloaded from github. 
+   (And with the latest version of usbmuxd, I also seems to resolv bug  #745844 and also seem that libimobile-utils/ifuse becomes totally works fine with iOS 7.1.1!)
+
+Regards,
+Takahide Nojima
+
+ -------------------次に、wish-listおくる--------------
+To: submit@bugs.debian.org
+Subject: src:usbmuxd: Propose to keep up with usbmuxd in github's.
+
+Package: src:usbmuxd
+Version: 1.0.8-5
+Severity: wishlist
+Tags: patch
+
+Dear Maintainer,
+
+ In my debian box(jessie/sid), I also met bug #746561. I built the latest version of usbmuxd downloaded from https://github.com/libimobiledevice/usbmuxd and that bug seems to totaly disappear and libimobiledevice-utls/ifuse works fine with iOS7.1.1.
+
+ I'd like to propose to change upstream source to that in github.
+
+ Also I'd like to propse patch of 'debian' directory diff'ed with usbmuxd-1.0.8-5.
+
+ How to use this patch:
+
+  Step 1. Apply patch to libimobiledevice reported in  bug #746630,
+build libimobiledevice pkg , and install them.
+  
+  Step 2. Download the latest usbmuxd source from https://github.com/libimobiledevice/usbmuxd.
+
+  Step 3. Copy 'debian' directory included submuxd-1.0.8-5 source package to usbmuxd source shown in Step 2.
+
+  Step 4. Apply patch attached this report , and delete follwing files.
+   - debian/usbmuxd.docs
+   - debian/usbmuxd.install
+   - debian/iproxy.1
+   - debian/patches/Disable-building-of-libusbmuxd-and-tools.patch
+   - debian/patches/Revert-ifdef-USBMUXD_DAEMON.patch
+   - debian/Set-OWNER-in-udev-rule.patch
+
+   Finally build usbmuxd package.
+
+Regards,
+Takahide Nojima
+----------------------------------------
+
+なんと、以上で
+
+
 --------------今日あらためて知った
 update-alternative ---config </etc/alternatives/以下のリンク名>
 で設定変更できるぞ。
