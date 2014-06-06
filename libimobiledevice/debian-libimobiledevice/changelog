@@ -1,8 +1,8 @@
-libimobiledevice (1.1.6+dfsg-2~a1) unstable; urgency=medium
+libimobiledevice (1.1.6+dfsg-2~a2) unstable; urgency=medium
 
-  * export plist_read_from_filename/plist_write_to_filename
+  * update to upstream
 
- -- Takahide Nojima <nozzy123nozzy@gmail.com>  Tue, 22 Apr 2014 21:47:00 +0900
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Tue, 3 Jun 2014 17:09:00 +0900
 
 libimobiledevice (1.1.6+dfsg-1) unstable; urgency=medium
 

@@ -32,8 +32,8 @@ iptables -A OUTPUT -p tcp --dport 443 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 22 --syn -j ACCEPT
 iptables -A OUTPUT -p udp --dport 123 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 123 --syn -j ACCEPT
-# spdy for google
-iptables -A OUTPUT -p tcp --dport 5222 --syn -j ACCEPT
+# GCM to google using chrome
+iptables -A OUTPUT -p tcp --dport 5228:5230 --syn -j ACCEPT
 # for usb0 ethernet for nook color
 iptables -A OUTPUT -p udp --dport 67:68 -o usb0 -j ACCEPT
 # for eth0 ethernet for eth0
@@ -46,12 +46,6 @@ iptables -A OUTPUT -p tcp --dport 587 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dst 198.27.80.17 --dport 8010 --syn -j ACCEPT
 # for animaze radio station
 iptables -A OUTPUT -p tcp --dst 72.233.93.160 --dport 10007 --syn -j ACCEPT
-# Netraji
-iptables -A OUTPUT -p tcp --dst 124.35.63.34 --dport 8000 --syn -j ACCEPT
-# hbr1.com
-iptables -A OUTPUT -p tcp --dst 217.64.173.228 --dport 19800 --syn -j ACCEPT
-# wknc 88.1 FM
-iptables -A OUTPUT -p tcp --dst 152.1.91.207 --dport 8000 --syn -j ACCEPT
 # for animNfo
 iptables -A OUTPUT -p tcp --dst 69.60.255.236 --dport 8888 --syn -j ACCEPT
 # for irc
@@ -60,15 +54,8 @@ iptables -A OUTPUT -p tcp --dport 6667 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 9418 --syn -j ACCEPT
 # for pgp server
 iptables -A OUTPUT -p tcp --dport 11371 --syn -j ACCEPT
-# for gobby
-iptables -A OUTPUT -p tcp --dport 6522 --syn -j ACCEPT
-iptables -A OUTPUT -p tcp --dport 6523 --syn -j ACCEPT
 # for gnome-shell?
 iptables -A OUTPUT -p tcp --dst 192.168.0.1 --dport 4713 --syn -j ACCEPT
-# for gnome-dictionary
-iptables -A OUTPUT -p tcp --dport 2628 --syn -j ACCEPT
-# for Leek-Radio
-iptables -A OUTPUT -p tcp --dport 12000 --syn -j ACCEPT
 # for crystal conquest
 iptables -A OUTPUT -p tcp --dport 6800 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 843 --syn -j ACCEPT
@@ -101,11 +88,6 @@ iptables -A OUTPUT -p udp --dport 1900 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 43 -j ACCEPT
 # for hange
 iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
-# for sqex
-iptables -A INPUT --src 10.22.95.25 -j ACCEPT
-iptables -A INPUT --src 10.22.95.24 -j ACCEPT
-iptables -A OUTPUT --dest 10.22.95.25 -j ACCEPT
-iptables -A OUTPUT --src 10.22.95.24 -j ACCEPT
 # for vivain shinjuku
 iptables -A OUTPUT -p tcp --dest 192.168.0.0/16 --dport 1111 -j ACCEPT
 # another service
@@ -116,9 +98,6 @@ iptables -A INPUT -p udp --dport 5353 --sport 5353 -i wlan0 -j ACCEPT
 iptables -A OUTPUT -p udp --dport 5353 --sport 5353 -o wlan0 -j ACCEPT
 # test for sip
 iptables -A OUTPUT -p udp --dport 3478  -j ACCEPT
-# test for animetop
-iptables -A OUTPUT -p tcp --dport 8716  -j ACCEPT
-
 iptables -A OUTPUT -p tcp -j LOG --log-prefix '[Drop output]'
 iptables -A OUTPUT -p udp -j LOG --log-prefix '[Drop output]'
 iptables -A INPUT -p tcp -j DROP 

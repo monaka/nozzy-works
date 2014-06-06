@@ -1,0 +1,11 @@
+libusbmuxd (1.0.9-2~a1) unstable; urgency=low
+
+  * update to upstream
+
+ -- Takahide Nojima <nozzy123nozzy@gmail.com>  Tue, 3 Jun 2014 16:20:25 +0900
+
+libusbmuxd (1.0.9-1) unstable; urgency=low
+
+  * Initial release (split off from usbmuxd)
+
+ -- Chow Loong Jin <hyperair@debian.org>  Sun, 23 Mar 2014 03:20:25 +0800

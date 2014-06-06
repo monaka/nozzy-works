@@ -1,0 +1,531 @@
+すごいぜdigital Ocean!
+
+ Step 1. アカウント作成
+ Step 2. コンフィグで、２段階認証
+　　　　　（電話入れると、 SNSがとどいて書かれているpinコードいれて、
+　　　　　　google 2段階認証アプリでバーコード読み取ってさらにpinコード入れると
+　　　　　　セットアップ完了。）
+ Step 3. sshキー先に作って登録したほうが良い。
+ Step 4. billingはpaypalで払え。
+※その方が安心。
+
+ 　Step5 . dropletとかいうのが要はインスタンスの事。適当に選んで作成
+　　　　　　押すとわずか30秒程度で１インスタンスの出来上がり。
+
+　ちゃんとsshキー登録して作ったなら、sshでキー指定するとログインできる。
+　そうじゃなかったら、登録メアドにアカウント届くのでそれをつかってログイン。
+
+さて、早速sidへアップグレードだー。
+
+あ、512Mbytesだったぜ＞メモリ。
+
+がー、virtioといい、Cirrus Logicといい、こりゃKVMだわ。
+
+root@debian001:~# ip addr show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 04:01:19:8c:09:01 brd ff:ff:ff:ff:ff:ff
+    inet xxx.xxx.xxx.xxx/18 brd 128.199.255.255 scope global eth0
+    inet6 fe80::601:19ff:fe8c:901/64 scope link 
+       valid_lft forever preferred_lft forever
+
+NICは一本かー。だが、しかし、直接global IPアドレスついてんのはすげえ。
+おー、netstat -nlpしたら幸いなことにsshしかlistenしてなかったぜぇ。
+
+root@debian001:~# cat /proc/cpuinfo 
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 45
+model name	: Intel(R) Xeon(R) CPU E5-2630L 0 @ 2.00GHz
+stepping	: 7
+microcode	: 0x1
+cpu MHz		: 1999.999
+cache size	: 4096 KB
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant_tsc up rep_good nopl pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx hypervisor lahf_lm xsaveopt
+bogomips	: 3999.99
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 40 bits physical, 48 bits virtual
+power management:
+
+だそうな。頑張るねー。
+
+root@debian001:~# iptables -nL
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+ということでがら空きだ。
+
+が、nc -l -p 8080してこっちからつないでみたが、見事ブロックされているようだ。
+よしよし。
+--->嘘800だ。マニュアルみると、最初からがら空きモードだった。
+    iptalbesでブロックしないと死亡する模様。
+
+-----ここから----------------
+nojima@debian001:~/bin$ cat iptables-digitalocean.sh 
+#!/bin/sh
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+iptables -P INPUT DROP
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+iptables -F INPUT
+iptables -F FORWARD
+iptables -F OUTPUT
+iptables -F -t nat
+
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 443 -j ACCEPT
+iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
+service netfilter-persistent save
+service netfilter-persistent start
+exit 0
+-----ここまで----------------
+やってみたらまあ、ガードされてるかな？
+---> sudo aptitude install iptables-persistentがなかったので、うまく動かんかった。
+
+
+
+まー、しゃねーから、さっくりdebian-sidにしてみる。
+
+うおっと、sysctl.confあたりが違うぜとかきたので、確認したら、
+/etc/sysctl.confに
+# Digital Ocean Recommended Settings:
+net.core.wmem_max=12582912
+net.core.rmem_max=12582912
+net.ipv4.tcp_rmem= 10240 87380 12582912
+net.ipv4.tcp_wmem= 10240 87380 12582912
+
+
+# Digital Ocean Recommended Settings:
+net.core.wmem_max=12582912
+net.core.rmem_max=12582912
+net.ipv4.tcp_rmem= 10240 87380 12582912
+net.ipv4.tcp_wmem= 10240 87380 12582912
+こんなものが入っておりましたとさ。
+
+ちゅーことで、とりいそぎkeep currently-installed versionで。
+※どうせ、sid標準のsysctl.confってば、何もないコメントアウト済
+のやつだし。
+
+ごあ、快適にupgradeしている最中に、
+
+Processing triggers for dictionaries-common (1.23.2) ...
+Errors were encountered while processing:
+ fuse
+E: Sub-process /usr/bin/dpkg returned an error code (1)
+A package failed to install.  Trying to recover:
+Setting up fuse (2.9.3-10) ...
+MAKEDEV not installed, skipping device node creation.
+device node not found
+dpkg: error processing package fuse (--configure):
+ subprocess installed post-installation script returned error exit status 2
+Errors were encountered while processing:
+ fuse
+                                         
+Current status: 0 updates [-290].
+
+こんな事言われたー。んだば、
+sudo aptitude install makedev
+とかしちゃる。
+が、すでに入ってるぜ。で、失敗なのは、
+sudo modprobe fuse
+modprobe: ERROR: could not insert 'fuse': Unknown symbol in module, or unknown parameter (see dmesg)
+ということですわー。
+
+あー、digital oceanは強制的にaptitude upgradeしても、ダメだ...orz
+ちゅーのも、kernelのバージョンは上がらずってとこらしい...クソがぁ。
+grubにゃkernelアップグレードの記載ははいってんだけど、
+これ経由で上がるわけじゃないらしいのう。
+
+nojima@debian001:~$ uname -a
+Linux debian001 3.2.0-4-amd64 #1 SMP Debian 3.2.54-2 x86_64 GNU/Linux
+nojima@debian001:~$ cat /etc/debian_version 
+jessie/sid
+nojima@debian001:~$ 
+
+こりゃ保証対象外だのう。くそがぁぁ。
+
+コミュニティSUGEEEE!
+VPN破りもこんなかんじだZEEE
+https://www.digitalocean.com/community/articles/how-to-setup-a-multi-protocol-vpn-server-using-softether
+--->内容的には公式ドキュメント読むより良い。完璧だ。
+
+debian unstableにするこのやり方は結局kernelがアプグレードしないので、NG。
+https://www.digitalocean.com/community/articles/upgrading-debian-to-unstable
+
+あれ？softetherってITPされてないんか？
+http://ja.softether.org/
+によると、今年の2014/1月にGPL2でopensource化されてた。ついでに言うと、
+https://github.com/SoftEtherVPN
+みると、debianディレクトリ込みだ。
+
+gitから落として中見て絶望。このdebianizeはひでえ。
+---> 理由：そもそもひどい。出来たパッケージもひどい。
+
+まあ、いいや。
+git clone https://github.com/SoftEtherVPN softether-vpn-4.04.9412
+cd softether-vpn-4.04.9412
+mv debian ../
+cd ..
+tar cJf softether-vpn_4.04.9412.orig.tar.xz softether-vpn-4.04.9412
+cd softether-vpn-4.04.9412
+mv ../debian .
+debuild -uc -us 2>&1 | tee ../build.log
+で出来上がり。
+
+-->設定やってみた。
+
+clientのアカウントはエディットダメ。消して新規に投入しかない。
+しまった、どうもsoftetherは、hubをつくるものらしい。
+さらに、ssl-vpnなのだが、最初に確かにhttps(443/tcp)でネゴするものの、
+残りはudpとかでアクセスするようにみえるぞ？？
+
+--->VPN server側で、
+VPN Server/VPN>ExtOptionList
+....中略...
+-----------+------------------------------------------------------------------------------
+Item       |DisableUdpAcceleration
+Value      |1
+Description|If you set this option to non-zero value, then all UDP Acceleration Function will be disabled on the all VPN Sessions of the Virtual Hub.
+-----------+------------------------------------------------------------------------------
+となってないと、udp使おうとして...失敗...セッション切れるの繰り返し。
+
+ここを1にして、やってみたところ....\(o)/SSLのみで無事つながった！
+
+がっ、ipアドレスとか全くふられない。VPN server側で、dhcp enableしたり、
+secureNatをonにしたりしたが、変わらず...orz
+--->ごは、すげえ。vpn接続したあと、client側で、
+　　　sudo dhcpclient vpn_myadopter
+   とかやったら、勝手にdhcpからIPアドレスが割り当てられた。
+　　192.168.30.1がgwらしいので、pingしてみたら、とおったよ！
+　　しかも！
+     cat /etc/resolv.conf
+    したら、
+
+　　　nameserver 192.168.30.1
+
+　だってさ。
+　　wget -O- http://armitunes.com:8010/listen.pls
+　試しにやってみたら、こちらも動いてるぜ。すげえ。
+
+ ここまでできたら念願の設定。
+
+   ifup wlan0=xxxxx
+   netstat -rn
+     0.0.0.0  x.y.z.w wlan0
+   sudo route del default 
+   sudo route add -host vpn.server.addr gw x.y.z.w dev wlan0
+   sudo vpnclient start
+   vpncmd
+   VPN>2 
+   VPN>accountconnect myconnection
+   VPN>accountstatusget myconnection
+   ...つながってる..
+   VPN>exit
+   sudo dhclient myadopter
+   cat /etc/resolv.conf
+   nameserver 192.168.30.1
+   netstat -rn
+   0.0.0.0 192.168.30.1 vpn_myadopter
+   
+   という感じでつながる。
+
+　　が、やっぱり、tcp on tcpのしかもover　seaということから、とてつもなく
+　　効率悪い模様で、git cloneしてみたら、5Mbpsぐらいしか出ない...orz
+   このあたり↓ 
+   http://linuxjf.sourceforge.jp/JFdocs/Adv-Routing-HOWTO/index.html
+   みて、80/tcp,443/tcpはvpnの口を通るように強制的に変更とかすべきかも...
+
+くそう。
+---> source追いかけた。で、InitMayaqua(xxx,debug,xx)の
+debug==0x123455だとデバッグトレースが動くらしい...が、こちら全部falseにハードコーディングだ...
+
+/opt/vpnserver/server_log/以下にログあり。で、↓
+
+2014-05-27 14:14:10.588 Connection "CID-18" terminated by the cause "The VPN ses
+sion has been deleted. It is possible that either the administrator disconnected
+ the session or the connection from the client to the VPN Server has been discon
+nected." (code 11).
+
+が頻発しており、接続が切れる模様。で、これをさぐると、
+softether-vpn-4.04.9412/src/bin/hamcore/strtable_en.stb
+に記述あり。code11とあるとおり、ERR_11が相当。
+
+まあ、ERR_11とかわかっても、結局ソースgrepして見つからんので、パス。
+---> 11番目のエラーという意味で、
+　　　src/Cedar/Cedar.hのERR_XXXXX 数字で定義されてるので、
+　　　みると、11の値を持つのは、
+
+       ERR_SESSION_REMOVED
+
+　　　が11に該当するエラーらしい。
+
+で、
+The session has been terminated.
+をキーワードにして引くと、
+LH_END_SESSION
+をキーワードとして引くことになり、引っかかったのは、
+src/Cedar/Protocol.c
+だった。該当箇所みてみたら、なんて長いfunctionなんだ！
+
+で、結局
+  782 bool ServerAccept(CONNECTION *c)
+のCLEANUPで処理されてるっぽいなぁ。
+
+
+---- ここはgnome3.8.4があまりに使いにくいので、解析に入った。
+
+evinceのスライダがあまりに使いにくいので、evince読んだ
+---> 
+/usr/bin/evince-thumbnailer a.pdf b.png
+がnautilusから呼び出されるthumbnail作りのプロセス。
+
+よくthumbnail作成が失敗する場合は、リトライについては、nautilus側
+で制御されている模様。が、thumbnailは
+~/.cache/thumbnails/
+以下にpng形式で保管されており、ファイル名がmd5sum?形式のファイル名
+となっているようだ。なので、thumbnailをリフレッシュする方法は
+~/.cache/thumbnails/以下を全部消すぐらいしかない。
+
+また、
+/usr/bin/evince-previewer file.pdf
+でプレビュー用となる。（そのまま実行可能)
+
+evinceのUIもmainも
+$(SRC)/shell/
+以下にあるようだ。
+
+--------------------nautilus
+うほ。nautlusのthumbnailは
+libnautilus-private/nautilus-thumbnails.c
+だった。
+で、結局のところ、
+ gnome_desktop_thumbnail_factory_xxxx
+という関数が呼ばれるが、これはlibgnome-desktop
+というライブラリの中にある...
+
+------vim
+
+vimgrepで出た結果を別ウィンドウでやるのは、quickfixという
+vimの機能だそうな。でもなぜかcwというコマンド。
+
+---- dig
+
+なんか知らんが、digのデフォルト仕様が変わった。で、
+普通に
+
+ dig ftp.jp.debian.org
+
+とかやってもまともにクエリできなかった。で、
+;; WARNING: EDNS query returned status FORMERR - retry with '+noedns'
+とかでてたので、試しに
+
+ dig ftp.jp.debian.org +noedns
+
+とかやったらちゃんとクエリされた。
+まぢかよ。
+-----hhvm
+
+くっそー、debian用のprecompiledパッケージとか、
+itpとかもされてんのに、肝心のソースパッケージが公開されてない
+ので、ビルドができねー、公式にも搭載できねー。
+
+そのくせ、作り方とか公開してやがる。
+https://github.com/facebook/hhvm/wiki/Building-and-installing-HHVM-on-Debian-8
+
+ぐっは、git cloneしたあとのREADME.mdみると
+To date, HHVM (and its predecessor HPHPc before it) has realized over a 9x increase in web request throughput and over a 5x reduction in memory consumption for Facebook compared with the PHP 5.2 engine + APC.
+とかいってるので、PHP5.2との比較なのか？？
+
+--------libimobiledevice
+もうね、いろいろアップグレードしすぎててちょっと治すぐらじゃ動かねー。
+libplistもアップグレード対象だ！
+ぐっは、全部git版でgit pullでアップグレードしたのに、全くifuseがafcエラー
+から抜けない...gvfsが邪魔ぶっこいてんのか？
+
+面白い。idevicesyslogを別窓で起動すると、iphoneのsyslogがstdoutに連結。
+で、他窓で、
+~/prog/libimobiledevice/ ifuse --documents com.readdle.ReaddleDocsIPad `pwd`/tmp
+Failed to start AFC service 'com.apple.mobile.house_arrest' on the device.
+とかすると、エラーがでた。
+内容は：
+n  3 22:42:07  lockdownd[52] <Notice>: 00281000 spawn_service_agent: Too many instances of service com.apple.mobile.house_arrest already running
+Jun  3 22:42:07  lockdownd[52] <Notice>: 00281000 spawn_and_handle_checkin: Could not spawn the com.apple.mobile.house_arrest service agent:ServiceLimit 
+
+とのことだそうな。要はlockdowndが動きすぎ。
+
+で、何が悪さしてんだろうか？とおもうとふいに心当たりあるのは、ps取るとafc-monitorとか
+gvfs経由で上がっている。これはgvfsの一部。で、
+sudo chmod -x /lib/udev/iphone-set-info /usr/lib/gvfs/gvfs-afc-volume-monitor
+という荒業があるらしい...（あたまいいけどちょっとなぁ）
+あー、gvfsの$(SRC_GVFS)/monitor/afc/afcvolume.cをみると、本件まっくろけだ...
+※くそう一時的にこいつをOFFりたいぜ。
+---> systemctlじゃダメらしい。
+
+gvfsのソースみてるけど、各サービスがどこかで起動される向けに作られているようだ。
+なので、main関数とかはソースが共通で、なんと、コンパイル時の
+-DBACKEND_TYPESですべてが決まる。
+--->ちゅーことは誰が起動かけてんだ？？
+
+Document3ならdav経由であるが、gnome3のnautilusで、
+サーバーへ接続→ dav://127.0.0.1:8000/とかでさっくりつながった。
+が、データ落そうとすると、Propfindの結果を受けてnautilusがハング...orz
+なんだよおおお。
+
+gvfsについては、
+
+nojima    1835  0.0  0.0 208836  3664 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfsd
+nojima    1847  0.0  0.0 289424  3472 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfsd-fuse /run/user/1000/gvfs -f -o big_writes
+nojima    1880  0.0  0.1 302492  5212 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfs-udisks2-volume-monitor
+nojima    1891  0.0  0.0 201996  3404 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfs-goa-volume-monitor
+nojima    1903  0.0  0.0 205992  3468 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfs-mtp-volume-monitor
+nojima    1911  0.0  0.0 215068  3708 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfs-gphoto2-volume-monitor
+nojima    1915  0.0  0.1 302720  5088 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfs-afc-volume-monitor
+nojima    2208  0.0  0.0 282572  3524 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfsd-burn --spawner :1.6 /org/gtk/gvfs/exec_spaw/0
+
+のように一般people権限で起動しているが、これはdbus-daemonによる起動であり、
+session.confにより指定されている/usr/share/dbus-1/sevices/以下
+のファイルがsessionスタートと同時に定義どおり起動されるお約束となっている。
+
+ほんと何でも動かすんだな>dbus
+
+で、ユーザホームディレクトリごとに設定できんのか？ということで、dbusの挙動
+調べ中。
+
+そしたら、bus/dbus-userdb.c
+というのがあり、_dbus_homedir_from_username
+とかそれらしいのが見つかる。--->いけるいけるのかぁ？--->あれあれ？これを呼び出している
+ものがdbusのソース全部で見つからん...orz
+が、同じソースにinit_system_dbというのがあり、この中で、意味深な
+　　-----------ここから--------------
+      if (!_dbus_user_database_get_uid (system_db,
+248                                         _dbus_getuid (),
+249                                         &info,
+250                                         &error))
+251         {
+252           _dbus_user_database_unref (system_db);
+253           system_db = NULL;
+254 
+255           if (dbus_error_has_name (&error, DBUS_ERROR_NO_MEMORY))
+256             {
+257               dbus_error_free (&error);
+258               return FALSE;
+259             }
+260           else
+261             {
+262               /* This really should not happen. */
+263               _dbus_warn ("Could not get password database information for UID of curre    nt process: %s\n",
+264                           error.message);
+265               dbus_error_free (&error);
+266               return FALSE;
+267             }
+268         }
+      ------------------ここまで
+
+ってのがみつかる。あー、結局init_system_db()は_dbus_homedir_XX()
+から呼び出される仕様なので、grepしたら、
+/**
+3776  * Appends the directory in which a keyring for the given credentials
+3777  * should be stored.  The credentials should have either a Windows or
+3778  * UNIX user in them.  The directory should be an absolute path.
+3779  *
+3780  * On UNIX the directory is ~/.dbus-keyrings while on Windows it should probably
+3781  * be something else, since the dotfile convention is not normal on Windows.
+3782  *
+3783  * @param directory string to append directory to
+3784  * @param credentials credentials the directory should be for
+3785  *
+3786  * @returns #FALSE on no memory
+3787  */
+3788 dbus_bool_t
+3789 _dbus_append_keyring_directory_for_credentials (DBusString      *directory,
+3790                                                 DBusCredentials *credentials)
+とかなので、いわゆるkeyringの呼び出しだ...orz
+※本当になんでもやってんなちくしょー。
+
+dbusは見事に巨大でスイスアーミー化してるので、
+http://www.freedesktop.org/wiki/Software/dbus/
+を最初に見たほうがよいかも...
+--->applicationからの使い方の話で、dbus本体の使い方じゃなかった..orz
+message+   841  0.0  0.0  42504  2784 ?        Ss   14:30   0:00 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+とあるので、こちらはsystemwideのdbusだ。
+
+で、ユーザ個別の奴は↓
+nojima    1912  0.0  0.0  42504  2116 ?        Ss   14:30   0:00 /usr/bin/dbus-daemon --fork --print-pid 5 --print-address 7 --session
+だった。
+
+dbus-daemonのmain関数は
+$(dbus-src)/bus/main.cにある。
+
+で
+dbus-1.8.2/dbus/dbus-sysdeps-util-unix.c
+を見るとDBUS_SESSION_CONFIG_FILEでハードコーディングだぁ。
+(/usr/share/dbus-1/sessionとかになる）
+
+dbusを--sessionでlaunchしてんのは、x-session-managerというgnome3搭載
+のセッション管理マネージャが行う。で、ユーザセッションをgnome3で起動してる
+親玉は、x-session-managerなので、gnome-session-propertiesコマンド
+でカスタマイズ可能らしい。やってみるみる。
+が、肝心のdbus-daemon --sessionについての設定が無い！
+また、XDG_XXXXな場所を見るらしいので、
+$(HOME)以下でfindしてみたら、
+./.config/gnome-session
+こんなのあったので、中身みてみる。おお、ここはsaved-sessionを
+記録する場所らしい。
+
+---->出た。ほしいのが出た。
+
+あ、dbusって起動時に一度しかサービス起動しないので、
+該当サービス死んでも何もしないようだ...なので、クソ邪魔な
+nojima    1915  0.0  0.1 302720  5088 ?        Sl   21:41   0:00 /usr/lib/gvfs/gvfs-afc-volume-monitor
+をkillしてあげたら、死んだままになった。ははは。
+
+おお、このままだと、nautilusも反応しないぜ！good!
+
+しかしながら、またもや、AFCでエラーになったので、これってlockdownd
+が死んでるだけという気がするので、一旦iphone再起動したら....
+一発でifuseできたーばんざいー
+
+で、nautilusあげたら、勝手に/usr/lib/gvfs/gvfs-afc-volume-monitorが起動しやがった。
+
+
+----thinkpad x230
+
+蓋閉じたら、sleepモードになる件のカスタマイズは↓
+https://wiki.archlinux.org/index.php/GDM_(%E6%97%A5%E6%9C%AC%E8%AA%9E)
+にある。なんと、systemdにて/etc/systemd/logind.conf
+が制御してやがった。該当
+HandleLidSwitch=ignore
+を明示する必要があるらしい。
+
+----Softetherはあっさり終わったから何しようかな
+おお、そーいえば、LLVMやるんじゃなかっか？
+hhvmだってあるんじゃ？
+CloudFoundaryもあったな。
+qemu-armもある。
+bluethooth解析もある。
+GNU Hurdやりたいし。
+cocos2d-xとかdebianで動かすとかね。
+ラップトップの電源の話とかね。
+dbusのdebian話とか変わっているからおもしろいかもな。
+（意外とみんなgnome3とかヘビーに使ってるくせにいろいろ知らん）

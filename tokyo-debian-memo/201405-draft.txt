@@ -326,6 +326,1224 @@ root                4419                954                 0                   
 ~/ docker.io search debian
 とやると、イメージ一覧が得られる。
 
+で、
+https://index.docker.io/_/debian/にあるとおりのイメージが利用可能。
+
+ここで、
+
+docker.io run -t -i -h debian-sid debian:sid
+
+とかやったが、
+docker.io run -t -i -h debian-sid debian:sid
+Unable to find image 'debian:sid' locally
+Pulling repository debian
+1cda8535c670: Error pulling image (sid) from debian, read tcp 162.159.254.251:443: connection reset by peer p 162.159.254.251:443: connection reset by peer 
+0ed2a4d77969: Error downloading dependent layers 
+2014/05/11 22:11:25 Could not find repository on any of the indexed registries.
+
+とか言われて終了。
+---> 5/13 22:57にて、wifiでやってみたら、
+
+docker.io run -t -i -h debian-sid debian:sid
+Unable to find image 'debian:sid' locally
+Pulling repository debian
+1cda8535c670: Download complete 
+511136ea3c5a: Download complete 
+0ed2a4d77969: Download complete 
+root@debian-sid:/# 
+
+となり、なんら問題なくdebian-sidが稼働。DLしてきたのも40Mbytesぐらいの
+かわいいサイズのイメージっぽいなー。
+
+早速
+~/doc/tokyo-debian/monthly-report-work/ docker.io run -t -i -h debian-sid debian:sid
+Unable to find image 'debian:sid' locally
+Pulling repository debian
+1cda8535c670: Download complete 
+511136ea3c5a: Download complete 
+0ed2a4d77969: Download complete 
+root@debian-sid:/# ls
+bin   dev  home  lib64	mnt  proc  run	 srv  tmp  var
+boot  etc  lib	 media	opt  root  sbin  sys  usr
+root@debian-sid:/# df -h
+Filesystem                                Size  Used Avail Use% Mounted on
+rootfs                                     37G   26G  9.4G  74% /
+none      　                               37G   26G  9.4G  74% /
+tmpfs                                      1.8G     0  1.8G   0% /dev
+shm                                       64M     0   64M   0% /dev/shm
+/dev/disk/by-uuid/d94713bd-c13e-4925-88f1-6dd9ba520cff   37G   26G  9.4G  74% /etc/hosts
+tmpfs                                     1.8G     0  1.8G   0% /proc/kcore
+root@debian-sid:/# 
+
+って感じで。一体なんだったんだろう？
+
+ifconfigとってみたら、
+root@debian-sid:/# ip addr show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+7: eth0: <BROADCAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 12:00:9a:a6:1e:07 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.2/16 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::1000:9aff:fea6:1e07/64 scope link 
+       valid_lft forever preferred_lft forever
+だってさ。
+
+root@debian-sid:/usr/bin# ps
+bash: ps: command not found
+root@debian-sid:/usr/bin# which
+
+まぢかー。そぎ落としてんなー。
+
+ホスト側で、みると
+
+6: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 56:84:7a:fe:97:99 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.42.1/16 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::5484:7aff:fefe:9799/64 scope link 
+       valid_lft forever preferred_lft forever
+8: veth89b0: <BROADCAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master docker0 state UP group default qlen 1000
+    link/ether 6e:31:56:aa:a3:62 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::6c31:56ff:feaa:a362/64 scope link 
+       valid_lft forever preferred_lft forever
+
+ってことだそうな。172.17.42.1って誰が作ってんのか？
+
+　このdebian-sidってば、調べたら
+  ------------ここから-----------------
+root@debian-sid:/usr/bin# dpkg -l
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name             Version       Architecture  Description
++++-================-=============-=============-======================================
+ii  apt              1.0           amd64         commandline package manager
+ii  base-files       7.2           amd64         Debian base system miscellaneous files
+ii  base-passwd      3.5.32        amd64         Debian base system master password and
+ii  bash             4.3-6         amd64         GNU Bourne Again SHell
+ii  bsdutils         1:2.20.1-5.7  amd64         Basic utilities from 4.4BSD-Lite
+ii  coreutils        8.21-1.1      amd64         GNU core utilities
+ii  dash             0.5.7-4       amd64         POSIX-compliant shell
+ii  debconf          1.5.52        all           Debian configuration management system
+ii  debconf-i18n     1.5.52        all           full internationalization support for 
+ii  debian-archive-k 2012.4        all           GnuPG archive keys of the Debian archi
+ii  debianutils      4.4           amd64         Miscellaneous utilities specific to De
+ii  diffutils        1:3.3-1       amd64         File comparison utilities
+ii  dpkg             1.17.6        amd64         Debian package management system
+ii  e2fslibs:amd64   1.42.9-3      amd64         ext2/ext3/ext4 file system libraries
+ii  e2fsprogs        1.42.9-3      amd64         ext2/ext3/ext4 file system utilities
+ii  findutils        4.4.2-7       amd64         utilities for finding files--find, xar
+ii  gcc-4.7-base:amd 4.7.3-12      amd64         GCC, the GNU Compiler Collection (base
+ii  gcc-4.8-base:amd 4.8.2-19      amd64         GCC, the GNU Compiler Collection (base
+ii  gnupg            1.4.16-1.1    amd64         GNU privacy guard - a free PGP replace
+ii  gpgv             1.4.16-1.1    amd64         GNU privacy guard - signature verifica
+ii  grep             2.18-1        amd64         GNU grep, egrep and fgrep
+ii  gzip             1.6-3         amd64         GNU compression utilities
+ii  hostname         3.15          amd64         utility to set/show the host name or d
+ii  inetutils-ping   2:1.9.2-1     amd64         ICMP echo tool
+ii  initscripts      2.88dsf-53    amd64         scripts for initializing and shutting 
+ii  insserv          1.14.0-5      amd64         boot sequence organizer using LSB init
+ii  iproute2         3.12.0-2      amd64         networking and traffic control tools
+ii  libacl1:amd64    2.2.52-1      amd64         Access control list shared library
+ii  libapt-pkg4.12:a 1.0           amd64         package management runtime library
+ii  libattr1:amd64   1:2.4.47-1    amd64         Extended attribute shared library
+ii  libaudit-common  1:2.3.4-1     all           Dynamic library for security auditing 
+ii  libaudit1:amd64  1:2.3.4-1     amd64         Dynamic library for security auditing
+ii  libblkid1:amd64  2.20.1-5.7    amd64         block device id library
+ii  libbz2-1.0:amd64 1.0.6-5       amd64         high-quality block-sorting file compre
+ii  libc-bin         2.18-4        amd64         Embedded GNU C Library: Binaries
+ii  libc6:amd64      2.18-4        amd64         Embedded GNU C Library: Shared librari
+ii  libcap2:amd64    1:2.22-1.2    amd64         support for getting/setting POSIX.1e c
+ii  libcomerr2:amd64 1.42.9-3      amd64         common error description library
+ii  libdb5.3:amd64   5.3.28-3      amd64         Berkeley v5.3 Database Libraries [runt
+ii  libdebconfclient 0.189         amd64         Debian Configuration Management System
+ii  libgcc1:amd64    1:4.8.2-19    amd64         GCC support library
+ii  liblocale-gettex 1.05-8        amd64         module using libc functions for intern
+ii  liblzma5:amd64   5.1.1alpha+20 amd64         XZ-format compression library
+ii  libmount1        2.20.1-5.7    amd64         block device id library
+ii  libncurses5:amd6 5.9+20140118- amd64         shared libraries for terminal handling
+ii  libpam-modules:a 1.1.8-3       amd64         Pluggable Authentication Modules for P
+ii  libpam-modules-b 1.1.8-3       amd64         Pluggable Authentication Modules for P
+ii  libpam-runtime   1.1.8-3       all           Runtime support for the PAM library
+ii  libpam0g:amd64   1.1.8-3       amd64         Pluggable Authentication Modules libra
+ii  libpcre3:amd64   1:8.31-3      amd64         Perl 5 Compatible Regular Expression L
+ii  libreadline6:amd 6.3-6         amd64         GNU readline and history libraries, ru
+ii  libselinux1:amd6 2.2.2-1       amd64         SELinux runtime shared libraries
+ii  libsemanage-comm 2.2-1         all           Common files for SELinux policy manage
+ii  libsemanage1:amd 2.2-1         amd64         SELinux policy management library
+ii  libsepol1:amd64  2.2-1         amd64         SELinux library for manipulating binar
+ii  libslang2:amd64  2.2.4-16      amd64         S-Lang programming library - runtime v
+ii  libss2:amd64     1.42.9-3      amd64         command-line interface parsing library
+ii  libstdc++6:amd64 4.8.2-19      amd64         GNU Standard C++ Library v3
+ii  libtext-charwidt 0.04-7+b2     amd64         get display widths of characters on th
+ii  libtext-iconv-pe 1.7-5+b1      amd64         converts between character sets in Per
+ii  libtext-wrapi18n 0.06-7        all           internationalized substitute of Text::
+ii  libtinfo5:amd64  5.9+20140118- amd64         shared low-level terminfo library for 
+ii  libusb-0.1-4:amd 2:0.1.12-23.3 amd64         userspace USB programming library
+ii  libustr-1.0-1:am 1.0.4-3       amd64         Micro string library: shared library
+ii  libuuid1:amd64   2.20.1-5.7    amd64         Universally Unique ID library
+ii  login            1:4.1.5.1-1.1 amd64         system login tools
+ii  lsb-base         4.1+Debian12  all           Linux Standard Base 4.1 init script fu
+ii  mawk             1.3.3-17      amd64         a pattern scanning and text processing
+ii  mount            2.20.1-5.7    amd64         Tools for mounting and manipulating fi
+ii  multiarch-suppor 2.18-4        amd64         Transitional package to ensure multiar
+ii  ncurses-base     5.9+20140118- all           basic terminal type definitions
+ii  ncurses-bin      5.9+20140118- amd64         terminal-related programs and man page
+ii  netbase          5.2           all           Basic TCP/IP networking system
+ii  passwd           1:4.1.5.1-1.1 amd64         change and administer password and gro
+ii  perl-base        5.18.2-2+b1   amd64         minimal Perl system
+ii  readline-common  6.3-6         all           GNU readline and history libraries, co
+ii  sed              4.2.2-4       amd64         The GNU sed stream editor
+ii  sensible-utils   0.0.9         all           Utilities for sensible alternative sel
+ii  startpar         0.58-5        amd64         run processes in parallel and multiple
+ii  sysv-rc          2.88dsf-53    all           System-V-like runlevel change mechanis
+ii  sysvinit         2.88dsf-53    amd64         System-V-like init utilities - metapac
+ii  sysvinit-core    2.88dsf-53    amd64         System-V-like init utilities
+ii  sysvinit-utils   2.88dsf-53    amd64         System-V-like utilities
+ii  tar              1.27.1-2      amd64         GNU version of the tar archiving utili
+ii  tzdata           2014b-1       all           time zone and daylight-saving time dat
+ii  util-linux       2.20.1-5.7    amd64         Miscellaneous system utilities
+ii  zlib1g:amd64     1:1.2.8.dfsg- amd64         compression library - runtime
+root@debian-sid:/usr/bin# 
+  ------------ここまで-----------------
+ってことらしい。
+root@debian-sid:/usr/bin# cat /etc/debian_version 
+jessie/sid
+だ。
+root@debian-sid:/etc/apt# cat sources.list
+deb http://http.debian.net/debian sid main
+おふ。
+んじゃー、aptitudeしちゃる。
+
+~/doc/tokyo-debian/monthly-report-work/ docker.io run -t -i -h debian-sid debian:sid
+root@debian-sid:/# 
+
+はやっ！なんだこの早さ！
+あれ？exitしたらdocker container丸ごと終了した..
+
+root@debian-sid:/# echo $$
+1
+まぢか。pid=1らしい。
+root@debian-sid:/# ls -l /proc/
+total 0
+dr-xr-xr-x  9 root root    0 May 13 14:11 1
+dr-xr-xr-x  9 root root    0 May 13 14:13 8
+dr-xr-xr-x  4 root root    0 May 13 14:13 acpi
+笑。プロセスは２つしか居ない。
+
+つまり、pid=1のshellが終了するとシステムはシャットダウンだ。
+
+で、dockerのdebian-sid上でapt-get update;apt-get install procps
+してプロセスみ
+
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0  18016  1988 ?        Ss   17:12   0:00 /bin/bash
+root       846  0.0  0.0  17492  1136 ?        R+   17:26   0:00 ps -auxww
+
+わおー。
+
+ところで、pullしたイメージの様子は、
+
+~/ docker.io images --tree
+Warning: '--tree' is deprecated, it will be removed soon. See usage.
+└─511136ea3c5a Virtual Size: 0 B
+  ├─0ed2a4d77969 Virtual Size: 122.7 MB
+  │ └─1cda8535c670 Virtual Size: 122.7 MB Tags: debian:sid
+  └─6c991eb93460 Virtual Size: 0 B
+    └─9f4e93171ec5 Virtual Size: 2.489 MB
+      └─2d8e5b282c81 Virtual Size: 2.489 MB Tags: busybox:latest
+
+ということなので。
+※ images の--treeオプションって...代わりはあるの？
+
+ネットワークが勝手にdocker0とかいうbridge作られるのがウザいのであれば、
+
+http://docs.docker.io/use/networking/
+
+みて、すでにできてるbridgeを指定する、あるいは、-icc=trueとかするなど
+して遊ぶ。
+
+docker虎の巻
+https://gist.github.com/tcnksm/7700047
+
+とかで言われている内容はちょっと古いかも？ネットワークは素でつかえるよ！
+
+おお、
+exuberant-ctags
+バージョン: 1:5.9~svn20110310-7
+(sid最新）
+だと、go言語サポート済。
+
+ctags -Rしたら
+
+█▓▒░nojima@nightmare░▒▓██▓▒░ 日  5月 11 10:16:20午後 
+~/prog/debian/docker.io/docker.io-0.9.1~dfsg1/ ctags -R
+ctags: Warning: cannot recurse into directory "utils/testdata/fs/g" : Permission denied
+ctags: Warning: cannot open source file "utils/testdata/fs/a/d" : No such file or directory
+ctags: Warning: cannot recurse into directory "utils/testdata/fs/a/e/h" : Permission denied
+ctags: Warning: cannot open source file "utils/testdata/fs/a/f" : No such file or directory
+ctags: Warning: cannot recurse into directory "utils/testdata/fs/b/h" : Permission denied
+
+とか言われてなんだとおもったら、こんな感じだったw
+
+█▓▒░nojima@nightmare░▒▓██▓▒░ 日  5月 11 10:16:47午後 
+~/prog/debian/docker.io/docker.io-0.9.1~dfsg1/ ls -l utils/testdata/fs
+合計 8
+drwxr-xr-x 2 nojima nojima 4096  3月 26 07:00 a
+drwxr-xr-x 2 nojima nojima 4096  3月 26 07:00 b
+lrwxrwxrwx 1 nojima nojima   40  3月 26 07:00 g -> ../../../../../../../../../../../../root
+
+そりゃエラーになるわ。
+
+くそ、ソース落としてきてみると、
+ ~/prog/debian/docker.io/docker.io-0.9.1~dfsg1/docker/docker.go
+の冒頭が
+ 
+ ------------こっから--------------------
+package main
+  2 
+  3 import (
+  4         "fmt"
+  5         "log"
+  6         "os"
+  7         "strings"
+  8 
+  9         "github.com/dotcloud/docker/api"
+ 10         "github.com/dotcloud/docker/builtins"
+ 11         "github.com/dotcloud/docker/dockerversion"
+ 12         "github.com/dotcloud/docker/engine"
+ 13         flag "github.com/dotcloud/docker/pkg/mflag"
+ 14         "github.com/dotcloud/docker/pkg/opts"
+ 15         "github.com/dotcloud/docker/sysinit"
+ 16         "github.com/dotcloud/docker/utils"
+ 17 )
+ 18 
+ 19 func main() {
+----------ここまで----------------------
+
+ってことだそうな。名前空間がgithub.comというのは聞いていたが...
+
+ぐっは、dockerサーバー（多分）のソースは
+ $(DOCKER_SOURCE)/docker/docker.goがmain()。
+
+オプションみると、
+
+　　- ネットワークから、
+　　- bridgeから、
+   - cliもか？
+　　（ps -auxww | fgrep dockerとかしたら、
+　　　root       962  0.0  0.1 213428  6828 ?        Ssl  15:16   0:00 /usr/bin/docker.io -d
+
+　　　だった。つまり、docker.ioをdaemonモードで動かしてるぜ）
+
+をサポートしているような気がする...
+
+go言語のバイナリは実行にあたり外部ライブラリを利用しないとは聞いていたので、
+みてみたら、本当にそうだった...
+
+~/prog/debian/docker.io/ ldd /usr/bin/docker.io 
+	linux-vdso.so.1 (0x00007fffc5dfe000)
+	libdevmapper.so.1.02.1 => /lib/x86_64-linux-gnu/libdevmapper.so.1.02.1 (0x00007ffb5936e000)
+	libapparmor.so.1 => /usr/lib/x86_64-linux-gnu/libapparmor.so.1 (0x00007ffb59164000)
+	libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007ffb58f46000)
+	libsqlite3.so.0 => /usr/lib/x86_64-linux-gnu/libsqlite3.so.0 (0x00007ffb58c8a000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ffb588e0000)
+	libselinux.so.1 => /lib/x86_64-linux-gnu/libselinux.so.1 (0x00007ffb586bb000)
+	libudev.so.1 => /lib/x86_64-linux-gnu/libudev.so.1 (0x00007ffb584a9000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ffb595c8000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007ffb582a5000)
+	libpcre.so.3 => /lib/x86_64-linux-gnu/libpcre.so.3 (0x00007ffb58048000)
+	librt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007ffb57e40000)
+
+というわけで、go言語specificなライブラリは無い。
+
+とりあえず、ネタとしては、
+To instruct the kernel to enable memory cgroup support, edit
+/etc/default/grub and extend GRUB_CMDLINE_LINUX_DEFAULT like:
+
+GRUB_CMDLINE_LINUX_DEFAULT="cgroup_enable=memory swapaccount=1"
+
+Then run update-grub, and reboot.
+
+ぐらいはやっておいた方がよいかも？？
+
+ネタ的なオプション
+ docker.io-0.9.1だと、
+  config.goの中にある謎オプションとして、
+   GraphDriver
+   ExecDriver　---> lxc/nativeというのがある。
+    --> lxc.NewDriver/native.NewDriver()で初期化される。
+
+   InterContainerCommunication
+　がある。あと、何故かMtuとかある。（特に断りなければ1500bytes=> ether frameだ）
+
+　docker.io-0.9.1 runtime.goで、default DNSとして、8.8.8.8,8.8.4.4
+がデフォルト指定に指定されていた。
+
+
+
+ところで、内部構造の記載は↓
+http://2013.8-p.info/japanese/06-22-docker.html
+
+知らんかったが、dockerは/sbin/initの代わりとして起動可能とわー。
+
+
+-----------go lang----------
+dockerのソースで、
+
+  3 import (
+  4         "fmt"
+  5         "log"
+  6         "os"
+  7         "strings"
+  8 
+  9         "github.com/dotcloud/docker/api"
+ 10         "github.com/dotcloud/docker/builtins"
+ 11         "github.com/dotcloud/docker/dockerversion"
+ 12         "github.com/dotcloud/docker/engine"
+ 13         flag "github.com/dotcloud/docker/pkg/mflag"
+ 14         "github.com/dotcloud/docker/pkg/opts"
+ 15         "github.com/dotcloud/docker/sysinit"
+ 16         "github.com/dotcloud/docker/utils"
+ 17 )
+
+とあれば、$(SRC)/api,$(SRC)/builtinsだと思え。
+
+また、Makefileが面白いことになっていて
+
+  -------------ここから--------------
+  3 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+  4 DOCKER_IMAGE := docker:$(GIT_BRANCH)
+  5 DOCKER_DOCS_IMAGE := docker-docs:$(GIT_BRANCH)
+  6 DOCKER_RUN_DOCKER := docker run --rm -i -t --privileged -e TESTFLAGS -v "$(CURDIR)/bund    les:/go/src/github.com/dotcloud/docker/bundles" "$(DOCKER_IMAGE)"
+  7 
+  8 default: binary
+  9 
+ 10 all: build
+ 11         $(DOCKER_RUN_DOCKER) hack/make.sh
+ 12 
+ 13 binary: build
+ 14         $(DOCKER_RUN_DOCKER) hack/make.sh binary
+ 15 
+ 16 cross: build
+ 17         $(DOCKER_RUN_DOCKER) hack/make.sh binary cross
+ 18 
+ 19 docs: docs-build
+ 20         docker run --rm -i -t -p 8000:8000 "$(DOCKER_DOCS_IMAGE)"
+ 21 
+
+となっているようにdockerはdockerでコンパイル？
+
+おっと、野島の環境を元に書く場合気をつけるのは、
+ip_forward=1
+の環境なので、こちらは別途入れる必要あり。
+
+dockerをgoogle gceで使うので、
+とりあえず、GCE契約してみた。
+ 
+詳しくは
+http://deeeet.com/writing/2014/04/13/docker-meetup-2/
+
+で、会社名と、会社の連絡先（メールだけどね）を聞かれる...orz
+おまけに何ページにもわたり、英語によるアンケートを尋ねられる...
+内容は今回の評価に関する内容。
+https://developers.google.com/compute/docs/signup
+がそこらじゅうで案内されているが、もう時代遅れ！
+くそう、これは間違いだ。普通に利用できるやんけ。（消しといてくれよ＞google!)
+
+クレジットカード握りしめて
+　https://developers.google.com/
+から素直にGCEまでたどれば、OK。
+
+ Debian勉強会参加者はもれなくgoogleアカウントとってるから、 以下の
+登録だけで済む。
+
+ [プロジェクト作成]
+
+ プロジェクト名（適当）、プロジェクトID(ハイフンと数字を入れてみた）を入れるらしい。
+
+　Project名：nozzy's evaluation project
+　ProjectID: nozzy-evaluation-test-001
+
+  -->
+  [支払い]
+   住所に電話番号を聞かれる。
+
+　おお、電話番号の折り返しもなんもなしで作られるようだ。
+
+　Tipsだが、アカウント設定について、日本語を選んでおくと、Google Developers console
+が日本語化される。
+
+　あとは、
+　　https://developers.google.com/cloud/sdk/
+　から、sdkを拾ってくる。
+
+　ちょっと汚染されるかも？という心配があるが、取り急ぎ、
+　　https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+　を落とすやり方でやってみる。で、展開して、
+  ./google-cloud-sdk/install.sh
+  らしいのだが、ちょっと中身確認をば。
+　
+　とりあえず、一般ユーザで実行したところ、ちゃんとローカルユーザでのインストール（
+おそらくカレントディレクトリ）が行われる。
+
+　zshの場合、source ./google-cloud-sdk/path.zsh.incでOK.
+
+もしかして、gcloudコマンドって、debianパッケージのどっかにあるかなーと思い
+apt-file search gloudしたが、全く該当せず。
+
+で、GCEで使う場合、Docker側公式ドキュメントで、
+
+Google Cloud Platform
+http://docs.docker.io.s3-website-us-west-2.amazonaws.com/installation/google/
+が良い説明
+
+で、machine-typeはf1-microを使ってみる。（一番やすいもん！それでも1台1ヶ月$9.67。約900円）
+
+sdkぶちこんで、
+
+% gcloud auth login
+-->突如ブラウザが開き承認をせまられるので、「承諾」。
+% gcutil listzones --project=nozzy-evaluation-test-001 
++----------------+--------+-------------------------------+
+| name           | status | next-maintenance              |
++----------------+--------+-------------------------------+
+| asia-east1-a   | UP     | None scheduled                |
++----------------+--------+-------------------------------+
+| asia-east1-b   | UP     | None scheduled                |
++----------------+--------+-------------------------------+
+| europe-west1-a | UP     | 2014-08-01T12:00:00.000-07:00 |
++----------------+--------+-------------------------------+
+| europe-west1-b | UP     | None scheduled                |
++----------------+--------+-------------------------------+
+| us-central1-a  | UP     | None scheduled                |
++----------------+--------+-------------------------------+
+| us-central1-b  | UP     | None scheduled                |
++----------------+--------+-------------------------------+
+
+まあ、どこがどこかわからんが。
+
+gcutil listmachinetypes --project nozzy-evaluation-test-001
+すると、
++-----------------+----------------+------+-----------+-------------+
+| name            | zone           | cpus | memory-mb | deprecation |
++-----------------+----------------+------+-----------+-------------+
+| n1-standard-1-d | asia-east1-a   |    1 |      3840 | OBSOLETE    |
++-----------------+----------------+------+-----------+-------------+
+| n1-standard-1   | asia-east1-a   |    1 |      3840 |             |
++-----------------+----------------+------+-----------+-------------+
+| f1-micro        | asia-east1-a   |    1 |       614 |             |
++-----------------+----------------+------+-----------+-------------+
+| g1-small        | asia-east1-a   |    1 |      1740 |             |
++-----------------+----------------+------+-----------+-------------+
+| n1-standard-1   | asia-east1-b   |    1 |      3840 |             |
+                 ...中略...
+と、name/zone/specの３つがとれる。
+
+~/prog/google-gce/ gcutil addinstance docker-test001 --project=nozzy-evaluation-test-001 --image=backports-debian-7 --machine_type=f1-micro --zone=asia-east1-a --wait_until_running --auto_delete_boot_disk 
+INFO: Resolved backports-debian-7 to projects/debian-cloud/global/images/backports-debian-7-wheezy-v20140415
+WARNING: You don't have an ssh key for Google Compute Engine. Creating one now...
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+INFO: Waiting for insert of instance docker-test001. Sleeping for 3s.
+INFO: Waiting for insert of instance docker-test001. Sleeping for 3s.
+INFO: Waiting for insert of instance docker-test001. Sleeping for 3s.
+INFO: Ensuring docker-test001 is running.  Will wait to start for: 240 seconds.
+
+Table of resources:
+
++-------------+----------------+----------------+------------+---------+
+| name        | network-ip     | external-ip    | zone       | status  |
++-------------+----------------+----------------+------------+---------+
+| docker-     | 10.240.235.194 | 107.167.185.30 | asia-      | RUNNING |
+| test001     |                |                | east1-a    |         |
++-------------+----------------+----------------+------------+---------+
+
+Table of operations:
+
++--------------------+--------+-----------------------+----------------+
+| name               | status | insert-time           | operation-type |
++--------------------+--------+-----------------------+----------------+
+| operation-14002317 | DONE   | 2014-05-16T02:15:31.7 | insert         |
+| 31192-4f980daf0e0c |        | 10-07:00              |                |
+| 0-e1351dbb-        |        |                       |                |
+| 5d7e06ed           |        |                       |                |
++--------------------+--------+-----------------------+----------------+
+
+ls -l ~/.sshすると、
+
+~/prog/google-gce/ ls -la ~/.ssh 
+合計 68
+drwx------  2 nojima nojima  4096  5月 16 18:15 .
+drwxr-xr-x 51 nojima nojima  4096  5月 16 12:57 ..
+-rw-r--r--  1 nojima nojima   300  8月  1  2012 config
+-rw-------  1 nojima nojima  1766  5月 16 18:15 google_compute_engine
+-rw-r--r--  1 nojima nojima   398  5月 16 18:15 google_compute_engine.pub
+-rw-------  1 nojima nojima  1743  9月 27  2009 id_rsa
+-rw-r--r--  1 nojima nojima   398  9月 27  2009 id_rsa.pub
+-rw-------  1 nojima nojima 17497  3月 17 22:44 known_hosts
+-rw-------  1 nojima nojima 17275  3月 17 22:43 known_hosts.old
+
+google_compute_engine/google_compute_engine.pubが出来上がってる。
+
+~/prog/google-gce/ gcutil ssh docker-test001
+CommandError: You must specify a project name using the "--project" flag.
+
+█▓▒░nojima@nightmare░▒▓██▓▒░ 金  5月 16 06:21:40午後 
+~/prog/google-gce/ gcutil ssh --project=nozzy-evaluation-test-001 docker-test001
+INFO: Zone for docker-test001 detected as asia-east1-a.
+INFO: Running command line: ssh -o UserKnownHostsFile=/dev/null -o CheckHostIP=no -o StrictHostKeyChecking=no -i /home/nojima/.ssh/google_compute_engine -A -p 22 nojima@107.167.185.30 --
+Warning: Permanently added '107.167.185.30' (ECDSA) to the list of known hosts.
+Linux docker-test001 3.13-0.bpo.1-amd64 #1 SMP Debian 3.13.7-1~bpo70+1 (2014-03-29) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+nojima@docker-test001:~$ ls
+nojima@docker-test001:~$ pwd
+/home/nojima
+nojima@docker-test001:~$ ls
+nojima@docker-test001:~$ 
+
+という感じで、母艦のユーザがそのまま作られた。
+
+一応、
+nojima@docker-test001:~$ cat /etc/apt/sources.list
+deb     http://gce_debian_mirror.storage.googleapis.com/ wheezy         main
+deb-src http://gce_debian_mirror.storage.googleapis.com/ wheezy         main
+deb     http://http.debian.net/debian wheezy         main
+deb-src http://http.debian.net/debian wheezy         main
+deb     http://security.debian.org/   wheezy/updates main
+deb-src http://security.debian.org/   wheezy/updates main
+だってさ。
+gce_debian_mirror.storage.googleapis.comからapt-getできる。
+
+nojima@docker-test001:~$ cat /proc/cpuinfo 
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 62
+model name	: Intel(R) Xeon(R) CPU @ 2.50GHz
+stepping	: 4
+microcode	: 0x1
+cpu MHz		: 2500.000
+cache size	: 30720 KB
+physical id	: 0
+siblings	: 1
+core id		: 0
+cpu cores	: 1
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant_tsc nopl xtopology pni pclmulqdq ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes f16c rdrand hypervisor lahf_lm fsgsbase smep
+bogomips	: 5000.00
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 46 bits physical, 48 bits virtual
+power management:
+
+ってすごくないか？
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Tri
+g-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                                    Version                     
+ Architecture Description
++++-=======================================-============================
+-============-==========================================================
+=================
+ii  acpi-support-base                       0.140-5                     
+ all          scripts for handling base ACPI events such as the power bu
+tton
+ii  acpid                                   1:2.0.16-1+deb7u1           
+ amd64        Advanced Configuration and Power Interface event daemon
+ii  adduser                                 3.113+nmu3                  
+ all          add and remove users and groups
+ii  apt                                     0.9.7.9+deb7u1              
+ amd64        commandline package manager
+ii  apt-utils                               0.9.7.9+deb7u1              
+ amd64        package managment related utility programs
+ii  aptitude                                0.6.8.2-1                   
+ amd64        terminal-based package manager
+ii  aptitude-common                         0.6.8.2-1                   
+ all          architecture indepedent files for the aptitude package man
+ager
+ii  base-files                              7.1wheezy4                  
+ amd64        Debian base system miscellaneous files
+ii  base-passwd                             3.5.26                      
+ amd64        Debian base system master password and group files
+ii  bash                                    4.2+dfsg-0.1                
+ amd64        GNU Bourne Again SHell
+ii  bsdmainutils                            9.0.3                       
+ amd64        collection of more utilities from FreeBSD
+ii  bsdutils                                1:2.20.1-5.3                
+ amd64        Basic utilities from 4.4BSD-Lite
+ii  ca-certificates                         20130119                    
+ all          Common CA certificates
+ii  coreutils                               8.13-3.5                    
+ amd64        GNU core utilities
+ii  cpio                                    2.11+dfsg-0.1               
+ amd64        GNU cpio -- a program to manage archives of files
+ii  cron                                    3.0pl1-124                  
+ amd64        process scheduling daemon
+ii  curl                                    7.26.0-1+wheezy9            
+ amd64        command line tool for transferring data with URL syntax
+ii  dash                                    0.5.7-3                     
+ amd64        POSIX-compliant shell
+ii  debconf                                 1.5.49                      
+ all          Debian configuration management system
+ii  debconf-i18n                            1.5.49                      
+ all          full internationalization support for debconf
+ii  debian-archive-keyring                  2012.4                      
+ all          GnuPG archive keys of the Debian archive
+ii  debianutils                             4.3.2                       
+ amd64        Miscellaneous utilities specific to Debian
+ii  diffutils                               1:3.2-6                     
+ amd64        File comparison utilities
+ii  dmidecode                               2.11-9                      
+ amd64        SMBIOS/DMI table decoder
+ii  dmsetup                                 2:1.02.74-8                 
+ amd64        Linux Kernel Device Mapper userspace library
+ii  dpkg                                    1.16.12                     
+ amd64        Debian package management system
+ii  e2fslibs:amd64                          1.42.5-1.1                  
+ amd64        ext2/ext3/ext4 file system libraries
+ii  e2fsprogs                               1.42.5-1.1                  
+ amd64        ext2/ext3/ext4 file system utilities
+ii  ethtool                                 1:3.4.2-1                   
+ amd64        display or change Ethernet device settings
+ii  file                                    5.11-2+deb7u3               
+ amd64        Determines file type using "magic" numbers
+ii  findutils                               4.4.2-4                     
+ amd64        utilities for finding files--find, xargs
+ii  gcc-4.7-base:amd64                      4.7.2-5                     
+ amd64        GCC, the GNU Compiler Collection (base package)
+ii  gcutil                                  1.14.2-1                    
+ all          Command line tool for interacting with Google Compute Engi
+ne
+ii  gettext-base                            0.18.1.1-9                  
+ amd64        GNU Internationalization utilities for the base system
+ii  gnupg                                   1.4.12-7+deb7u3             
+ amd64        GNU privacy guard - a free PGP replacement
+ii  google-compute-daemon                   1.1.2-1                     
+ all          Google Compute Engine Management Daemon
+ii  google-startup-scripts                  1.1.2-1                     
+ all          Google Compute Engine Startup Scripts
+ii  gpgv                                    1.4.12-7+deb7u3             
+ amd64        GNU privacy guard - signature verification tool
+ii  grep                                    2.12-2                      
+ amd64        GNU grep, egrep and fgrep
+ii  groff-base                              1.21-9                      
+ amd64        GNU troff text-formatting system (base system components)
+ii  grub-common                             1.99-27+deb7u2              
+ amd64        GRand Unified Bootloader (common files)
+ii  grub-pc                                 1.99-27+deb7u2              
+ amd64        GRand Unified Bootloader, version 2 (PC/BIOS version)
+ii  grub-pc-bin                             1.99-27+deb7u2              
+ amd64        GRand Unified Bootloader, version 2 (PC/BIOS binaries)
+ii  grub2-common                            1.99-27+deb7u2              
+ amd64        GRand Unified Bootloader (common files for version 2)
+ii  gzip                                    1.5-1.1                     
+ amd64        GNU compression utilities
+ii  hostname                                3.11                        
+ amd64        utility to set/show the host name or domain name
+ii  ifupdown                                0.7.8                       
+ amd64        high level tools to configure network interfaces
+ii  info                                    4.13a.dfsg.1-10             
+ amd64        Standalone GNU Info documentation browser
+ii  init-system-helpers                     1.18~bpo70+1                
+ all          helper tools for all init systems
+ii  initramfs-tools                         0.115~bpo70+1               
+ all          generic modular initramfs generator
+ii  initscripts                             2.88dsf-41+deb7u1           
+ amd64        scripts for initializing and shutting down the system
+ii  insserv                                 1.14.0-5                    
+ amd64        boot sequence organizer using LSB init.d script dependency
+ information
+ii  install-info                            4.13a.dfsg.1-10             
+ amd64        Manage installed documentation in info format
+ii  iproute                                 20120521-3+b3               
+ amd64        networking and traffic control tools
+ii  iptables                                1.4.14-3.1                  
+ amd64        administration tools for packet filtering and NAT
+ii  iputils-ping                            3:20101006-1+b1             
+ amd64        Tools to test the reachability of network hosts
+ii  isc-dhcp-client                         4.2.2.dfsg.1-5+deb70u6      
+ amd64        ISC DHCP client
+ii  isc-dhcp-common                         4.2.2.dfsg.1-5+deb70u6      
+ amd64        common files used by all the isc-dhcp* packages
+ii  klibc-utils                             2.0.1-3.1                   
+ amd64        small utilities built with klibc for early boot
+ii  kmod                                    9-3                         
+ amd64        tools for managing Linux kernel modules
+ii  kpartx                                  0.4.9+git0.4dfdaf2b-7~deb7u2
+ amd64        create device mappings for partitions
+ii  libacl1:amd64                           2.2.51-8                    
+ amd64        Access control list shared library
+ii  libapt-inst1.5:amd64                    0.9.7.9+deb7u1              
+ amd64        deb package format runtime library
+ii  libapt-pkg4.12:amd64                    0.9.7.9+deb7u1              
+ amd64        package managment runtime library
+ii  libasprintf0c2:amd64                    0.18.1.1-9                  
+ amd64        GNU library to use fprintf and friends in C++
+ii  libattr1:amd64                          1:2.4.46-8                  
+ amd64        Extended attribute shared library
+ii  libblkid1:amd64                         2.20.1-5.3                  
+ amd64        block device id library
+ii  libboost-iostreams1.49.0                1.49.0-3.2                  
+ amd64        Boost.Iostreams Library
+ii  libbsd0:amd64                           0.4.2-1                     
+ amd64        utility functions from BSD systems - shared library
+ii  libbz2-1.0:amd64                        1.0.6-4                     
+ amd64        high-quality block-sorting file compressor library - runti
+me
+ii  libc-bin                                2.13-38+deb7u1              
+ amd64        Embedded GNU C Library: Binaries
+ii  libc6:amd64                             2.13-38+deb7u1              
+ amd64        Embedded GNU C Library: Shared libraries
+ii  libcap2:amd64                           1:2.22-1.2                  
+ amd64        support for getting/setting POSIX.1e capabilities
+...中略...
+
+で、google GCE上のインスタンスでlsmodとかすると、さすがKVMと言われるだけあって、
+nojima@docker-test001:~$ lsmod
+Module                  Size  Used by
+crct10dif_pclmul       13348  0 
+crc32_pclmul           12915  0 
+crc32c_intel           21809  0 
+ghash_clmulni_intel    13021  0 
+aesni_intel            54868  0 
+aes_x86_64             16719  1 aesni_intel
+lrw                    12757  1 aesni_intel
+evdev                  17445  2 
+gf128mul               12970  1 lrw
+processor              28212  0 
+button                 12944  0 
+thermal_sys            27429  1 processor
+glue_helper            12695  1 aesni_intel
+i2c_piix4              12672  0 
+ablk_helper            12572  1 aesni_intel
+cryptd                 14517  3 ghash_clmulni_intel,aesni_intel,ablk_helper
+i2c_core               24092  1 i2c_piix4
+ext4                  481727  1 
+crc16                  12343  1 ext4
+mbcache                13082  1 ext4
+jbd2                   82494  1 ext4
+sg                     29972  0 
+sd_mod                 44292  2 
+crc_t10dif             12431  1 sd_mod
+crct10dif_common       12356  2 crct10dif_pclmul,crc_t10dif
+virtio_scsi            17661  1 
+scsi_mod              186678  3 sg,sd_mod,virtio_scsi
+virtio_net             26363  0 
+virtio_pci             17389  0 
+virtio_ring            13321  3 virtio_net,virtio_pci,virtio_scsi
+virtio                 13058  3 virtio_net,virtio_pci,virtio_scsi
+だった。
+
+で、さらに、
+nojima@docker-test001:~$ uname -a
+Linux docker-test001 3.13-0.bpo.1-amd64 #1 SMP Debian 3.13.7-1~bpo70+1 (2014-03-29) x86_64 GNU/Linux
+こんな感じ。
+
+ぬー。GCEの
+https://wiki.debian.org/Cloud/GoogleComputeEngineImage
+は古い...が、
+gcutil --project=debian-cloud listkernel
+は読める。
+
+KVMホストだからsid動くかなーということで、
+
+~/ gcutil addinstance docker-test002 --project=nozzy-evaluation-test-001 --image=debian-7 --machine_type=f1-micro --zone=asia-east1-a --wait_until_running --auto_delete_boot_disk  
+INFO: Resolved debian-7 to projects/debian-cloud/global/images/debian-7-wheezy-v20140415
+INFO: Waiting for insert of instance docker-test002. Sleeping for 3s.
+INFO: Waiting for insert of instance docker-test002. Sleeping for 3s.
+INFO: Waiting for insert of instance docker-test002. Sleeping for 3s.
+INFO: Waiting for insert of instance docker-test002. Sleeping for 3s.
+INFO: Ensuring docker-test002 is running.  Will wait to start for: 240 seconds.
+
+Table of resources:
+
++----------------+--------------+----------------+--------------+---------+
+| name           | network-ip   | external-ip    | zone         | status  |
++----------------+--------------+----------------+--------------+---------+
+| docker-test002 | 10.240.12.20 | 107.167.186.55 | asia-east1-a | RUNNING |
++----------------+--------------+----------------+--------------+---------+
+
+Table of operations:
+
++-------------------------------+--------+-------------------------------+----------------+
+| name                          | status | insert-time                   | operation-type |
++-------------------------------+--------+-------------------------------+----------------+
+| operation-1400238895151-4f982 | DONE   | 2014-05-16T04:14:55.559-07:00 | insert         |
+| 85f23798-b1be9ab8-ad4685a1    |        |                               |                |
++-------------------------------+--------+-------------------------------+----------------+
+
+してみた。
+
+うほ、gceは
+nojima@docker-test002:/etc/apt$ sudo -l
+Matching Defaults entries for nojima on this host:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User nojima may run the following commands on this host:
+    (ALL : ALL) ALL
+    (root) NOPASSWD: ALL
+
+ってことなので、なんでもできるぞ。いきなり、sudo ANYUSER OKとは恐れ入る。
+
+nojima@docker-test002:/etc/apt$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+ntp:x:101:103::/home/ntp:/bin/false
+sshd:x:102:65534::/var/run/sshd:/usr/sbin/nologin
+nojima:x:1000:1000::/home/nojima:/bin/bash
+
+なのだ。
+
+で、
+sudo -s -u root -H
+cd /var/lib/apt/listsして、
+diff -u gce%5fdebian%5fmirror.storage.googleapis.com_dists_wheezy_main_binary-amd64_Packages http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages
+したら合致した。
+
+root@docker-test002:/var/lib/apt/lists# md5sum http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages gce%5fdebian%5fmirror.storage.googleapis.com_dists_wheezy_main_binary-amd64_Packages 
+8d6ea830080ad85c8a6ada7d219782e6  http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages
+8d6ea830080ad85c8a6ada7d219782e6  gce%5fdebian%5fmirror.storage.googleapis.com_dists_wheezy_main_binary-amd64_Packages
+
+こんな感じ。
+
+で、
+root@docker-test002:/etc/apt# cat sources.list
+deb     http://gce_debian_mirror.storage.googleapis.com/ sid         main contrib non-free
+deb-src http://gce_debian_mirror.storage.googleapis.com/ sid         main contrib non-free
+deb     http://http.debian.net/debian sid         main contrib non-free
+deb-src http://http.debian.net/debian sid         main contrib non-free
+
+してみてapt-get updateとかしたらどうなるのだろう？
+
+
+わおー、なんの問題もなくupdateできたぜー。
+
+oot@docker-test002:/etc/apt# apt-get update 
+Get:1 http://gce_debian_mirror.storage.googleapis.com sid Release.gpg [836 B]
+Get:2 http://http.debian.net sid Release.gpg [836 B] 
+Get:3 http://gce_debian_mirror.storage.googleapis.com sid Release [205 kB]
+Get:4 http://http.debian.net sid Release [205 kB]     
+Get:5 http://gce_debian_mirror.storage.googleapis.com sid/main Sources [7205 kB]
+Get:6 http://gce_debian_mirror.storage.googleapis.com sid/contrib Sources [58.6 kB]       
+Get:7 http://gce_debian_mirror.storage.googleapis.com sid/non-free Sources [106 kB]
+Get:8 http://http.debian.net sid/contrib Translation-en [42.4 kB]                         
+Get:9 http://http.debian.net sid/main Translation-en [4587 kB]                            
+Get:10 http://gce_debian_mirror.storage.googleapis.com sid/main amd64 Packages [6724 kB]  
+Get:11 http://gce_debian_mirror.storage.googleapis.com sid/contrib amd64 Packages [53.4 kB]
+Get:12 http://gce_debian_mirror.storage.googleapis.com sid/non-free amd64 Packages [88.4 kB]
+Get:13 http://gce_debian_mirror.storage.googleapis.com sid/contrib Translation-en [42.4 kB]
+Get:14 http://http.debian.net sid/non-free Translation-en [77.3 kB]                       
+Get:15 http://http.debian.net sid/main Sources [7233 kB]                                  
+Get:16 http://gce_debian_mirror.storage.googleapis.com sid/main Translation-en [4588 kB]
+Get:17 http://gce_debian_mirror.storage.googleapis.com sid/non-free Translation-en [77.3 kB]
+Get:18 http://http.debian.net sid/contrib Sources [57.0 kB]                               
+Get:19 http://http.debian.net sid/non-free Sources [107 kB]                               
+Get:20 http://http.debian.net sid/main amd64 Packages [6742 kB]                           
+Get:21 http://http.debian.net sid/contrib amd64 Packages [54.7 kB]                        
+Get:22 http://http.debian.net sid/non-free amd64 Packages [91.6 kB]                       
+Fetched 38.3 MB in 17s (2204 kB/s)                                                        
+W: Failed to fetch bzip2:/var/lib/apt/lists/partial/gce%5fdebian%5fmirror.storage.googleapis.com_dists_sid_main_source_Sources  Hash Sum mismatch
+
+W: Failed to fetch bzip2:/var/lib/apt/lists/partial/gce%5fdebian%5fmirror.storage.googleapis.com_dists_sid_contrib_source_Sources  Hash Sum mismatch
+
+W: Failed to fetch bzip2:/var/lib/apt/lists/partial/gce%5fdebian%5fmirror.storage.googleapis.com_dists_sid_non-free_source_Sources  Hash Sum mismatch
+
+W: Failed to fetch bzip2:/var/lib/apt/lists/partial/gce%5fdebian%5fmirror.storage.googleapis.com_dists_sid_main_binary-amd64_Packages  Hash Sum mismatch
+
+W: Failed to fetch bzip2:/var/lib/apt/lists/partial/gce%5fdebian%5fmirror.storage.googleapis.com_dists_sid_contrib_binary-amd64_Packages  Hash Sum mismatch
+
+W: Failed to fetch bzip2:/var/lib/apt/lists/partial/gce%5fdebian%5fmirror.storage.googleapis.com_dists_sid_non-free_binary-amd64_Packages  Hash Sum mismatch
+
+E: Some index files failed to download. They have been ignored, or old ones used instead.
+
+apt-get dist-upgrade
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Calculating upgrade... Done
+The following NEW packages will be installed:
+  firmware-linux-free gcc-4.9-base init-system-helpers iproute2 libarchive-extract-perl
+  libatm1 libaudit-common libaudit1 libboost-iostreams1.54.0 libcap2-bin libdb5.3
+  libdebconfclient0 libee0 libestr0 libffi6 libgmp10 libgnutls-openssl27 libgnutls28
+  libhogweed2 libjson-c2 liblog-message-simple-perl liblogging-stdlog0 liblognorm0
+  libmodule-pluggable-perl libnettle4 libpam-cap libpcre3 libpng12-0 libpod-latex-perl
+  libprocps3 libpython-stdlib libpython2.7-minimal libpython2.7-stdlib
+  libsasl2-modules-db libtasn1-6 libterm-ui-perl libtext-soundex-perl libudev1
+  libxtables10 linux-image-3.14-1-amd64 openssh-sftp-server perl perl-modules rename
+  startpar sysvinit-core
+The following packages will be upgraded:
+  acpi-support-base acpid apt apt-utils aptitude aptitude-common base-files base-passwd
+  bash bsdmainutils bsdutils ca-certificates coreutils cpio curl dash debconf
+  debconf-i18n debianutils diffutils dmidecode dmsetup dpkg e2fslibs e2fsprogs ethtool
+  file findutils gcc-4.7-base gettext-base gnupg gpgv grep groff-base grub-common grub-pc
+  grub-pc-bin grub2-common gzip hostname ifupdown info initramfs-tools initscripts
+  install-info iproute iptables iputils-ping isc-dhcp-client isc-dhcp-common klibc-utils
+  kmod kpartx libacl1 libapt-inst1.5 libapt-pkg4.12 libasprintf0c2 libattr1 libblkid1
+  libboost-iostreams1.49.0 libbsd0 libbz2-1.0 libc-bin libc6 libcomerr2 libcurl3
+  libcwidget3 libdevmapper1.02.1 libedit2 libept1.4.12 libexpat1 libfreetype6 libfuse2
+  libgcc1 libgcrypt11 libgdbm3 libgnutls26 libgpg-error0 libgssapi-krb5-2 libidn11
+  libk5crypto3 libkeyutils1 libklibc libkmod2 libkrb5-3 libkrb5support0 libldap-2.4-2
+  liblocale-gettext-perl libmagic1 libmount1 libncurses5 libncursesw5 libnewt0.52
+  libnfnetlink0 libopts25 libp11-kit0 libpam-modules libpam-modules-bin libpam-runtime
+  libpam0g libparted0debian1 libpipeline1 libpopt0 libreadline6 libsasl2-2
+  libsasl2-modules libselinux1 libsemanage-common libsemanage1 libsepol1
+  libsigc++-2.0-0c2a libslang2 libsqlite3-0 libss2 libssh2-1 libssl1.0.0 libstdc++6
+  libtext-charwidth-perl libtext-iconv-perl libtinfo5 libusb-0.1-4 libuuid-perl libuuid1
+  libwrap0 libxapian22 linux-image-amd64 locales login logrotate lsb-base lsb-release
+  man-db manpages mime-support module-init-tools mount multiarch-support nano
+  ncurses-base ncurses-bin net-tools netbase ntp openssh-client openssh-server openssl
+  parted passwd perl-base procps python python-minimal python2.7 python2.7-minimal
+  readline-common rsync rsyslog sed sensible-utils sudo sysv-rc sysvinit sysvinit-utils
+  tar tasksel tasksel-data traceroute tzdata ucf udev util-linux uuid-runtime vim-common
+  vim-tiny wget whiptail zlib1g
+177 upgraded, 46 newly installed, 0 to remove and 0 not upgraded.
+Need to get 105 MB of archives.
+After this operation, 212 MB of additional disk space will be used.
+Do you want to continue [Y/n]? 
+
+やってみる。
+
+うまく行っているようには見えるが、
+
+rocessing triggers for man-db (2.6.2-1) ...
+locale: Cannot set LC_CTYPE to default locale: No such file or directory
+locale: Cannot set LC_MESSAGES to default locale: No such file or directory
+locale: Cannot set LC_ALL to default locale: No such file or directory
+Setting up perl-base (5.18.2-4) ...
+
+というエラーが頻発しているので、これをなんとかせねば。
+
+----------参考-----------------------------------------
+https://asciinema.org/a/7360
+のgceのスクリーンキャストによれば、
+root@mainyaa-docker:~# echo 'deb-src http://http.debian.net/debian sid main' >> /etc/apt/sources.list
+root@mainyaa-docker:~# locale-gen en_US.UTF-8
+Generating locales (this might take a while)...
+  en_US.UTF-8... done
+Generation complete.
+root@mainyaa-docker:~# echo 'LANG="en_US.UTF-8"' > /etc/locale.conf
+root@mainyaa-docker:~# sysctl -w net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
+root@mainyaa-docker:~# echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
+をやってるっぽい。
+--------------------------------------------------
+
+が、自分は、
+dpkg-reconfigure locales
+で、
+ en_US.UTF-8
+ ja_JP.UTF-8
+を選び、defaultとしたら、locale系のワーニングは消えた。
+
+
+あと、grubはgceは入っていないらしい？？
+grub入れますか？とか聞いてくるので、入れないで進めるというのでOK.
+
+で、~/ gcutil  resetinstance --project=nozzy-evaluation-test-001 docker-test002
+INFO: Zone for docker-test002 detected as asia-east1-a.
+INFO: Waiting for reset of instance docker-test002. Sleeping for 3s.
+
+Table of resources:
+
++----------------+--------------+----------------+--------------+---------+
+| name           | network-ip   | external-ip    | zone         | status  |
++----------------+--------------+----------------+--------------+---------+
+| docker-test002 | 10.240.12.20 | 107.167.186.55 | asia-east1-a | RUNNING |
++----------------+--------------+----------------+--------------+---------+
+
+Table of operations:
+
++-------------------------------+--------+-------------------------------+----------------+
+| name                          | status | insert-time                   | operation-type |
++-------------------------------+--------+-------------------------------+----------------+
+| operation-1400240487746-4f982 | DONE   | 2014-05-16T04:41:27.906-07:00 | reset          |
+| e4df49d0-aa7db202-dcecd726    |        |                               |                |
++-------------------------------+--------+-------------------------------+----------------+
+をしてみた。
+
+ををー、
+
+~/ gcutil ssh --project=nozzy-evaluation-test-001 docker-test002           
+INFO: Zone for docker-test002 detected as asia-east1-a.
+INFO: Running command line: ssh -o UserKnownHostsFile=/dev/null -o CheckHostIP=no -o StrictHostKeyChecking=no -i /home/nojima/.ssh/google_compute_engine -A -p 22 nojima@107.167.186.55 --
+Warning: Permanently added '107.167.186.55' (ECDSA) to the list of known hosts.
+Linux docker-test002 3.14-1-amd64 #1 SMP Debian 3.14.4-1 (2014-05-13) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Fri May 16 11:15:40 2014 from 180.43.29.35
+nojima@docker-test002:~$ last
+nojima   pts/1        180.43.29.35     Fri May 16 11:43   still logged in   
+reboot   system boot  3.14-1-amd64     Fri May 16 11:41 - 11:43  (00:01)    
+nojima   pts/1        180.43.29.35     Fri May 16 11:15 - 11:39  (00:24)    
+reboot   system boot  3.2.0-4-amd64    Fri May 16 11:15 - 11:43  (00:28)    
+
+wtmp begins Fri May 16 11:15:15 2014
+nojima@docker-test002:~$ 
+
+こんな感じでアップグレードしたか？
+
+
+なんかよくわからんが、
+
+nojima@docker-test002:~$ uname -a
+Linux docker-test002 3.14-1-amd64 #1 SMP Debian 3.14.4-1 (2014-05-13) x86_64 GNU/Linux
+
+こうなった。ただ、さすがにsystemd配下ではないようで、
+nojima@docker-test002:~$ ls -al /sbin/init 
+-rwxr-xr-x 1 root root 40552 Apr  7 09:54 /sbin/init
+nojima@docker-test002:~$ cat /etc/debian_version 
+jessie/sid
+nojima@docker-test002:~$ 
+
+こんな感じだ。
+うお、aptitudeも全部はいったぞ。
+
+nojima@docker-test002:~$ aptitude
+nojima@docker-test002:~$ aptitude search docker.io
+p   docker.io                             - Linux container runtime                        
+なーんだ、はいってるじゃんかー
+で、aptitude install docker.ioした。
+
+さらに、
+nojima@docker-test002:~$ /sbin/sysctl net.ipv4.ip_forward
+net.ipv4.ip_forward = 1
+した。
+
+なるほど、gceは、
+nojima@docker-test002:~$ netstat -rn
+Kernel IP routing table
+
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.240.0.1      0.0.0.0         UG        0 0          0 eth0
+10.240.0.1      0.0.0.0         255.255.255.255 UH        0 0          0 eth0
+172.17.0.0      0.0.0.0         255.255.0.0     U         0 0          0 docker0
+
+ということで、NIC IFは1つしかないのかー。
+
+うおー、うごいちゃったぜ。
+
+nojima@docker-test002:~$ docker.io run -t -i -h debian-sid debian:sid
+Unable to find image 'debian:sid' locally
+Pulling repository debian
+1cda8535c670: Pulling image (sid) from debian, endpoint: https://cdn-registry-1.docker.io/v1cda8535c670: Download complete 
+511136ea3c5a: Download complete 
+0ed2a4d77969: Download complete 
+root@debian-sid:/#     
+
+ppp経由だと何故かdocker.ioが動かんのでネットワークいろいろ調べたら、
+要は
+http://www.slideshare.net/enakai/docker-34668707
+http://docs.docker.io/use/networking/
+とかにある件がいろいろ邪魔してる。
+
+なので、pppが有効の時に
+sudo systemctl restart docker.io
+とかすると、ちゃんとnatとか設定される。
+
+~/ sudo iptables -t nat -nL
+Chain PREROUTING (policy ACCEPT)
+target     prot opt source               destination         
+DOCKER     all  --  0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+DOCKER     all  --  0.0.0.0/0           !127.0.0.0/8          ADDRTYPE match dst-type LOCAL
+
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination         
+MASQUERADE  all  --  172.17.0.0/16       !172.17.0.0/16       
+MASQUERADE  all  --  0.0.0.0/0            0.0.0.0/0           
+
+こんな感じ。
+
+
+あと、docker-0.9.1は
+
+
+基本的にdocker.ioのふるbridgeのIPレンジは
+72.16.42.1/24
+となるが、一体誰が指定しているかわからん。
+唯一このアドレスがハードコーディングされている場所は、
+./networkdriver/lxc/driver.go:		"172.16.42.1/24",
+であるが、ソースを見ると、このアドレスをbridgeが持つのか？というような
+使い方に見えるので、割り当てているわけではないように見える。
+
+なお、ネットワーク関係の設定をごりごりやってるのは、
+./networkdriver/lxc/driver.go
+となる。
+
+あ、ちなみに、docker.io -dでデーモンモードで動いているdocker.ioは
+debian sidの場合、
+
+ sudo systemctl stop docker.io.service
+
+で止めないと止まらない。
+
+
+  -------------ここまで--------------
+
+んー、これはgoの流儀なのか？
+
+うう、go言語は生成されるのが単一バイナリなので、バイナリが動作するといっても、
+golangパッケージが入ってないので、別途入れたほうが良い。
+
+~/ sudo aptitude install golang
+以下の新規パッケージがインストールされます:
+  golang golang-doc{a} golang-go{a} golang-go-linux-amd64{a} golang-go.tools{a} 
+  golang-src{a} 
+更新: 0 個、新規インストール: 6 個、削除: 0 個、保留: 0 個。
+33.0 M バイトのアーカイブを取得する必要があります。展開後に 221 M バイトのディスク領域が新たに消費されます。
+先に進みますか? [Y/n/?] Y
+
+といった感じだ。
+
+パッケージマニュアル見たいのであれば、
+ godoc xxxx
+で読める。
 
 --------------どうでもよいが、
 WEB DB Press PDF版　No.80みてびびったのが、
@@ -339,3 +1557,8 @@ phantomjs
 
 　　何故か超絶Ubuntuマンセー。んでもって、Debianの扱いは最悪。
 　　Ubuntu: その他 = 99:1ぐらい差がある。
+
+どうでもいいが、
+ google chromeってば、なんか裏でgoogleとごそごそ通信しまくってる。
+なんだ？
+5228/tcpとか。気持ち悪すぎだろう？

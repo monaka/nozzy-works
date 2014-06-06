@@ -1,0 +1,68 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,6 @@
+ AUTOMAKE_OPTIONS = foreign
+ ACLOCAL_AMFLAGS = -I m4
+-SUBDIRS = src include tools
++SUBDIRS = utils src include tools
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libusbmuxd.pc
+--- a/configure.ac
++++ b/configure.ac
+@@ -88,6 +88,7 @@
+ 
+ AC_OUTPUT([
+ Makefile
++utils/Makefile
+ src/Makefile
+ include/Makefile
+ tools/Makefile
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,15 +1,12 @@
+-AM_CPPFLAGS = -I$(top_srcdir)/include
++AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/utils
+ 
+ AM_CFLAGS = $(GLOBAL_CFLAGS) $(libplist_CFLAGS)
+ AM_LDFLAGS = $(GLOBAL_LIBS) $(libpthread_LIBS) $(libplist_LIBS)
+ 
+ lib_LTLIBRARIES = libusbmuxd.la
+ libusbmuxd_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBUSBMUXD_SO_VERSION) -no-undefined
+-libusbmuxd_la_LIBADD =
+-libusbmuxd_la_SOURCES = \
+-		collection.c collection.h \
+-		socket.c socket.h \
+-		libusbmuxd.c
++libusbmuxd_la_LIBADD = ../utils/libutilities.la
++libusbmuxd_la_SOURCES = libusbmuxd.c
+ 
+ if WIN32
+ libusbmuxd_la_LDFLAGS += -avoid-version
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -1,4 +1,4 @@
+-AM_CFLAGS = $(GLOBAL_CFLAGS) -I$(top_srcdir)/src -I$(top_srcdir)/include
++AM_CFLAGS = $(GLOBAL_CFLAGS) -I$(top_srcdir)/utils -I$(top_srcdir)/src -I$(top_srcdir)/include
+ AM_LDFLAGS = $(libpthread_LIBS)
+ 
+ bin_PROGRAMS = iproxy
+@@ -6,5 +6,5 @@
+ iproxy_SOURCES = iproxy.c
+ iproxy_CFLAGS = $(AM_CFLAGS)
+ iproxy_LDFLAGS = $(AM_LDFLAGS)
+-iproxy_LDADD = $(top_builddir)/src/libusbmuxd.la
++iproxy_LDADD = $(top_builddir)/src/libusbmuxd.la $(top_builddir)/utils/libutilities.la
+ 
+--- /dev/null
++++ b/utils/Makefile.am
+@@ -0,0 +1,9 @@
++AM_CFLAGS = $(GLOBAL_CFLAGS)
++
++noinst_LTLIBRARIES = libutilities.la
++
++libutilities_la_SOURCES =                      \
++       $(top_srcdir)/src/socket.c              \
++       $(top_srcdir)/src/collection.c          \
++       $(top_srcdir)/src/socket.h              \
++       $(top_srcdir)/src/collection.h
