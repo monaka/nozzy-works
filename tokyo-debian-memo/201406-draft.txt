@@ -508,6 +508,13 @@ nojima    1915  0.0  0.1 302720  5088 ?        Sl   21:41   0:00 /usr/lib/gvfs/g
 
 で、nautilusあげたら、勝手に/usr/lib/gvfs/gvfs-afc-volume-monitorが起動しやがった。
 
+ideviceinstallerのソースみたら、
+  -l ---> inst_proxyというiOSのサービス経由でインストール済アプリの情報引っ張ってくる。
+　　　　　　（つまり、install用の手続きを活用）
+  -o xml --> plist形式のデータをxml形式に変換してみせる。
+
+次はifuseあたりを見れば、まあ、app-idからどうやってマウント情報引っ張ってくる
+かがわかるな。
 
 ----thinkpad x230
 
