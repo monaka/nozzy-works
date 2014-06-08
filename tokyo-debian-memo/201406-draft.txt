@@ -306,6 +306,11 @@ evinceのスライダがあまりに使いにくいので、evince読んだ
 以下にpng形式で保管されており、ファイル名がmd5sum?形式のファイル名
 となっているようだ。なので、thumbnailをリフレッシュする方法は
 ~/.cache/thumbnails/以下を全部消すぐらいしかない。
+--->
+thnumbnail構築失敗のデータは、
+~/.cache/thumbnails/fail以下のデータ。
+なので、これ全部消すと、thumbnail生成失敗の奴だけ、
+全部やりなおしてくれる。
 
 また、
 /usr/bin/evince-previewer file.pdf
