@@ -530,6 +530,26 @@ https://wiki.archlinux.org/index.php/GDM_(%E6%97%A5%E6%9C%AC%E8%AA%9E)
 HandleLidSwitch=ignore
 を明示する必要があるらしい。
 
+--- pacatとlame
+
+pulseaudioのチャネルをインターセプトしてmp3にコンバートするときの
+コマンドライン
+
+pacmd list-sink-inputs
+で、音源のindexを求める。
+
+次に
+parecord --file-format=flac --monitor-stream=4 test.flac 
+あたりで仮録音して、paplay test.flacとかしてちゃんと
+キャプチャできてるか調べる。
+
+問題ないようであれば、
+pacat --monitor-stream=4 -r | lame -r -m s -b 192 - xxxx.mp3
+
+とかすると、pulseaudioの入力デバイスをステレオ生キャプチャして、
+mp3ファイルにコンバート可能。
+※ -rオプションをpacatに突っ込まないと、recordモードにならん。
+
 ----Softetherはあっさり終わったから何しようかな
 おお、そーいえば、LLVMやるんじゃなかっか？
 hhvmだってあるんじゃ？
@@ -541,3 +561,100 @@ cocos2d-xとかdebianで動かすとかね。
 ラップトップの電源の話とかね。
 dbusのdebian話とか変わっているからおもしろいかもな。
 （意外とみんなgnome3とかヘビーに使ってるくせにいろいろ知らん）
+ARM64 cross buildの話でもよいかも？
+--->現状サマリ：https://wiki.debian.org/Arm64Port
+nftablesも良いか？
+
+----- debian勉強会用でそろそろ調べるか
+udpateは5/17から。
+
+debian-announceから。
+--->特になし。
+
+debian-news
+5/26版より：
+
+1) ARM64のボランティアがほしいとのこと。
+  クイズネタとしては、ARM64のハードは売られているか？
+ がいいかも？
+ ---> http://pc.watch.impress.co.jp/docs/column/kaigai/20130918_615784.html
+      によれば、iphone 5sのA7はARM64だ。なんてこったぁ。
+
+2) edos.debian.netがqa.debian.org/doseで復活したそうな。
+　dose-debcheckというのがあるそうな↓
+　http://dose.gforge.inria.fr/doc/tools/debcheck-primer.html
+　 ---> どうも、依存関係でパッケージがインストールできるかどうかを素早く検査できるツールらしい。
+　参考：http://upsilon.cc/~zack/blog/posts/2008/06/debian_weather_is_back/　　　　　
+
+３）GNU/Hurdの話題
+   
+    去年のGSoCが作業の始まり？だったが、やっとinitシステム
+がSysvinitになったらしい。（クイズいきか）
+
+　　以下は
+　　　https://lists.debian.org/debian-devel-announce/2014/05/msg00006.html
+　　より抜粋：
+
+　　うほ、iceweasel 29がまともに動くらしい。
+
+　　ネットワークドライバはDDEになったそうな。（まあ、昔からそうだが）
+　　で、良い点アピールとして、DDE配下であれば、万一ドライバがハングしても、
+　　しれっと、kill & restartで、tcpは切れることなく接続を継続とのこと。
+
+　　threadがちゃんとpthreadになったらしい。以前は、ユーザスペースで
+　　ごまかした実装だったらしいが、machとかでちゃんとサポートするようになった
+　　とのこと（ホントか？）
+
+　　最近の発表は↓
+　　https://www.gnu.org/ghm/2013/paris/
+　　らしいが、内容は全く変わってねぇ。
+
+ 4) その他
+
+　　ブルガリアのとある地方の軍機関がPCのOSをDebianにしたらしい。
+　　 https://joinup.ec.europa.eu/community/osor/news/open-source-everywhere-plovdiv-military-prosecution
+　　　やるな。
+
+　　The contest for the DebConf15 logo [13] just closed. Vote for your
+favorite logo on the dedicated wiki page [14].
+　　https://wiki.debconf.org/wiki/DebConf15/Germany/LogoContest/Voting
+
+5) new packages 
+  * cube2 — 3D first-person shooter game engine [35]
+   -->遂にか
+
+  * mate-desktop-environment — MATE Desktop Environment [37]
+　　-->遂にか
+
+  * nftables — program to control packet filtering rules by Netfilter project [39]
+　　-->遂にか。
+
+debian-announce
+ 2014.6.9
+
+ -DebConf15のロゴが決まったそうな。
+ -完全なMATE 1.8 desktop environmentがdebianへポーティング？されたそうな。
+ -The Debian Continuous Integration project
+
+debian-announce
+2014/5/27  Misc Developer News (#35)
+
+パッケージに含まれるupstreamのURLをチェックするツールduckの話。
+dputするまえにちぇっくしろよ？とのこと。
+
+mentorsの現状
+ Since its 15 packages waiting for reviews in June 2010, we have now more
+ than 70 packages waiting for review[4]. So if you feel like educating
+ new packaging contributors, it's time to have a look there.
+はああああ。機能してんのかこりゃ。
+
+DEP-12がPTSによりサポート：
+debian/upstream/metadata 
+つけろよとのこと。
+ここでDEPは→http://dep.debian.net/
+（debian enchancements proposal)
+PTSは→http://packages.qa.debian.org/common/index.html
+
+
+
+
