@@ -157,7 +157,7 @@ modprobe: ERROR: could not insert 'fuse': Unknown symbol in module, or unknown p
 grubにゃkernelアップグレードの記載ははいってんだけど、
 これ経由で上がるわけじゃないらしいのう。
 
-nojima@debian001:~$ uname -a
+ojima@debian001:~$ uname -a
 Linux debian001 3.2.0-4-amd64 #1 SMP Debian 3.2.54-2 x86_64 GNU/Linux
 nojima@debian001:~$ cat /etc/debian_version 
 jessie/sid
@@ -257,6 +257,21 @@ secureNatをonにしたりしたが、変わらず...orz
    みて、80/tcp,443/tcpはvpnの口を通るように強制的に変更とかすべきかも...
 
 くそう。
+
+ --->ここで！vultrのクラウドを利用し、tokyo regionで作ってみた。
+　　　すげえ！完全にSSL/VPN(443/tcpのみ）で接続したら！
+  PING 192.168.30.1 (192.168.30.1) 56(84) bytes of data.
+64 bytes from 192.168.30.1: icmp_seq=1 ttl=128 time=8.01 ms
+64 bytes from 192.168.30.1: icmp_seq=2 ttl=128 time=11.1 ms
+64 bytes from 192.168.30.1: icmp_seq=3 ttl=128 time=7.50 ms
+64 bytes from 192.168.30.1: icmp_seq=4 ttl=128 time=7.35 ms
+64 bytes from 192.168.30.1: icmp_seq=5 ttl=128 time=12.4 ms
+64 bytes from 192.168.30.1: icmp_seq=6 ttl=128 time=7.52 ms
+64 bytes from 192.168.30.1: icmp_seq=7 ttl=128 time=7.94 ms
+64 bytes from 192.168.30.1: icmp_seq=8 ttl=128 time=6.92 ms
+
+   ってことで、超快適！スピードもはえええ！
+
 ---> source追いかけた。で、InitMayaqua(xxx,debug,xx)の
 debug==0x123455だとデバッグトレースが動くらしい...が、こちら全部falseにハードコーディングだ...
 
@@ -530,6 +545,86 @@ https://wiki.archlinux.org/index.php/GDM_(%E6%97%A5%E6%9C%AC%E8%AA%9E)
 HandleLidSwitch=ignore
 を明示する必要があるらしい。
 
+powersavingに成功。
+http://pcdennokan.dip.jp/hardware/vaiopro11_debian/
+を参照して以下のスクリプトを書く。
+ -------------------ここから---------------
+#!/bin/sh
+# USB の自動サスペンド
+for idx in `/bin/ls -1 /sys/bus/usb/devices/usb*/power/autosuspend`
+do
+	echo 1 > $idx
+done
+
+# WiFi の省電力設定
+/sbin/iw dev wlan0 set power_save on
+
+# サウンドまわりの省電力設定
+echo 1 > /sys/module/snd_hda_intel/parameters/power_save
+
+# laptop mode 
+echo 5 > /proc/sys/vm/laptop_mode
+echo 0 > /proc/sys/kernel/nmi_watchdog
+
+echo 1500 > /proc/sys/vm/dirty_writeback_centisecs
+
+# PCI 経由で繋がってるものの省電力設定
+for idx in `/bin/ls -1 /sys/bus/pci/devices/*/power/control`
+do
+	echo 'auto' > ${idx}
+done
+# SSD が稼動してない時に SATA を最低消費電力モードにする設定
+for idx in `/bin/ls -1 /sys/class/scsi_host/*/link_power_management_policy`
+do
+	echo 'min_power' > ${idx}
+done
+# ethernet wake on lan enable
+ethtool -s eth0 wol d
+# setting cpus powersaving
+for idx in `/bin/ls -1 /sys/devices/system/cpu/*/cpufreq/scaling_governor`
+do
+	echo 'powersave' > ${idx}
+done
+exit 0
+ -------------------ここまで---------------
+
+さらに、
+sudo powertop
+でみると、cpu freqが3.xGHzで張り付いたままなので、いくつもdaemonを殺す。
+ power食い過ぎdaemonは次のとおり。
+
+  - impulse screen lets ---> idling中pulseaudioを全力で起動しちゃうのでNG。
+  - screen let ---> impulse起動されても困るので。
+  - conky ---> とにかくハード叩きまくるので電力消費しまくり
+　　　　　　update_interval 5
+　　　　　　にすると消費が目立たなくなった。
+
+これでもcpu freqが張り付いたままなので、
+https://wiki.debian.org/HowTo/CpuFrequencyScaling
+をみて、
+/etc/default/cpufrequtils
+を新造して、
+GOVERNOR="powersave"
+をぶちこむ。
+
+で、リブートしたところ！＞15W --> 6.X wまで落ちた。
+ついでにバックライトも50%ぐらいにして、まあ、なんとか、Idle状態であれば、
+7時間程度のバッテリ消費となった。
+
+---->
+こちら、おんなじ悩みを抱えている人がいるようで、
+http://unix.stackexchange.com/questions/128068/changing-systemd-handlelidswitch-setting-during-run-time
+で、みると右斜め上の発展をしていた。
+  EXAMPLE
+     # systemd-inhibit wodim foobar.iso
+
+   This burns the ISO image foobar.iso on a CD using wodim(1), 
+ and inhibits system sleeping, shutdown and idle while doing so.
+
+つまり、特定のコマンドを動かしているときは、
+inhibits system sleeping, shutdown and idle
+をするということが出来るようになった。
+
 --- pacatとlame
 
 pulseaudioのチャネルをインターセプトしてmp3にコンバートするときの
@@ -562,8 +657,23 @@ cocos2d-xとかdebianで動かすとかね。
 dbusのdebian話とか変わっているからおもしろいかもな。
 （意外とみんなgnome3とかヘビーに使ってるくせにいろいろ知らん）
 ARM64 cross buildの話でもよいかも？
+sysctlさらにコアにやるということもいいかも。
+ -->とにかく違いすぎだろJK。
+
 --->現状サマリ：https://wiki.debian.org/Arm64Port
 nftablesも良いか？
+
+--- Debian/GNU Hurdを調べてみた
+
+げええ、コンソールが使えんやんかー。
+
+http://darnassus.sceen.net/~hurd-web/hurd/console/
+によると、
+console -d vga -d pc_kbd --repeat=kbd -d pc_mouse --repeat=mouse -d generic_speaker -c /dev/vcs
+が上がってなさそうだったので、あげたらいきなりloginプロンプトでた。
+うーん、端末処理がよくわからんのう。
+
+おお、確かにshutdown はちゃんと動いた。
 
 ----- debian勉強会用でそろそろ調べるか
 udpateは5/17から。

@@ -88,8 +88,8 @@ iptables -A OUTPUT -p udp --dport 1900 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 43 -j ACCEPT
 # for hange
 iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
-# for vivain shinjuku
-iptables -A OUTPUT -p tcp --dest 192.168.0.0/16 --dport 1111 -j ACCEPT
+# for lan
+iptables -A OUTPUT -p tcp --dest 172.16.52.10 --dport 8000 -j ACCEPT
 # another service
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
 iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input]'

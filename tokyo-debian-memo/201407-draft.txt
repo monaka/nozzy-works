@@ -1,0 +1,428 @@
+ARM64調べてみた。
+debianでは、遂にustableでは
+qemu-system-armが2.0を迎えちゃったので、
+こちらがaarch64をサポート済み。
+aptitude install qemu-system-arm
+ぶち込んで確認してみた。
+
+~/ qemu-system-aarch64 -machine help
+Supported machines are:
+versatileab          ARM Versatile/AB (ARM926EJ-S)
+lm3s811evb           Stellaris LM3S811EVB
+z2                   Zipit Z2 (PXA27x)
+connex               Gumstix Connex (PXA255)
+sx1                  Siemens SX1 (OMAP310) V2
+realview-eb          ARM RealView Emulation Baseboard (ARM926EJ-S)
+cubieboard           cubietech cubieboard
+vexpress-a9          ARM Versatile Express for Cortex-A9
+lm3s6965evb          Stellaris LM3S6965EVB
+realview-pbx-a9      ARM RealView Platform Baseboard Explore for Cortex-A9
+musicpal             Marvell 88w8618 / MusicPal (ARM926EJ-S)
+mainstone            Mainstone II (PXA27x)
+terrier              Terrier PDA (PXA270)
+n810                 Nokia N810 tablet aka. RX-44 (OMAP2420)
+xilinx-zynq-a9       Xilinx Zynq Platform Baseboard for Cortex-A9
+nuri                 Samsung NURI board (Exynos4210)
+realview-eb-mpcore   ARM RealView Emulation Baseboard (ARM11MPCore)
+verdex               Gumstix Verdex (PXA270)
+spitz                Spitz PDA (PXA270)
+canon-a1100          Canon PowerShot A1100 IS
+akita                Akita PDA (PXA270)
+smdkc210             Samsung SMDKC210 board (Exynos4210)
+integratorcp         ARM Integrator/CP (ARM926EJ-S)
+sx1-v1               Siemens SX1 (OMAP310) V1
+kzm                  ARM KZM Emulation Baseboard (ARM1136)
+highbank             Calxeda Highbank (ECX-1000)
+n800                 Nokia N800 tablet aka. RX-34 (OMAP2420)
+collie               Collie PDA (SA-1110)
+realview-pb-a8       ARM RealView Platform Baseboard for Cortex-A8
+vexpress-a15         ARM Versatile Express for Cortex-A15
+none                 empty machine
+cheetah              Palm Tungsten|E aka. Cheetah PDA (OMAP310)
+tosa                 Tosa PDA (PXA255)
+midway               Calxeda Midway (ECX-2000)
+virt                 ARM Virtual Machine
+borzoi               Borzoi PDA (PXA270)
+versatilepb          ARM Versatile/PB (ARM926EJ-S)
+█▓▒░nojima@nightmare░▒▓██▓▒░ 火  6月 17 04:44:11午後 
+~/ qemu-system-arm -machine help
+Supported machines are:
+versatileab          ARM Versatile/AB (ARM926EJ-S)
+versatilepb          ARM Versatile/PB (ARM926EJ-S)
+lm3s811evb           Stellaris LM3S811EVB
+z2                   Zipit Z2 (PXA27x)
+connex               Gumstix Connex (PXA255)
+sx1                  Siemens SX1 (OMAP310) V2
+realview-eb          ARM RealView Emulation Baseboard (ARM926EJ-S)
+cubieboard           cubietech cubieboard
+vexpress-a9          ARM Versatile Express for Cortex-A9
+lm3s6965evb          Stellaris LM3S6965EVB
+realview-pbx-a9      ARM RealView Platform Baseboard Explore for Cortex-A9
+musicpal             Marvell 88w8618 / MusicPal (ARM926EJ-S)
+mainstone            Mainstone II (PXA27x)
+terrier              Terrier PDA (PXA270)
+n810                 Nokia N810 tablet aka. RX-44 (OMAP2420)
+xilinx-zynq-a9       Xilinx Zynq Platform Baseboard for Cortex-A9
+nuri                 Samsung NURI board (Exynos4210)
+realview-eb-mpcore   ARM RealView Emulation Baseboard (ARM11MPCore)
+verdex               Gumstix Verdex (PXA270)
+spitz                Spitz PDA (PXA270)
+canon-a1100          Canon PowerShot A1100 IS
+akita                Akita PDA (PXA270)
+smdkc210             Samsung SMDKC210 board (Exynos4210)
+integratorcp         ARM Integrator/CP (ARM926EJ-S)
+sx1-v1               Siemens SX1 (OMAP310) V1
+kzm                  ARM KZM Emulation Baseboard (ARM1136)
+highbank             Calxeda Highbank (ECX-1000)
+n800                 Nokia N800 tablet aka. RX-34 (OMAP2420)
+collie               Collie PDA (SA-1110)
+realview-pb-a8       ARM RealView Platform Baseboard for Cortex-A8
+vexpress-a15         ARM Versatile Express for Cortex-A15
+none                 empty machine
+cheetah              Palm Tungsten|E aka. Cheetah PDA (OMAP310)
+tosa                 Tosa PDA (PXA255)
+midway               Calxeda Midway (ECX-2000)
+virt                 ARM Virtual Machine
+borzoi               Borzoi PDA (PXA270)
+█▓▒░nojima@nightmare░▒▓██▓▒░ 火  6月 17 04:45:18午後 
+
+というわけで、aarch64だろうが、arm32bitだろうがお構いなしだ。
+
+https://wiki.debian.org/Arm64Qemu
+の内容は古い。が、
+
+ aptitude install qemu
+
+で全アーキテクチャ全部入りとなる。
+
+げ、基本
+https://wiki.debian.org/Arm64Qemu
+みると、
+
+　- Linuxにaarch64でqemuが動くようにbinfmtの設定ぶちこんで、
+ - chrootの元で、ユーザランドをaarch64エミュレーションする
+
+のが開発の基本らしいぞ。なんてこった。
+
+くそう。tool-chainがよーわからんぞ。
+
+p   gcc-arm-none-eabi               - GCC cross compiler for ARM Cortex-A/R/M pr
+p   gdb-arm-none-eabi               - GNU debugger for ARM Cortex-A/R/M processo
+
+
+-------ネタ
+DigitalOceanでIPv6対応したそうな！DebianでIPv6ネタでもやろうかな...
+
+------> nook再び
+
+x-loaderは、ほんとに何も入ってないARMから基本的なレジスタ・ベクタを
+初期化し、さらにmmcを初期化して続くu-bootを読み込むのに使われるプログラム
+
+nookの場合、
+x-loader/cpu/omap3以下が使われるっぽい。
+また、ramの動作モードやらpllなどの設定はboard/omap3621_boxerでやる。
+
+ついでに、ブート出来るバイナリであるために、署名が必要で、署名用のツールが
+梱包されている。
+
+要は、x-loaderは、
+
+　　mmcデバイスがあり、
+   arm32であり、
+　　他RAMのレジスタやらが（ダミーでもよいかな）
+
+があれば動作可能。
+---> qemu-system-armにいっそ搭載すればいいんじゃね？
+
+--- HHVM
+
+どうも、
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=727085
+にてITPされているようだ。
+
+gitブランチは
+http://anonscm.debian.org/gitweb/?p=collab-maint/hhvm.git;a=summary
+にて管理されているらしい。
+
+---- systemd
+/etc/systemd/logind.conf
+に
+HandleLidSwitch=ignore
+を入れて
+sudo systemctl restart systemd-logind.service 
+としたところ、蓋閉めてもsuspendしなくなった。
+が、もちっとスマートな方法ってないかなー。
+
+----dbus-monitorしてみた。
+
+~/ dbus-monitor --system
+signal sender=org.freedesktop.DBus -> dest=:1.68 serial=2 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus; member=NameAcquired
+   string ":1.68"
+
+...この状態で、laptopの蓋閉じて開けた...
+signal sender=:1.17 -> dest=(null destination) serial=247 path=/org/freedesktop/UPower; interface=org.freedesktop.UPower; member=Changed
+signal sender=:1.17 -> dest=(null destination) serial=254 path=/org/freedesktop/UPower; interface=org.freedesktop.UPower; member=Changed
+signal sender=:1.17 -> dest=(null destination) serial=261 path=/org/freedesktop/UPower/devices/battery_BAT0; interface=org.freedesktop.UPower.Device; member=Changed
+signal sender=:1.17 -> dest=(null destination) serial=262 path=/org/freedesktop/UPower; interface=org.freedesktop.UPower; member=DeviceChanged
+   string "/org/freedesktop/UPower/devices/battery_BAT0"
+signal sender=:1.17 -> dest=(null destination) serial=264 path=/org/freedesktop/UPower/devices/battery_BAT0; interface=org.freedesktop.UPower.Device; member=Changed
+signal sender=:1.17 -> dest=(null destination) serial=265 path=/org/freedesktop/UPower; interface=org.freedesktop.UPower; member=DeviceChanged
+   string "/org/freedesktop/UPower/devices/battery_BAT0"
+signal sender=:1.17 -> dest=(null destination) serial=267 path=/org/freedesktop/UPower/devices/battery_BAT0; interface=org.freedesktop.UPower.Device; member=Changed
+signal sender=:1.17 -> dest=(null destination) serial=268 path=/org/freedesktop/UPower; interface=org.freedesktop.UPower; member=DeviceChanged
+   string "/org/freedesktop/UPower/devices/battery_BAT0"
+しらんかったが、
+upower
+というパッケージがあった。
+
+うほ。upowerdが打ち上がってるぜ。
+~/ ps -auxww | fgrep upower                
+root      1605  0.0  0.1 254228  6668 ?        Ssl  22:04   0:00 /usr/lib/upower/upowerd
+
+で、よくわからんが、
+~/ upower --monitor-detail
+Monitoring activity from the power daemon. Press Ctrl+C to cancel.
+[22:47:02.374]	device changed:     /org/freedesktop/UPower/devices/battery_BAT0
+  native-path:          BAT0
+  vendor:               SANYO
+  model:                45N1023
+  serial:               2403
+  power supply:         yes
+  updated:              2014年06月23日 22時47分02秒 (0 seconds ago)
+  has history:          yes
+  has statistics:       yes
+  battery
+    present:             yes
+    rechargeable:        yes
+    state:               discharging
+    energy:              43.34 Wh
+    energy-empty:        0 Wh
+    energy-full:         52.11 Wh
+    energy-full-design:  57.72 Wh
+    energy-rate:         10.252 W
+    voltage:             11.991 V
+    time to empty:       4.2 hours
+    percentage:          83%
+    capacity:            90.2807%
+    technology:          lithium-ion
+  History (rate):
+    1403531222	10.252	discharging
+    1403531192	9.387	discharging
+    1403531162	9.256	discharging
+    1403531132	10.034	discharging
+とすると、dbusでUpowerへのシグナル飛ぶのにあわせて、こちらのモニタが
+バンバンでてくる。
+
+くっそー。systemd複雑すぎー。
+
+dbus周りって天才のなせる技なのか？...何凄いって、単純な機構を組み合わせて
+ここまでハード固有の大規模・多様な件をうまく扱ってる...
+
+systemctlは、内部でpagerコマンドを呼び出す。
+日本語設定のdebianシステムだと、通常はpager-> lvなので、
+env LV='-c' systemctl list-unit-files
+とかすると色とりどりの表示が見えて嬉しいかもね。
+
+なんか、dbus周りからいろいろgnomeの謎サービスへのヒントが見えてきて面白い。
+---> 
+signal sender=:1.41 -> dest=(null destination) serial=12 path=/org/freedesktop/UDisks2/drives/C400_MTFDDAK128MAM_00000000123403498188; interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
+   string "org.freedesktop.UDisks2.Drive.Ata"
+   array [
+      dict entry(
+         string "SmartUpdated"
+         variant             uint64 1403786217
+      )
+   ]
+   array [
+   ]
+
+なるものから、udisksというサービスが見えてきて、ここから、
+ man udiskd
+ man 8 udisk
+ man polkit
+と見ていくといろいろ理解が深まる感じー
+
+なんかもー、いろいろdbusと統合してるようで、
+/usr/share/dbus-1
+以下にあるファイル群がいろいろなプロセス呼び出してdbusめがけて
+メッセージを流しこむ・プロセスを起動する。なんかイベント・ドリブン
+な感じでプロセスがdbusにより起動するかんじだのう。
+
+例：udevがなんか感じて→dbusに流す→サービスをdbusが起動→サービスが
+dbusにメッセージ流す→何か別のサービスが起動する→...
+
+ってな感じ。
+
+iphone挿すと、
+/usr/lib/gvfs/gvfs-afc-volume-monitorがいちいちウザい
+件は
+/usr/share/dbus-1/services/org.gtk.Private.AfcVolumeMonitor.service
+が起動するのが理由か。
+
+----> ARMネタ
+
+usbをserial terminalデバイス代わりにする流行り（？）は、
+cdc_acm（usb communication device class abstruct control model)
+らしいぞ。いっそのことモデムデバイスとして認識させるが吉。
+情報源は、
+http://en.wikipedia.org/wiki/USB_communications_device_class
+がよさげ。
+
+nook colorのu-boot用のmakeターゲットは、
+omap3621_evt1a_config
+となる。omap3はusb系のchipセット？を持っているが、u-bootからは
+どうもfastboot対応にハードコーディングされるようだ。
+これか？
+fastboot↓
+http://news.mynavi.jp/column/androidnow/043/
+
+nook-1.2のu-bootのソースにはfastboot.cの呼び出しができるのはomap3のみだ。すげえ。
+
+----> evolution 3.12.2
+
+糞がぁぁっ、Bccヘッダ削らずにGmail送りやがったなぁ！
+ヘッダにBcc:ってなんだよおおおおお。どこのヘッダだよチキショウ！
+個人情報ダダ漏れじゃんかぁ！バグ突き止めてbugfillしちゃる！
+--->
+ gmailの仕様だった。gmailはbccを自分宛のメールだけに、
+bccのヘッダをつけるという仕様。実際に人に届いている
+メールにはbccヘッダは付いていない。
+
+ってことで、早速evolutionのソースを読むと、
+evolution-3.12.2/libemail-engine/mail-tools.c中の
+226 CamelMimePart *
+227 mail_tool_make_message_attachment (CamelMimeMessage *message)
+228 {
+229         CamelMimePart *part;
+230         const gchar *subject;
+231         struct _camel_header_raw *xev;
+232         gchar *desc;
+233 
+234         subject = camel_mime_message_get_subject (message);
+235         if (subject)
+236                 desc = g_strdup_printf (_("Forwarded message - %s"), subject);
+237         else
+238                 desc = g_strdup (_("Forwarded message"));
+239 
+240         /* rip off the X-Evolution headers */
+241         xev = mail_tool_remove_xevolution_headers (message);
+242         camel_header_raw_clear (&xev);
+243 
+244         /* remove Bcc headers */
+245         camel_medium_remove_header (CAMEL_MEDIUM (message), "Bcc");
+246 
+247         part = camel_mime_part_new ();
+248         camel_mime_part_set_disposition (part, "inline");
+
+という部分にて、
+
+244         /* remove Bcc headers */
+245         camel_medium_remove_header (CAMEL_MEDIUM (message), "Bcc");
+
+というクソコードを見つける。ヘッダ削んなよ！クソがァァ。ヘッダ根こそぎつけんなチキショウ！
+
+あと、Bccハンドリングしてる場所
+evolution-3.12.2/mail/em-composer-utils.c中の
+145 
+1146 static CamelMimeMessage *
+1147 em_utils_get_composer_recipients_as_message (EMsgComposer *composer)
+1148 {
+中の
+1195         /* Bcc */
+1196         dest_addr = bcc_addr;
+1197         destv = e_composer_header_table_get_destinations_bcc (table);
+1198         for (ii = 0; destv != NULL && destv[ii] != NULL; ii++) {
+1199                 text_addr = e_destination_get_address (destv[ii]);
+1200                 if (text_addr && *text_addr) {
+1201                         if (camel_address_decode (CAMEL_ADDRESS (dest_addr), text_addr     ) <= 0)
+1202                                 camel_internet_address_add (dest_addr, "", text_addr);
+1203                 }
+1204         }
+1205         e_destination_freev (destv);
+
+こんなところか？
+
+213         if (camel_address_length (CAMEL_ADDRESS (bcc_addr)) > 0)
+1214                 camel_mime_message_set_recipients (message, CAMEL_RECIPIENT_TYPE_BCC,      bcc_addr);
+
+なんかしらんが、ssl経由のsmtpって、
+sudo openssl s_server -accept 465 -cert ./server.crt -key server.nokey.key
+とかすると、うっかり間違えてevolutionはきちんとつないできた。
+伝聞はRFC2822形式でOK.すっかり騙される。
+
+------> apache-2.2.15-30(CentOS6.5)
+quilt化してパッチ当てたら、なんということでしょう！quiltはpatch -p1が
+前提なので、specファイルのように-pXを変更できるようなパッチには対応ができん。
+ ---> 嘘でした。
+　　seriesファイルにpach levelを書くことができるので、こちらで対処：
+　　例：seriesファイルの例
+　　　httpd-2.2.3-mod_proxy-change-state.patch
+　　　httpd-2.2.3-rotatelogs-trunk.patch
+　　　httpd-2.2.3-r982629.patch
+　　　httpd-2.2.15-proxy-failonstatus.patch -p0
+　　　httpd-2.2.3-ldaprefer.patch
+
+　　　↑ -p0というのがレベル
+　　これで万事解決！
+
+ quiltの動きは
+  quilt --trace command
+
+とかするとbash -x したような結果がさっさと得られる。
+
+---> softether bridge設定
+
+KVMとかで利用するなら、以下の方法で。
+
+ Step1. 母艦の/etc/network/interfacesの内容を以下のように用意して、
+　　　　　manualのbr3を作る
+
+　　　   ------------/etc/network/interfacesここから-------------
+   iface br3 inet manual
+        bridge_ports none
+        bridge_stp off
+        bridge_fd 0
+        bridge_maxwait 0
+　　　   ------------/etc/network/interfacesここまで-------------
+
+ $ sudo ifup br3
+ $ ip addr show
+   ...中略...
+9: br3: <BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether fe:54:00:7b:93:b0 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::34c2:37ff:fef1:94dd/64 scope link 
+       valid_lft forever preferred_lft forever
+
+ Step2. vpnbridgeを起動
+    sudo vpnbridge start
+
+ Step3. vpnbridgeにつなぐ。
+    vpncmd localhost /SERVER
+  
+ Step4. Hublistすると、BRIDGEという名前のHUBが見えるので、
+　　　　　Hub BRIDGE
+       する。
+ 
+ Step5. CascadeCreateして、SoftetherServerのVPN接続情報を突っ込む。
+        設定名は何でも良いが、ここでは、VPNcascadeとする。
+ Step6. CascadePasswordSetして、Step5の接続の為のユーザのパスワードを設定
+ Step7  CascadeOnline VPNcascade を実行
+ Step8  BridgeCreateして、仮想HUB名：BRIDGE、NICはbr3を指定。
+
+以上で、br3はVPN先のL2ネットワークにドッキングするので、br3上にtun/tapして
+もう好きにdhclientすれば、一発接続できるぜ。
+
+ ---> vpncmd localhost /SERVER /HUB:BRIDGE /CMD cascadeonline VPNcascade
+とかすれば本来いけるはずであるが、何故かパスワードを聞かれてしまい先に進めない...orz
+
+注意：
+bridgeとして接続された後のbr3に、母艦側でdhclient br3とかは出来ない模様
+なので、母艦もVPNに繋ぎたければ、vpnclient経由でつなぐ必要あり。
+
+bridge有効にしたらものすごい量のDstPort=80のkeepalive.softether.com
+宛のパケットが出るが、これはKeepDisbleで止めれる。
+
+----> 何故かcentos65
+
+acpidいれると、virsh shutdown経由でサーバー潰せるようになる。
+
