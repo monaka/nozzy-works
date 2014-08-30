@@ -89,7 +89,11 @@ iptables -A OUTPUT -p tcp --dport 43 -j ACCEPT
 # for hange
 iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
 # for lan
-iptables -A OUTPUT -p tcp --dest 172.16.52.10 --dport 8000 -j ACCEPT
+iptables -A OUTPUT -p tcp -d 172.16.52.10/32 --dport 8000 -j ACCEPT
+iptables -A INPUT  -s 10.22.95.25/32 -j ACCEPT
+iptables -A OUTPUT -d 10.22.95.25/32 -j ACCEPT
+## for ftp
+iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
 # another service
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
 iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input]'

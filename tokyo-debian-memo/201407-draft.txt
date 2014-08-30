@@ -426,3 +426,69 @@ bridge有効にしたらものすごい量のDstPort=80のkeepalive.softether.co
 
 acpidいれると、virsh shutdown経由でサーバー潰せるようになる。
 
+-------------------------Debian勉強会用調べ
+
+Debian Project News - July 3rd, 2014
+（See.https://www.debian.org/News/weekly/2014/11/）
+
+・GSoCネタ。
+　muonにapt-listbugsを組み込んだらしい。まあ、もともとapt-listbugsは
+パッケージのクリティカルバグをインストール前に警告するツール。K desktopの
+ソフトウェアコントロールセンターであるところのmuonに統合は、まあ、必要なネタ。
+
+muonは
+http://jontheechidna.wordpress.com/2010/07/05/introducing-qapt-and-the-muon-package-manager/
+
+
+  -------------参考-----------
+~/prog/my-works/ aptitude -w 80 show apt-listbugs
+パッケージ: apt-listbugs                 
+状態: インストールされていません
+バージョン: 0.1.13
+優先度: 任意
+セクション: admin
+メンテナ: Francesco Poli (wintermute) <invernomuto@paranoici.org>
+アーキテクチャ: all
+展開サイズ: 430 k
+依存: ruby | ruby-interpreter, ruby-debian (>= 0.3.3), apt (>= 0.9.11), ruby-gettext (>=
+        3.0.2), ruby-soap4r
+推奨: ruby-xmlparser, ruby-httpclient (>= 2.1.5.2-1)
+提案: reportbug, debianutils (>= 2.0) | www-browser | w3m
+破損: libapt-pkg4.12 (< 0.9.11)
+説明: tool which lists critical bugs before each APT installation
+ apt-listbugs is a tool which retrieves bug reports from the Debian Bug Tracking System and
+ lists them. Especially, it is intended to be invoked before each installation/upgrade by
+ APT in order to check whether the installation/upgrade is safe. 
+ 
+ Many developers and users prefer the unstable version of Debian for its new features and
+ packages.  APT, the usual upgrade tool, can break your system by installing a buggy
+ package. 
+ 
+ apt-listbugs lists critical bug reports from the Debian Bug Tracking System. Run it from
+ within the APT session, in order to see whether an installation or upgrade is known to be
+ unsafe.
+ホームページ: http://alioth.debian.org/projects/apt-listbugs/
+  -------------参考-----------
+
+・eglibc--> glibcへ移った。
+・ネットワークはTorを使い、ファイル・メール・メッセンジャーソフトに暗号を搭載
+　したDebianベースのシステムで、TailsというOSのHackFestaの話。
+
+debian-announceより、
+ Debian 6 LTSの話。で、LTSの有償サポートの受け皿の会社名:Freexian
+Raphaël Hertzog が設立。
+
+　先日出たdebian wheezyは7.6が出た。
+
+debian-developネタ
+jessieのデフォルトgccコンパイラはgcc-4.9になった。
+
+freez ... 11.5
+新規のtransitionができなくなる/Jessieの対応アーキテクチャの決定 9.5
+
+people.debian.orgはravelからparadisへ移設されるそうな。
+こちらにあわせてssl化するそうな。
+
+
+
+

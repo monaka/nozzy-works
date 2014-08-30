@@ -1,0 +1,116 @@
+Debconf14だが、
+ビデオは
+https://wiki.debconf.org/wiki/DebConf14/Videoteam
+によれば、
+http://meetings-archive.debian.net/pub/debian-meetings/
+以下に配置されるようだ。（まだ配置されてないけどね）
+--->やっと出た
+http://meetings-archive.debian.net/pub/debian-meetings/2014/debconf14/webm/
+
+んー、なんかビデオが少ない気がするが...
+まあ、zackの演説でも見るか。
+
+zackの演説プレゼン
+http://upsilon.cc/~zack/talks/2014/20140823-dc14-darkages.pdf
+
+要は、FreeSoftwareの普及では勝ったが、結局最近はcloudなどでサービス
+が提供されるようになってしまい、結局ユーザは利用しているプログラムを
+自由にいじることができなくなってしまった。これは、結局、FOSSにて
+勝利を収めた部分が、ユーザにとっては意味のないものになってしまった。
+（cloud側にproprietaly software入れられてしまうと、ユーザは
+どうにもできんし。）
+ --->じゃあどうすんのさ？という内容
+　　　さあ、ディスカッションのはじまりだ。42:43ころ。
+　　　--->んー、みのりのあるディスカッションじゃないなぁ。
+　　　　　どんなビジョンを見せようか？というのは同感。
+　　　　　--->んー、要は簡単じゃないぜということか？
+
+*Comming_of_Age_My_Life_with_debian.web
+女の人だ。Debianがどう生活を変えたかをしゃべる。
+家の紹介と自分の紹介はもういいから...なげーよ。
+農家なのか？うは、高校の写真やら、高校の紹介すんなよ。
+なげーよ。
+ 3.75あたりから確信か？computer gameから入ったとでも
+言いいたいのか？こいつ馬鹿なのか？
+MUDやってる（Multi User Dungeon)
+ 自分のキャラクタ紹介がVIM経由だw。12:30まですっ飛ばしたい。
+Debian sargeでゲームしてたのか？こいつ。
+ １６歳のときDebian WomenのTシャツ買ったらしい。なんと、
+この9ヶ月後、DDとなり、computer scienceの科へ進んだらしい。
+MIT MediaLabなのか？こいつ。すげえ。
+
+要は、どうDebianに出会い、リア充になったかみたいなプレゼンか？
+MIT在籍中もDebian Hackしてて、Debconf7にも参加したらしい。
+KSplice作った会社にフルタイムで働く--->結局Oracleに会社ごと買われた。
+https://www.ksplice.com/
+で、inboxapp.comやる
+https://www.inboxapp.com/
+
+inboxappのコードが表示。
+
+要は、ハイスクールでDebianに出会って、MITに行くわ、
+会社起こすわというリア充生活してまっせーという話。
+Debian Women所属。
+
+Wepons of the Geek.
+これも、女の人だ。Divergenceしてんなー。
+あ、Biella Colemanで良いみたい。
+--->げえええ、AnonymousとDebianの関係の話だ。
+    Warningのプレゼンがすげえ。
+ 　　Anonymousのビデオ凝ってんなー。
+　　（Debianの広報ビデオよりはるかに優れてるぜ）
+   Enid Gabriella Colemanは
+　　http://en.wikipedia.org/wiki/Gabriella_Coleman
+　　のとおり、hacker文化とかに詳しいアカデミーな人だが、
+　　Anonymousについての研究でも有名。
+
+　　で、笑うのは
+　　xenuという考え方。
+　　http://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%8C%E3%83%BC
+　　初めて知ったぜ。
+
+　　chanology とは、
+   http://en.wikipedia.org/wiki/Project_Chanology
+
+　　先のTomcluseの件も上に載ってる。
+   25分のところで、昼休みしゅーりょー。
+
+ぎゃぁぁ、なんてこった！ffmpegがsidから消えていて代わりにlibav-tools
+となった。こりゃDebian勉強会ネタによさげ？
+
+とりあえず、libav-toolsぶちこんで、
+avconv  -i Debian_in_the_Dark_Ages_of_Free_Software.webm -c:v h264 -c:a aac -strict experimental -b:a 192k Debian_in_the_Dark_Ages_of_Free_Software.mp4
+
+やってみた。--->結局元ファイルよりでかくなるので、NG。
+
+--------------------
+squeakやってみた。
+教科書：http://swikis.ddo.jp/squeak/13
+自由自在 Squeakプログラミング PDF版
+とりあえず、教科書はタダで手に入った。
+
+~/ sudo aptitude install squeak
+"squeak" パッケージは見つかりませんでした。
+しかし、以下のパッケージ名に "squeak" が含まれています:
+  squeak-vm squeak-vm:i386 squeak-plugins-scratch squeak-plugins-scratch:i386 
+  squeak-plugins-scratch-dbg squeak-plugins-scratch-dbg:i386 
+"squeak" パッケージは見つかりませんでした。
+しかし、以下のパッケージ名に "squeak" が含まれています:
+  squeak-vm squeak-vm:i386 squeak-plugins-scratch squeak-plugins-scratch:i386 
+  squeak-plugins-scratch-dbg squeak-plugins-scratch-dbg:i386 
+インストール・削除・更新されるパッケージがありません。
+更新: 0 個、新規インストール: 0 個、削除: 0 個、保留: 0 個。
+0  バイトのアーカイブを取得する必要があります。展開後に 0  バイトのディスク領域が新たに消費されます。
+
+ということらしい。
+うわ、squeak-vmちっせー。
+
+で、
+http://sourceforge.jp/frs/redir.php?m=jaist&f=%2Fsqueak-ja%2F59208%2FSqueak4.4-ja-all-in-one.zip
+
+から取ってきたイメージの中の、Squeak4.4-ja.changes  Squeak4.4-ja.image  SqueakV41.sourcesがあるディレクトリで、
+
+squeak Squeak4.4-ja.image
+
+とやると、日本語メニューのsqueakが立ち上がる。
+
