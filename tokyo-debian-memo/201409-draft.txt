@@ -114,3 +114,20 @@ squeak Squeak4.4-ja.image
 
 とやると、日本語メニューのsqueakが立ち上がる。
 
+------------------
+ごあああ、openssl-1.0.1i-2からなのか、よく判らんが、
+www.paypal.comへアクセスすると問答無用で切られるようになった。
+（protocolみると、client helloが完了した直後、RSTが叩きつけられて切られる）
+
+シミュレーション
+
+~/prog/debian/openssl/ openssl s_client -connect www.paypal.com:443
+
+きれいに切断されるぜ。一方、www.paypal.jpは問題無し。
+
+プロトコル見ると、opensslがextensionで、Heartbeatオプションを指定してるので、
+もしかして、ひっそりheartbleed拒否対応となったのか？＞www.paypal.com
+
+とりあえず、paypal（日本）サポートへ電話しても、普通につながると言っているので、
+opensslとの昨今の相性が悪いかと思われ。
+

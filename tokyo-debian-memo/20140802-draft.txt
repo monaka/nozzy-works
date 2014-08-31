@@ -1,0 +1,213 @@
+nook hd+32Gb手に入ったので早速改造あそび。
+
+以下の目標をクリアする必要あり。
+ 
+ - u-boot 
+ - x-loader
+ - kernel
+
+ nook hd+32gbはOMAP 4470ベース
+
+OMAP 4470のタブレットは近いものにBlaze tabletベースという
+のが使える。
+※しらんかったが、Blaze tabletは東芝からも民生品がでてる。
+http://omappedia.org/wiki/OMAP4_Blaze
+pandaboardはOMAP 4430シリーズだった。こちらもつかえんのか？
+
+OMAP44Xのdebian系は
+http://omappedia.org/wiki/Ubuntu_bootloader
+が参考になるかな。
+
+--->知らんかったが、git.omapzoom.orgはomap4もサポートしてるらしい。
+
+u-boot
+git clone git://git.omapzoom.org/repo/u-boot.git
+でOMAP用を手に入れる。
+
+あ、こっちがよさげ。OMAP4470そのもの。ただ、blaze tablet用だけどな。
+※blaze tabletとはTIのOMAP4470リファレンスカード
+
+ちなみに、git tag -lで登録されているすべてのtagがでてくる。
+
+むー、git.omapzoom.orgのu-boot.repoのリポジトリには
+ti.comな人がとにかくアップロードしてるみたい。
+例:
+  git show 92402c48102c38011c253788c90c6b88f464c0fd とか。
+
+うーん、「git で指定したコミットがどのブランチに属するか知りたい」はw
+一筋縄ではいかんらしい。が、ヒントは得られるもよう。
+
+git で指定したコミットがどのブランチに属するか知りたい;
+http://qa.atmarkit.co.jp/q/2318
+git name-rev commt-id
+
+のもよう。
+~/prog/nooter/nook-hd/u-boot/u-boot/ git name-rev 92402c48102c38011c253788c90c6b88f464c0fd
+92402c48102c38011c253788c90c6b88f464c0fd tags/4AI.5~4
+
+というわけで、4AI.5というタグの4つ前のコミット。コミットログは
+commit 92402c48102c38011c253788c90c6b88f464c0fd
+Author: Taras Kondratiuk <taras@ti.com>
+Date:   Wed Dec 14 17:41:20 2011 -0600
+
+    uBoot: Add OMAP4470 identification
+    
+    Correct OMAP4470 detection is needed to automate flashing script.
+    
+    Change-Id: I3910299e1a9b02c564985bfabfd5eb457408485d
+    Signed-off-by: Taras Kondratiuk <taras@ti.com>
+
+というはじめてOMAP4470が追加されたときのcommitらしい。
+
+~/prog/nooter/nook-hd/u-boot/u-boot/ git branch -a --contains 6AJ.1.2-RC3
+  remotes/origin/p-ti-u-boot-2013.04
+  remotes/origin/p-ti-u-boot-2013.04-bringup
+  remotes/origin/p-ti-u-boot-2013.04-wip
+
+ということらしくremoteブランチだ。
+
+~/prog/nooter/nook-hd/u-boot/u-boot/ git branch -a --contains 4AI.5      
+  remotes/origin/omap4_dev
+
+ということで、4AI.5はomap4_devらしい。
+
+やっとわかった。omap4_devのソースを取り出したかったら、
+
+ git checkout omap4_devとすればよい。これで、リモートブランチに
+含まれるomap4_devにcheckoutできる。実際git logしたところそれらしい
+内容が含まれていた。
+
+ git checkout omap4_devして、
+find . -name '*omap4*'
+すると、
+./board/omap4430sdp
+./board/omap4430sdp/omap4430sdp.c
+./board/omap4430panda
+./board/omap4430panda/omap4430panda.c
+./cpu/omap4
+./cpu/omap4/omap4.c
+./include/asm-arm/arch-omap4
+./include/asm-arm/arch-omap4/omap4430.h
+./include/configs/omap44XXtablet.h
+./include/configs/omap4430sdp.h
+./include/configs/omap4430panda.h
+しかないので、blazeか、pandaかといったところ。なお、
+OMAP4470は
+commit 92402c48102c38011c253788c90c6b88f464c0fd
+が最初のようだ。
+
+ところで、debian-sidでクロスコンパイルしようというのなら、
+aptitude install gcc-arm-none-eabi
+となる。
+また、u-boot関連のパッケージは
+u-boot-tools
+があり、中身は
+u-boot-tools: /usr/bin/mkimage
+が入ってるのみ。とりあえずインスコ。
+
+また、Makefileをみたところ
+make ARCH=arm omap44XXtablet_config (for Blaze_Tablet)
+は可動可能だ。
+
+うは、
+https://github.com/NookieDevs
+というリポジトリにnook hd+用の開発がおこなわれているぜ。
+
+https://github.com/NookieDevs/encore_cyanoboot
+の方はomap44XXtablet.hが無いので、おそらく古いソースに基づく
+（多分nook color用のbarns側ソース）
+
+https://github.com/NookieDevs/u-boot-hummingbird-ovation
+みるとomap44XXtablet.hが含まれているので今時からフォークか?
+
+で、git.omapzoom.orgと、githubのとをdiff -ur -x .git したら、
+大幅にgithub側に様々なomap用の改造が加えられていた。
+※pllまわりとか、lcdとか。
+
+--->github側を使うのが吉とみた。
+
+とおもったら、どうもこいつの取り込みは
+http://www.barnesandnoble.com/u/Terms-of-Service-NOOK-HD-HD-Plus/379003804/
+からたどれる
+http://images.barnesandnoble.com/PResources/download/Nook/source-code/nook_hd_2.0.2.tar.bz2
+をベースにしてるかも？といったところ。
+最新はOSS Release for LCD 2.2.0をLCD2.0.2のうえにさらに展開か。
+http://images.barnesandnoble.com/PResources/download/Nook/source-code/nook_hd_2.2.0-delta.tar.bz2
+
+---> deltaの方に展開（摘要）の仕方と、ビルドの仕方がのっている。
+
+いちおう、barnsの端末は
+http://www.tele.soumu.go.jp/j/adm/monitoring/summary/qa/keitaidenwa/index.htm
+という電波法の問題があるので、宣伝にあたっては注意がいる。
+
+コンパイル前に
+export ARCH=arm
+export CROSS_COMPILE=arm-none-eabi-
+export PATH=../u-boot/tools:$PATH
+しとかないと超面倒なので、やっとく。
+
+あー、x-loaderのコンパイル中に、
+
+/cpu/omap4'
+arm-none-eabi-gcc -Wa,-gstabs -D__ASSEMBLY__ -g  -Os -ffunction-sections -fdata-sections -mthumb -mthumb-interwork   -fno-strict-aliasing  -fno-common -ffixed-r8 -msoft-float  -D__KERNEL__ -DTEXT_BASE=0x40304350 -I/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/include -fno-builtin -ffreestanding -nostdinc -isystem /usr/lib/gcc/arm-none-eabi/4.8/include -pipe  -DCONFIG_ARM -D__ARM__ -march=armv7-a -mabi=apcs-gnu -c -o rom_public_dispatcher.o /home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/cpu/omap4/rom_public_dispatcher.S
+/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/cpu/omap4/rom_public_dispatcher.S: Assembler messages:
+/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/cpu/omap4/rom_public_dispatcher.S:39: Error: selected processor does not support ARM mode `smc #0'
+/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/config.mk:171: recipe for target 'rom_public_dispatcher.o' failed
+make[1]: *** [rom_public_dispatcher.o] Error 1
+make[1]: Leaving directory '/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/cpu/omap4'
+Makefile:112: recipe for target 'cpu/omap4/libomap4.a' failed
+make: *** [cpu/omap4/libomap4.a] Error 2
+
+とかいわれるが、これは、
+http://beagle1.blog.so-net.ne.jp/2012-07-11
+に載ってる内容がキモ。.arch_extension secをコードに入れる。
+
+これもだ。
+arm-none-eabi-gcc -g  -Os -ffunction-sections -fdata-sections -mthumb -mthumb-interwork   -fno-strict-aliasing  -fno-common -ffixed-r8 -msoft-float  -D__KERNEL__ -DTEXT_BASE=0x40304350 -I/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/include -fno-builtin -ffreestanding -nostdinc -isystem /usr/lib/gcc/arm-none-eabi/4.8/include -pipe  -DCONFIG_ARM -D__ARM__ -march=armv7-a -mabi=apcs-gnu -Wall -Wstrict-prototypes -c -o hal_services.o hal_services.c
+{standard input}: Assembler messages:
+{standard input}:279: Error: selected processor does not support Thumb mode `smc #0'
+/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/x-loader/config.mk:173: recipe for target 'hal_services.o' failed
+
+おお、
+arm-none-eabi-objcopy --gap-fill=0xff -O binary x-load x-load.bin
+gcc -O3 -o signGP  scripts/signGP.c
+TEXT_BASE=`grep -w _start System.map|cut -d ' ' -f1`
+./signGP x-load.bin 0x40304350
+cp x-load.bin.ift MLO
+
+ということで、ちゃんと書名されたブートローダが出来上がり?
+
+u-bootもおなじく、
+arm-none-eabi-gcc -g  -Os   -fno-strict-aliasing  -fno-common -ffixed-r8 -msoft-float  -D__KERNEL__ -DTEXT_BASE=0x80e80000 -I/home/nojima/prog/nooter/nook-hd/nook-hd-hdplus/distro/u-boot/include -fno-builtin -ffreestanding -nostdinc -isystem /usr/lib/gcc/arm-none-eabi/4.8/include -pipe  -DCONFIG_ARM -D__ARM__ -march=armv7-a -mabi=apcs-gnu -Wall -Wstrict-prototypes -c -o hal_services.o hal_services.c
+{standard input}: Assembler messages:
+{standard input}:267: Error: selected processor does not support ARM mode `smc #0'
+とのこと。
+
+うほ。versionがわからねー。
+
+がああ、kernelでもエラーだ。
+  AS      arch/arm/mm/proc-v7.o
+arch/arm/mm/proc-v7.S: Assembler messages:
+arch/arm/mm/proc-v7.S:385: Error: selected processor does not support ARM mode `smc #0'
+scripts/Makefile.build:341: recipe for target 'arch/arm/mm/proc-v7.o' failed
+
+ AS      security/smc/bridge_pub2sec.o
+security/smc/bridge_pub2sec.S: Assembler messages:
+security/smc/bridge_pub2sec.S:85: Error: selected processor does not support ARM mode `smc #0'
+scripts/Makefile.build:341: recipe for target 'security/smc/bridge_pub2sec.o' failed
+make[2]: *** [security/smc/bridge_pub2sec.o] Error 1
+scripts/Makefile.build:441: recipe for target 'security/smc' failed
+make[1]: *** [security/smc] Error 2
+Makefile:945: recipe for target 'security' failed
+
+まあ、なんかしらんが、
+Athlon AMD 5600+ぐらいで、20分くらいでコンパイル完了だった...
+Image Name:   Linux-3.0.31
+Created:      Sun Aug  3 02:16:49 2014
+Image Type:   ARM Linux Kernel Image (uncompressed)
+Data Size:    3528084 Bytes = 3445.39 kB = 3.36 MB
+Load Address: 0x80008000
+Entry Point:  0x80008000
+  Image arch/arm/boot/uImage is ready
+だそうで。
+あー、カーネル古いなぁ...
