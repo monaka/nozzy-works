@@ -72,6 +72,24 @@ Wepons of the Geek.
 　　chanology とは、
    http://en.wikipedia.org/wiki/Project_Chanology
 
+   scientologyとはなんじゃ？
+　　http://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AD%E3%82%B8%E3%83%BC
+
+　　まあ、なんか宗教みたいなもんか？>scientology
+
+    よく出てくるnemesisとは、
+　　http://ja.wikipedia.org/wiki/%E3%83%8D%E3%83%A1%E3%82%B7%E3%82%B9
+
+-->　　クラッカー文化の深淵を語るかんじ。
+　　　紹介されている内容：scientology,wikileaks,anonimousなどなど。
+　　　基本的にはanonymousの連中の考え方、進化、方向など。
+
+　　　　anonymousは捉えどころが無い。動機に応じて、誰かが何かに抗議を
+　　　示すためサーバ攻撃を仕掛けるようだ。これは政治だったり、
+　　　社会的何かだったり。2chの〜祭りみたいなもんか？
+　　
+
+
 　　先のTomcluseの件も上に載ってる。
    25分のところで、昼休みしゅーりょー。
 
@@ -82,6 +100,189 @@ Wepons of the Geek.
 avconv  -i Debian_in_the_Dark_Ages_of_Free_Software.webm -c:v h264 -c:a aac -strict experimental -b:a 192k Debian_in_the_Dark_Ages_of_Free_Software.mp4
 
 やってみた。--->結局元ファイルよりでかくなるので、NG。
+--->クソ面倒なので、iphoneアプリのPlayerXtreme HD(無料)に流し込んで、
+webmのまま見ることにした。問題なかった。
+ 
+* Welcome_talk_
+
+ - Hack Dayをdebconf14の途中に挟んだとのこと。
+ - Hack部屋を含む部屋には22:00にロックアウトされるんで、その
+　　時間までには出てくれとのこと。
+
+>聞き取りが甘くてちょっと良くわからず...
+
+*　My-PGPGPG_key_is_RSA_2048bit_but_I_put_the_private_key_on...
+
+ g新部さんのプレゼン。
+
+　 GnukTokenの紹介、歴代どう作ってきたか、プレゼンとデモ。
+
+　 おお、STM32F103で書いたgnutokenは、何もつないでない内蔵ADコンバータの
+　1bit目をエントロピー発生機にして利用とのこと。うまいなー。
+（どのカードかはわからんが、Diodeつないでたということから熱雑音か、
+ツェナーつかってるのか？）
+
+　NIST Sp 800-90BのFull Entropy Sourceはdraft段階だが、
+実装が小さいデバイスにも楽ちんだったとのこと。
+
+　聴講者からNewG売ってくれというツッコミ入った。
+　※日本人何人か行ったのかなぁ...観客に何人かそれらしき人が居た。
+　（台湾か中国の人かな？）
+
+　g新部さんの吉牛のTシャツが光るぜ。
+
+　29:00頃からデモあり。このデバイスで1.5秒でgpgサインが可能とのこと。
+ 実際動いてた。
+
+　OpenPGPは3つのキーを扱えるので、NeuGは最大3つのキーを搭載可能。
+
+　どこで本デバイスの議論ができんのか？というツッコミがあった。
+
+　ストア可能なキーサイズは？ということで、2kbytesだそうな。
+
+　ハードは何でもいいのか？--->もちろん、とのこと。
+
+* Bits_from_the_DPL
+　スライド：http://blop.info/p/201408-dc14-dpl.pdf
+　（Lucasのtwitterより
+　　　https://twitter.com/LucasNussbaum/status/505121993302097920）
+
+  Lucas Nussbaumの公演。
+
+　ちょっち訛りがあるなぁ。
+   --->何故かdebconf13のT-shartsを着てる。
+ 
+  Jessie freezeは現行340RC bugs=21 weeksでfixできるんじゃないかとのこと。
+　　きっとクリスマスには間に合うんじゃ？とジョークがでる。
+ 
+   珍しくお金の話が出た。
+
+　　　おお、収支が出た。Trusted Organizationに金預けてる様：
+
+
+        ----------------------
+　　　SPI US,USD: $193,623.09 @2014-06-30
+     FFIS(Germany EUR): $31,400
+     Debian France (EUR): $3,800
+     Debconf Deutschland (EUR): $0
+     Debian.ch (Switzerland,CHF): $32,700
+        ----------------------
+
+     合計：$261,523 (＝28,244,484円@108円/$1)
+
+　　 収支説明中に、俺は否定派だけどなとのツッコミが入る。
+
+　　　SPIの資産が増えているのはDebconfの収支が+の為。特にlast2年が凄い。
+   　(途中何か、聴衆からツッコミが入るがちょっとわからず。）
+
+　　　SPIからクレッジットカードでのDebian Project Organizationへの寄付が出来るとのこと。
+　　　Debian.orgのDonationリンクがSPIのページにリンクはってあるとのこと（あとで確認）
+
+　　　１人あたり、$25の寄付が中心値とのこと。
+
+　　　Debconf 予算：$150k-250k/y travel sponsorshipが増加  $42k/yとのこと。
+　　　
+　　Debianを改善するために寄付を使おう！との事。
+　　※要は使わずに何もしないのが悪い。
+
+　　　---> Debconf開催には十分とのこと。（まあ、Debconfの度に収支が増加しているため）
+　
+　　いくつかの利用先についてディスカッションが行われた。
+
+   結果サマリ：
+   
+　　　1. もちっとDebianの露出に使おうとのこと。
+
+　　　　　例えば、
+        - Minidebconf開け（DD派遣の旅費とか）（ほぼ全員賛成）
+　　　　 - 景品（例：T-sharts)を新たなcontributorsへ（例：$5,000/yぐらいか？とのこと）（意見別れた）
+　　　　 - Debianのブースの何かにつかう。（評決とったら、あまり積極的ではない）
+
+　　　2. セキュリティと信頼の改善
+
+　　　　-　Debian DeveloperへCryptograhic smartcardsを配れ
+
+　　  3. 開発の効率化
+　　　　 - Sprintsの開催(ほぼ全員賛成）
+　　　　 - 開発用Hardwareの用意（porting用とか、D-iメンテナ用とかね）（ほぼ全員賛成）
+　　　　 - Debconfへのtravel sponsorshipへさらに増資（ほぼ全員賛成）
+
+     4. upstreamとのコミュニケーションに使おうとのこと
+
+　　　　- upstreamのconferenceへの旅費など。（ほぼ全員賛成）
+　　　　（upstreamとdinnerはどうかとか言ってる）
+　　　　　
+　　　※金の話なのでツッコミ入るなぁ...議論が足りないとのことか？
+
+　　　試しに参加者に評決とってみた。
+　　
+　　Debian Projectの　SWOT分析してるぜ。
+
+　　 Stong: 
+      - 
+
+　　　LucusがOSSのプロジェクトでもDebianほどの規模を持つプロジェクトを知ってる人は？
+　　　みたいな質問をした。
+     --->どれぐらいの人数いるのさ？というツッコミに、DD1000人ぐらい、
+          DM300人ぐらい、その他諸々手伝ってる人はいっぱいいるとのこと。
+
+　　　HP,ValuvがDebianと協調して動いてるとのこと。
+　　　Post Snorden
+
+　　 Weakness:
+
+     -とにかくマンパワー分散中、また、コアの部分でマンパワー足らん。
+　　　-Debian Projectの中で諸々細分化が始まる。
+　　　　--> 情報共有をうまくやってくれとのこと。
+
+　　　ITPは多いもののsuponserが見つからんという事態になってるとか。
+
+　　　upstreamとコミュニケーションしてくれとのこと。
+
+　　Threats:
+    We aren't cool anymore - distributions are solved problems --->どういうことだ？
+　　 Required skillはまあ、いつものこと。
+　　 language-specific packaging solutionsとの競合。（rubygemsとか、python eggsとか、OCAML OPAMとかなどなど）
+
+　　　35:40でQAタイム。
+
+   - 最初の質問はよくわからねー。
+　　　回答もよくわからねー
+
+　　- 2ndの質問（というか意見？）
+　　　よくわからん。
+　　　3rdは
+　　　　　パッケージのコンテンストとかやればという意味？
+
+　　　4th (Paulだ）
+　　　　　よくわからん。
+
+     5th ←こいつがいろいろツッコミうけ
+    　　PGP
+
+     6th ←5thの続き
+　　　　PGPのcrypt用スマートカードの件か？
+
+　　結構物議かもしてたが、なんだ？
+　　　--->一人勘違いした質問をした人が居たので、そちらにツッコミラッシュ。
+　　　　　質問を取り下げた模様。
+
+
+とりあえず、よくわからんので、
+ git clone http://anonscm.debian.org/git/debconfsubs/debconfsubs.git
+して字幕入手。が、9/17時点で、
+~/doc/debian/debconfsubs/debconfsubs/2014/debconf14/english/wip/ ls
+Coming_of_Age_My_Life_with_Debian.txt
+GRUB_ancient_and_modern.txt
+Infrastructure_updates_can_we_change_anything_in_less_than_2_years.txt
+One_year_of_fedmsg_in_Debian.txt
+Status_report_of_the_Debian_Printing_team.txt
+Welcome_talk.en.srt
+bugsdebianorg_Database_Ho.en.srt
+room338 - volunteer recruitment session -- Moray Allan.txt
+しかないぜ。Welcome_talk.en.srtはなんとなくわかった。
+
+　
 
 --------------------
 squeakやってみた。
@@ -130,4 +331,38 @@ www.paypal.comへアクセスすると問答無用で切られるようになっ
 
 とりあえず、paypal（日本）サポートへ電話しても、普通につながると言っているので、
 opensslとの昨今の相性が悪いかと思われ。
+
+./Configure no-heatbeats ...
+でOPENSSL_NO_HEARTBEATSが設定されるようだ。
+
+でやってみたら、HEARTBEATSをdisable出来てんのにpaypalから蹴られる。なんじゃこりゃ。
+
+とりあえず、bugreportしてみよう。
+---> debian-develに投げ込んでみた。
+
+---->結局paypal側の問題っぽいなー。
+で合わせてわかったこととして、vultrって、IPレンジのwhoisがひどい...
+これはまずいと思うので、vultrへ連絡しよう！
+
+--- 電源
+
+あーどうでもよいけど、usbを
+
+for idx in `/bin/ls -1 /sys/bus/usb/devices/usb*/power/autosuspend`
+do
+        echo 1 > $idx
+done
+
+実行して、suspend対応にしたら、usb電源まじで切れるので、デバイスつないでも
+detect出来ないという罠がある。
+
+で、強制的に起すのは↓
+nightmare# for usb in `ls -1 /sys/bus/usb/devices/usb*/power/control`
+do
+echo on > $usb        
+done
+
+これでデバイスつなぐと認識できるようになる。
+
+
 
