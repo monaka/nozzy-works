@@ -34,10 +34,22 @@ http://upsilon.cc/~zack/talks/2014/20140823-dc14-darkages.pdf
 言いいたいのか？こいつ馬鹿なのか？
 MUDやってる（Multi User Dungeon)
  自分のキャラクタ紹介がVIM経由だw。12:30まですっ飛ばしたい。
-Debian sargeでゲームしてたのか？こいつ。
- １６歳のときDebian WomenのTシャツ買ったらしい。なんと、
-この9ヶ月後、DDとなり、computer scienceの科へ進んだらしい。
-MIT MediaLabなのか？こいつ。すげえ。
+　15歳にて、Debian sargeに出会ったらしい。ここで、
+どうやって世界中の開発者が協調してDebianを作り上げているのか
+非常に不思議に思ったとの事。で、planet debianでdebian wo
+memの投稿を見て、完全に魅せられてしまい、人生変わったそうな。
+ircに入るわなどし、ゲーム一辺倒の生活から、debianへチェンジ
+したそうな。
+
+ １６歳のときDebian WomenのTシャツ買ったらしい。
+
+　そうこうあって、Debian womenの人に多大な影響を受けながら、
+hacker生活求めてmitへ行ったようだが、
+--> 最終学歴はMITのようだ。
+http://www.linkedin.com/in/christinespang
+so i started to work for ksplice before i finished mit
+という話が乗っているので、入学していたのか？？
+
 
 要は、どうDebianに出会い、リア充になったかみたいなプレゼンか？
 MIT在籍中もDebian Hackしてて、Debconf7にも参加したらしい。
@@ -48,8 +60,8 @@ https://www.inboxapp.com/
 
 inboxappのコードが表示。
 
-要は、ハイスクールでDebianに出会って、MITに行くわ、
-会社起こすわというリア充生活してまっせーという話。
+要は、ハイスクールでDebianに出会って、MITに入学、
+inboxという会社の立ち上げに参加するわというリア充生活してまっせーという話。
 Debian Women所属。
 
 Wepons of the Geek.
@@ -108,6 +120,43 @@ webmのまま見ることにした。問題なかった。
  - Hack Dayをdebconf14の途中に挟んだとのこと。
  - Hack部屋を含む部屋には22:00にロックアウトされるんで、その
 　　時間までには出てくれとのこと。
+    --->ここは嘘。
+
+　　git clone http://anonscm.debian.org/git/debconfsubs/debconfsubs.git
+
+　　によれば、
+
+　　- 写真とか撮影は禁止?（見たいなら、撮影グループの動画を見てくれとのこと）
+　　- どうも、大学のカフェテリアを使うので、夕食の時間で混乱を生んだらしい。
+    - 今回はコーヒー/紅茶/ラテが無料だったらしい。
+　　- hack部屋(room238)からは22:00に追い出されるらしいが、他の場所があるのでつかってくれ。
+
+　とのこと。途中で、steaveおじさんとバトンタッチ。ここで、russさんが、
+どうも今回相当なマネジメント力を発揮された方らしく
+（実際には大変なケンケンガクガクの状況を、人事操作まで発揮して収めた）、
+記念に、盾を作って渡した。が、この盾の内容がひどい。
+
+ アメリカ国防総称の戦争準備状態のレベルでDefconf(Defense Rediness Conditon)
+というのがあり、
+http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%95%E3%82%B3%E3%83%B3
+のとおりで、Defconf level 5<<1の順で厳戒態勢となる。こちらに習った文言
+が今回の盾に記載されており、russさんが読まされていた。
+
+　debcon 5 ... メールのやりとりで早期に議論が収まる場合
+  debcon 4 ... メールの議論が長期に渡って収まらず
+　　　　　　　　　　redittとか、HNとかにスレッドの内容が投下され、
+　　　　　　　　　　LWNに議論の内容がニュースで投稿されるような事態
+  debcon 3 ... いわゆるDQNがスレで暴れて議論が荒れ、仕方無いので、
+　　　　　　　　ML管理者がDQNをbanするような事態
+  debcon2  ... 例えるとUNが黙ってないレベル。(debianは国際協調プロジェクトだからね!)
+               UNが行動起こすかの投票まで行われるような事態。
+　　　　　　　　（もはや議論が苛烈しすぎて戦争レベル）
+  debcon1  ... レーザー兵器が衛星に打ち込まれるレベル
+　　　　　　　　（要は、議論がもはや収集つかんレベル）
+
+参考：
+room338\ -\ volunteer\ recruitment\ session\ --\ Moray\ Allan.txt
+にもあるが、51週にも渡る相当なblame warがあったそうな。
 
 >聞き取りが甘くてちょっと良くわからず...
 
@@ -282,7 +331,126 @@ bugsdebianorg_Database_Ho.en.srt
 room338 - volunteer recruitment session -- Moray Allan.txt
 しかないぜ。Welcome_talk.en.srtはなんとなくわかった。
 
-　
+
+* GRUB_anceient_and_modern.txt
+
+--> 昔のGRUBのUEFI対応って、RedHatがちゃんとしたのではなく、やっつけ
+的実装で対応してたのかー。-->当時だれもこのやっつけ的対応にツッコミ
+入れてなかったとか。
+2002にgrubのrewriteが開始。
+Yoshinori K. Okujiさんという方が当時のgrubのリードメンテナ。
+彼によりPreliminary Univarsal Programming Architecture for GNU Grub
+(PUPAともいう)という名の作業がはじまったそうな。
+
+2007に一旦の一応の完成をみたが、かなり実験的な作品になったとのこと。
+2009にやっと各ディストリビューションがこの新しいgrubの対応を開始。
+ついに2012にgrub2.0としてリリースできた。
+
+non-x86アーキテクチャにgrubがポートされたのは、2004年のNew World Macs
+向けのPowerPCポートだそうな。
+
+armとarm64対応は去年(2013)に追加されたそうな。
+grubのarm32のいくつかは、プラットフォームの提供しているubootを活用し、
+uboot APIの助力を得てgrubが使えるようになっているそうな。
+
+いまのところ、理論上は、jessieリリースにてs390以外はbootローダは
+何らかのgrubによるサポートが得られるはずとのこと。
+
+grub legacy(←0.92とかだろうな）はdebugに対してなにもサポート用の
+設計がが無いのでdebugが大変つらいとのこと。（もう、print文やら、
+qemuのgdbエージェント経由のデバッグやらで大変だったらしい）
+
+なので、grub 2.0から、grub-probeやら、grub-fstestとかのユーティリティを
+つみ、とにかくユーザ空間でのエミュレーションである程度のデバッグができる
+ようにしたらしい。
+
+FUSEを活用して、grub-mountができた。
+
+　Debianでは、grub2に構成スクリプトつけて定義ファイルを生成するようしたとの
+事。
+
+以降、英語の原文みても、あまりに高度過ぎて（UEFIの仕組みとか判らんと理解できない）
+よくわからん...
+
+質疑応答で理解できた点のみ記載
+
+ 1. Documentationがクソ。どうしたのか？手伝いがいるのか？
+
+  --> １〜２年前からちゃんとした文章を途中まで書いたが未だ完成してない。
+　　　おまけにgrub2に至っては書き直すそばから仕様が変わる。
+　　　それでも2010年よりは状況はマシになってはいる。
+
+* Jessie bits from the release team
+
+　9/5 Stop NEW transitions。
+
+ 10/5 緊急uploadを無視しはじめる。testingへの以降に10日かかるようにする。
+　　　セキュリティチームによりサポートできないパッケージの決定が行われる。
+
+ 11/5 Freezeさせる。
+
+今のところ計画どおりに進めてる。
+
+現在450のCritical bugsとのこと。
+
+2/5以降、testingに移動するのが望ましくないと判断されたパッケージは
+removeされる。
+どのパッケージも無事だとは思わないようにとのこと。
+
+new transitionをしないでね。
+Jessieに入れる気のないパッケージのアップロードは控えてねとのこと。
+バグを潰してくれとの事。
+
+--->いつから？
+
+インストールテストしてくれとのこと。
+
+ユーザが知るべきと思うようなメジャーアップデートがupstreamで
+行われてしまったら、release-noteの擬似パッケージに含めてくれとの事。
+
+情報源：
+https://release.debian.org/
+
+QA
+1. 
+
+UEFIを持つPCを使っている人はテストしてくれとのこと。
+他の質問はよく判らん...orz
+
+* Debian_Long_Term_Support
+Holger Levsen
+
+会場の人ほとんどが、現在old stable利用者w
+
+もともとは、Freexiamというところがはじめたらしい。
+ああ、これはRaphael Hertzogが立てた。
+http://www.freexian.com/services/debian-lts.html
+
+LTSのパッケージはLTSにしかはいらないとのこと。
+
+LTSへのアップロードはDDのみ。
+
+パッケージ
+
+ debain-security-support
+
+を導入すると、どれがsupportされているのかわかるとのこと。
+---> debian sidにも入ってるぜ。
+
+sponsor募集！
+
+LTSはセキュリティサポートチームが決めているパッケージのみサポート。
+
+QAはほとんど判らず...orz
+ 
+
+Debconf14tips
+
+もう普通に聞いてたら、時間なさすぎなので、mplayer入れて
+早聴を試みる。
+---> ]キーで再生速度を10%づつupできる。これは便利。
+
+
 
 --------------------
 squeakやってみた。
