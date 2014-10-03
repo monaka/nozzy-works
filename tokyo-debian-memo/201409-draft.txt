@@ -163,6 +163,9 @@ room338\ -\ volunteer\ recruitment\ session\ --\ Moray\ Allan.txt
 *　My-PGPGPG_key_is_RSA_2048bit_but_I_put_the_private_key_on...
 
  g新部さんのプレゼン。
+　プレゼン資料は
+   http://gobby.debian.org/export/debconf14/bof/gnuk
+ が資料。
 
 　 GnukTokenの紹介、歴代どう作ってきたか、プレゼンとデモ。
 
@@ -331,6 +334,16 @@ bugsdebianorg_Database_Ho.en.srt
 room338 - volunteer recruitment session -- Moray Allan.txt
 しかないぜ。Welcome_talk.en.srtはなんとなくわかった。
 
+--->実は
+https://wiki.debconf.org/wiki/Videoteam/Subtitles
+で紹介されているとおり、
+
+http://www.amara.org/
+
+の専用環境でsubtitle起しが行われている。Downloadもできるので、
+こちらで参照するのがよいかも。--->と思ったら、gitの内容とにたりよったりだ。
+
+
 
 * GRUB_anceient_and_modern.txt
 
@@ -381,6 +394,8 @@ FUSEを活用して、grub-mountができた。
 　　　それでも2010年よりは状況はマシになってはいる。
 
 * Jessie bits from the release team
+
+ スライドは：https://release.debian.org/talks/debconf14/rt-debconf14.pdf
 
 　9/5 Stop NEW transitions。
 
@@ -442,7 +457,202 @@ sponsor募集！
 LTSはセキュリティサポートチームが決めているパッケージのみサポート。
 
 QAはほとんど判らず...orz
+
+--->なんか気になるのが、発表者のやる気のなさ。これはスタイルなのか？
+
+*Debian Contributors_one_year_later.webm
+
+https://contributors.debian.org/
+ここのことね。使い方のデモと、現状の機能、しくみ、ソースの説明。
+
+基本的にdatasourceとして登録したMLやWEBサービスから、
+見つかるe-mailアドレスからリストを作る。
+
+いつの間にやら、
+https://contributors.debian.org/contributor/nozzy123nozzy-guest%40alioth
+に載っていた...bugreportするだけでも載るようだ。
+
+ほぼ、全自動で登録されるとのこと。もちろん、次の年にはクリアされるので、
+活動やめちゃった人は取り除かれる。
+
+データソースは：
+https://contributors.debian.org/sources/
+が利用される。
+
+ソースコード：
+http://anonscm.debian.org/cgit/nm/dc.git/
+
+develop用のwiki
+https://wiki.debian.org/Teams/FrontDesk/DcSiteDevel
+
+バグレポ：
+https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=nm.debian.org;dist=unstable
+
+おおー、datasource追加のデモも行われた。
+（例：debconfのページ使ってた）
  
+Q.A.
+
+ Debian SecrityチームはcloseのMLを使っているが、どうやってcontributionを
+確認してるのか？
+--->CVE list commitsから取ってる。
+
+ MIAはどうすんのさ？
+
+あー、QAほとんどわからず。
+
+※しかしまー、Asheesh Laroiaは老けたのう。どうしたんだ？？
+
+* MIA team BOF
+
+ MIAの候補者に対しては、手動の手段でメンテナと連絡とるそうな。
+
+　MIAとみなす条件と解除の条件が紹介された。
+
+　ところで、皆MIAをミアといってる...
+
+　基本的にQAでは
+
+　　-どう正確にMIAを判定するかという事がいくつか。
+ 　-MIAになっちゃったパッケージはteamメンテにすれば？とかのアイデアが出た。
+   
+* Lightning Talks
+
+1st 
+videoが途中開始だ...orz
+http://www.pclob.gov/
+の件？
+途中でタイムアップ
+
+2nd 
+FireFoxOSの紹介ですな。
+
+3rd
+Engaging non-technical Users:
+ Adventures in Random Meetups Usigng meetup.com
+もうタイトルそのまんまの発表。
+Technicalじゃない人に専門用語を使わずにどうやって
+凄さをわかってもらうかで僅かな時間でヒント募集。
+
+4th
+Snowdrift.coop: Hacking the Economics of FLO
+https://snowdrift.coop/
+の件。
+ちなみにFLOとは、Free/Libre/Openの意味。
+
+https://snowdrift.coop/p/snowdrift/w/intro
+の説明。
+Snowdrift diliemma
+-->誰もやらなきゃ何も進まない、自分がやると一人でやるはめに。
+こちらを解決するためのアイデアについてサイトらしい。
+よーわからんのう。
+
+5th
+Bit from Asheesh
+よーわからん??
+
+6th 
+最近のmini debconf　BCN 2014の件
+と将来のmini debconfの宣伝。
+
+Debian womenの方が紹介され、
+160名の参加者のうち約35%が女性だったとのこと。
+
+7th 
+DNSCryptの件
+http://dnscrypt.org/
+resolverのrecursive dns queryの通信をproxy使って強化する。
+そうしないと、
+ Kaminsky Vulnerability
+でcache poisoningされちゃうかもよ。
+
+windows/openwrt/のバイナリも用意。
+
+8th
+Configuration Management by Botnet
+sshを使ったbotnetをつくれば、サーバーマネジメントは楽じゃん？
+というアイデアの説明。そのうち見せるよとのこと。
+
+9th
+Free Software social networking
+http://noosfero.org/
+の宣伝か？
+みると、AGPLなソーシャルメディアプラットフォームのようだ。
+日本でも採用事例（world museum project）があるようだ。
+調べると：http://sns.hiroba.sist.chukyo-u.ac.jp/worldmuseum/%E3%83%AF%E3%83%BC%E3%83%AB%E3%83%89%E3%83%9F%E3%83%A5%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%A0
+だった。確かに、noosferoのマークあり。
+
+10th 
+dconf in Git $HOME
+dconfとはGNOME3のgconfのこと。
+
+dconfをgitで管理しょうぜとのこと。
+
+11th
+find & imporove some bottleneck in Debian project.
+やまねさんの発表。0:43:14あたりから。
+ftpのnew queueの停滞を、debian contributorであるていど
+カバーしようぜという内容。debian contributorらで、
+前段レビューかけて、ftpmasterへ引き渡し。ftpmasterはGo/Nogoを判断するだけ。
+これで、処理をパラレル化できるので劇的に早いし、
+将来にdebianのftpmaster候補をふやすのにもちょうど良いという内容。
+ 
+12th
+How not to delete all your importnt files.
+
+safe-rmの紹介
+
+apt-get install safe-rm
+
+例がひどい。
+rm -rf /usr/lib/junk
+をtypoしちゃって、
+rm -rf /usr/lib /junk
+ああ、絶叫ですよね。
+
+なるほど、safe-rmはブラックリスト化されたディレクトリを消去の候補からはずすコマンド。
+
+13th
+おお、zackの発表だ。タイトルわからん。
+www.non-free.orgの提案。contrib,non-freeだけ集めたリポジトリに分けようぜ
+という内容。こうすれば、apt/sources.listのトップにcontrib non-freeとか
+書かなくてすむ。
+
+これは、freeかnon-freeかについてきちんと分けることができ、free softwareとは
+何かを啓蒙できるとのこと。いまだと一緒なので、ユーザにアピールが薄い。
+
+詳しくは、http://www.non-free.org/
+
+14th　
+Maintaining packages you don't understand.
+
+結構会場に上のタイトルのような事をしている人がいた。
+
+講師の例のご披露。
+  - git-remote-bzr
+  - qemu
+  - u-boot
+  - ltsp
+  - simple-cdd
+
+15th
+How can I contribute to Debian?
+lucusが120秒でやった。
+どうやって初心者がdebianに貢献するかの件
+how-can-i-helpコマンドの件。
+packaging-tutorialの紹介
+https://wiki.debian.org/Teamsの紹介
+
+*QA Linus_Torvalds
+
+linusが来て、QAに応じる会。
+くそう、youtubeにも動画上がってるが、字幕機能がないのう。
+質問者が一列にならんで一人１質問していった。
+
+　- linusの回答で結構汚い表現がでたので、スタッフが指摘するという場面があった。
+  - 
+10分程度で視聴ギブアップ。
+
 
 Debconf14tips
 
@@ -511,6 +721,7 @@ opensslとの昨今の相性が悪いかと思われ。
 ---->結局paypal側の問題っぽいなー。
 で合わせてわかったこととして、vultrって、IPレンジのwhoisがひどい...
 これはまずいと思うので、vultrへ連絡しよう！
+--->
 
 --- 電源
 
@@ -532,5 +743,74 @@ done
 
 これでデバイスつなぐと認識できるようになる。
 
+--- usbmuxd
+おおー、9/8に自分のパッチが全部取り込まれたみたいだのう。
+See. usbmuxdのchangelog。
+
+----------さーて、Debian Announceをみるかー
+
+DPNはないらしい。が、FSFがhttp://h-node.orgの情報について
+mainのみのDebianで動くかどうか一緒にやろうぜという連絡をしてきた。
+--->結構便利かな。特にUSBドングル系
+https://lists.debian.org/debian-news/2014/msg00012.html
+
+debian-announceネタ
+
+Debconf14終わった件：
+https://lists.debian.org/debian-announce/2014/msg00007.html
+参加者は300人らしい。
+Debconf15はHeidelberg,ドイツで2015/8/15-22で開くとのこと。
+Debcampはいつもどおり、前の週予定。
+
+debian-devel-announceネタ
+https://lists.debian.org/debian-devel-announce/2014/08/msg00007.html
+以降のネタ
+
+https://rtc.debian.org/
+のエンハンスをGSoCで学生さんがやったとのこと。
+詳しくは、
+http://julianalouback.com/
+のブログを見るとわかる。
+Debconf14の発表は
+https://summit.debconf.org/debconf14/meeting/123/looking-back-on-a-debian-summer-of-code/
+の１つ。
+
+https://lists.debian.org/debian-devel-announce/2014/08/msg00008.html
+incoming.debian.orgが公開状態となった。IP reachableであれば、どこからでも
+アクセス可能。かつ、builddにて使われるアーカイブは、
+http://incoming.debian.org/debian-buildd/以下に配置されたそうな。
+
+bit from DPL
+https://lists.debian.org/debian-devel-announce/2014/08/msg00010.html
+
+1. USの登録商標としてDebianロゴが登録されたそうな。
+　　http://tdr.uspto.gov/search.action?sn=86037470
+　　で閲覧可能。
+
+2. はじめてBitCoinによる寄付を受けたとのこと。ただ、この手の貨幣を将来どうしていくか
+　　について意見を募集中とのこと。
+
+3.　検索エンジンのDuckDuckGoからDebianへレベニューシェアの収入が入ったとのこと。
+　　月当たりになおすと、$152。Debianパッケージのiceweaselに、検索エンジンの候補として
+　　搭載した件でのレベニューシェア。
+
+　　なお、DuckDuckGoの特徴は、プライバシーを守った形で検索が可能という検索エンジン。
+　　最近では、appleのsafariにも詰むとかの噂がある。
 
 
+他
+　 2つ新しいアーキテクチャがDebian archiveに8/27に追加されました。
+　　Arm64/ppc64elの２つ。BugFillされる予定だからよろしくとのこと。
+　　https://lists.debian.org/debian-devel-announce/2014/08/msg00012.html
+
+　 8/31にてarm64ポート用にARM DS-5 Development StudioのDebian版の提供が行われた模様。
+　　利用はタダ。 http://ds.arm.com/debianからDL可能。
+
+　 2048bit未満のキーはDebianのキーリングから2014/12/31以降消去するとのこと。
+
+　 2014/9/17にDebian Policy 3.9.6.0がリリース。
+
+
+
+
+　　
