@@ -1,0 +1,20 @@
+vultrでもう一個debian立ち上げて、openVPN使ってSSL-vpnを
+つくってみるかぁ。
+
+
+-------------bluez& pulse
+
+何時からかはわからんが、bluez+pluseaudioで動かん。
+bluezはDRC-BT30（headphone)に接続するのだが、
+pulseaudio側で認識していない。
+
+--->調べ方：
+pactl list 
+にて。
+
+bluez バージョン: 5.23-1
+pulseaudio バージョン: 5.0-6+b1
+
+おそらくだが、systemd/dbusの類でミスってる気がする...
+
+
