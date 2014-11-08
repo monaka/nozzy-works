@@ -48,6 +48,12 @@ iptables -A OUTPUT -p tcp --dst 198.27.80.17 --dport 8010 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dst 72.233.93.160 --dport 10007 --syn -j ACCEPT
 # for animNfo
 iptables -A OUTPUT -p tcp --dst 69.60.255.236 --dport 8888 --syn -j ACCEPT
+# for radio hbr1.com
+iptables -A OUTPUT -p tcp --dst 93.94.83.52 --dport 19800 --syn -j ACCEPT
+# for radio paradice
+iptables -A OUTPUT -p tcp --dst 8.25.37.138 --dport 9000 --syn -j ACCEPT
+# for radio GFM
+iptables -A OUTPUT -p tcp --dst 195.138.247.90 --dport 8000 --syn -j ACCEPT
 # for irc
 iptables -A OUTPUT -p tcp --dport 6667 --syn -j ACCEPT
 # for git 
@@ -115,6 +121,7 @@ if [ "X${ppp_enable}X" != "XX" ]; then
 	iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE
 	iptables -A FORWARD -i br0 -o ppp0 -j ACCEPT
 	iptables -A FORWARD -i ppp0 -o br0 -j ACCEPT
+	iptables -A FORWARD -j LOG --log-prefix '[Drop forward]'
 fi
 
 service netfilter-persistent save

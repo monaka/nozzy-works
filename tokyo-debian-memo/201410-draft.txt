@@ -17,4 +17,399 @@ pulseaudio バージョン: 5.0-6+b1
 
 おそらくだが、systemd/dbusの類でミスってる気がする...
 
+--------- libvirt-daemon-system
+
+ebtoolsというiptablesもどき？が入った。なんじゃこりゃ？
+
+--------- iptables -t nat 系がうまく動かないので、調べた
+
+結局
+sudo sysctl -p net.ipv4.ip_forward=1
+してないのが原因だった。どこで消えた？
+
+--------- manpages-ja
+
+pod4manではないらしい。
+
+--------- systemdctl
+
+pagerの仕組みがよくわからんので、ソース落として調べた。
+　--> 
+    優先度MAX: PAGER/SYSTEMD_PAGERを起動
+　　2nd : /usr/bin/pagerコマンドを起動
+   3rd：  /bin/lessコマンドを起動
+   4th:  /bin/moreコマンドを実行
+　 5th: そのままstdoutへ出しちゃう（splice systemcall使う）　
+  
+--------- centos
+
+ yumの代わりにrepoquery -lにて、パッケージの中身の一覧を見ることが可能。
+
+
+----------apacheのバグおいかけ。
+
+検証方法としては、もうdebugシンボルつけてgdbがよさげ。
+
+ apacheのpreforkサーバーの場合、
+
+　1. child_mainからおっかけがよさげ。
+
+ 2. preforkの場合、accept後は、
+　　　httpd-2.2.27/server/mpm/prefork/prefork.c
+　　　のchild_mainの
+　　　665         current_conn = ap_run_create_connection(ptrans, ap_server_conf, csd     , my_child_num, sbh, bucket_alloc);
+ 666         if (current_conn) {
+ 667             ap_process_connection(current_conn, csd);
+ 668             ap_lingering_close(current_conn);
+ 669         }
+　　　のap_process_connectionで処理される。
+
+　3. ap_process_connection（httpd-2.2.27/server/connection.c)では、
+　　　rc = ap_run_pre_connection(c, csd);
+　　　　---> ap_run_pre_connection (c=0x7fc844fb6688, csd=0x7fc844fb6498)
+    at /root/rpmbuild/BUILD/httpd-2.2.27/server/connection.c:44
+44      AP_IMPLEMENT_HOOK_RUN_ALL(int,pre_connection,(conn_rec *c, void *csd),(c, csd),OK,DECLINED)なので、MACROで実装されてる。debuggerでおっかけると
+　　　　　各モジュールのpre_handlerを片っ端から呼び出す
+
+    　
+    が呼ばれた後に
+
+　3. ap_run_process_connection(httpd/server/connection.c)の呼び出し
+　　　--> AP_IMPLEMENT_HOOK_RUN_FIRST()
+    ---> http_core.cのap_process_http_connection()がまず真っ先に呼び出される。
+ここで、
+ 183     while ((r = ap_read_request(c)) != NULL) {
+184
+185         c->keepalive = AP_CONN_UNKNOWN;
+186         /* process the request if it was read without error */
+187
+188         ap_update_child_status(c->sbh, SERVER_BUSY_WRITE, r);
+189         if (r->status == HTTP_OK)
+190             ap_process_request(r);
+191
+192         if (ap_extended_status)
+193             ap_increment_counts(c->sbh, r);
+194
+195         if (c->keepalive != AP_CONN_KEEPALIVE || c->aborted)
+196             break;
+197
+198         ap_update_child_status(c->sbh, SERVER_BUSY_KEEPALIVE, r);
+199         apr_pool_destroy(r->pool);
+200
+201         if (ap_graceful_stop_signalled())
+202             break;
+203
+204         if (!csd) {
+205             csd = ap_get_module_config(c->conn_config, &core_module);
+206         }
+207         apr_socket_opt_set(csd, APR_INCOMPLETE_READ, 1);
+208         apr_socket_timeout_set(csd, c->base_server->keep_alive_timeout);
+209         /* Go straight to select() to wait for the next request */
+210     }
+というreadingのループに入る。
+
+ところで、ap_read_request()(httpd-2.2.27/server/protocol.c)を見ると、
+r->server->limit_req_lineというのがあり、どうもある一定以上の大きさを
+持つ行数のデータはうまく扱えないようだ。
+
+　read_request_line()一発で、blank lineまでの要求を吸い出す。
+
+httpd-2.2.27/modules/http/http_request.cのap_process_request()で
+http request headerに基づき、処理をする。
+
+で、実際に各handerが呼び出されるのは、
+ httpd-2.2.27/server/config.cのap_invoke_handler()にて呼びだされる。
+この関数の中のap_run_handler(r)にて、各モジュールのhandlerが呼び出されるのだが、
+proxy_ajpの場合、mod_proxy.cのproxy_hander()が呼び出される。
+
+で、mod_proxy.cの糞長いstatic int proxy_handler(request_rec *r)の中の
+1036         ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->server,
+1037                      "Running scheme %s handler (attempt %d)",
+1038                      scheme, attempts);
+1039         access_status = proxy_run_scheme_handler(r, worker, conf,
+1040                                                  url, NULL, 0);
+1041         if (access_status == OK)
+1042             break;
+のproxy_run_scheme_handlerで、mod_proxy_ajpが呼び出され、
+(gdb) s
+proxy_ajp_handler (r=0x7fc844fc6518, worker=0x7fc844a20800,
+    conf=0x7fc844a200d8,
+    url=0x7fc844fc83b6 "ajp://localhost:8009/XXXX/echoback?14",
+    proxyname=0x0, proxyport=0)
+    at /root/rpmbuild/BUILD/httpd-2.2.27/modules/proxy/mod_proxy_ajp.c:693
+693     {
+となる。
+
+
+apacheは
+　Step 1. connectionを受付
+  Step 2. ap_process_connectionにて、過去の経歴おかまいなしに、各モジュールのpre_handlerを
+　　　　　　片っ端から呼び出す。つまり、connection1本あたり、モジュール数分のpre_handlerが
+　　　　　　　逐一呼び出される設計。
+
+  Step 3. 
+
+　ap_run_pre_connection()はどこで宣言されてんのかよくわからんが、
+中は単純で、_hookという変数に格納されているハンドラを片っ端から呼び出すだけのようだ。
+
+ ちなみに、
+   p _hooks
+$4 = {link_create_connection = 0x7fc844ad5210,
+  link_process_connection = 0x7fc844ad6110,
+  link_pre_connection = 0x7fc844aab1d0}
+とのこと。
+ 
+ 
+
+バグ：
+
+ proxy_ajpにて、POSTのデータに3kbytesとか突っ込んで
+負荷かけると何故か電文が途中でランダムに切れる。
+
+　再現：
+　　　curl -0 -k -s --data-binary @encode.dat -H 'Content-Type: application/octet-stream' -o echoback.$idx.dat http://xxx.xxx.xxx.xx/XXXX/echoback'?'$idx
+
+とか。
+
+　ところどころランダムに3744bytes(Complete),2735,1288とかで切れちゃう。
+
+　loglevel debug
+
+でerror_logに詳細が(ap_log, DEBUGとか)のメッセージが出てくるが、みると、
+3744bytes -->EOSが返却されてる。
+2735bytes -->EOSがない
+1288bytes -->EOSがない
+
+という謎現象。また、tcpdumpとかでサーバー上のethernet電文をみても、
+最後までちぎれることなく電文は送られているにもかかわらず、apache側
+でちぎってしまう。
+
+10/7時点の仮説では、そもそもproxy_ajpが電文が途中で切れちゃうことについて
+なんら対策が無いのでは？という気がしてならない。
+
+また同時にわかったこととして、mod_ext_filterは、電文が途中で切れるたびに
+うっかりhandlerを起動しちゃうクセがあるようだ。
+
+※なお、apache2.2系列には、mod_ext_filterのinput-modeにて、
+　　http://mail-archives.apache.org/mod_mbox/httpd-users/201211.mbox/%3CCAKUrXK6EG=+itWzS=U1-=eu14A71bs1VCvBK948amM8UBeR_fQ@mail.gmail.com%3E
+で示される実装上のバグがある。
+
+　つまり、EOS来た後、なぜか不完全なctxを持つ呼び出しがかかることがあるので、
+その場合は、新たにeosを作って送り返すという処理が必要。http_coreでも
+同様の処理を当たり前のように入れていた...(いったいどんな仕組みでそうなるのか...orz)
+
+
+--------- vim
+
+1. netrwからの切り替えは、
+  :buffers!
+ でhidden-bufferの一覧をもって切り替えるのがよさげ。
+
+2. vimの色合いが暗くて見づらい場合は、
+   :colorscheme desert
+   とかよいかも。どんなcolorschemeが使えるかは、
+　　:view $VIMRUNTIME/colors/
+   で眺めることをおすすめ。
+
+3. commandヒストリは
+  : + CTRL-F
+  でヒストリ使うのがらく。で、vimのカーソル移動、編集で編集した結果をくりかえしとか便利。
+
+4. windows操作で知るべきは、:onlyで現行のwindowのみにできる。
+
+----------Libreoffice
+
+どうも、upstreamのバージョン：
+
+ Libreoffice安定版：
+
+　　Linux版： libreoffice-4.2.6.3
+             libreoffice-dictionaries-4.2.6.3
+             libreoffice-help-4.2.6.3
+             libreoffice-translations-4.2.6.3
+
+ https://ja.libreoffice.org/download/libreoffice-fresh/
+ LibreOffice最新版：
+
+　　Linux版： libreoffice-4.3.2.2
+             libreoffice-dictionaries-4.3.2.2
+             libreoffice-help-4.3.2.2
+             libreoffice-translations-4.3.2.2
+
+Debianは、
+
+  libreoffice-4.3.3-rc2-git20141011版(arm/x86/x86-64)
+  libreoffice-4.3.2-2: arm64 mips
+ 
+
+がsid入りしてる。
+
+なお、
+
+ 10/22のjessie(testing)は、
+    4.3.2-2 (arm/x86/x86-64)
+ wheezy(stable)は、
+    3.5.4 (arm32,64/x86/x86-64)
+　
+ experimental版は、
+　　libreoffice_4.4.0-alpha1-1
+のようだ？(
+https://lists.debian.org/debian-openoffice/2014/10/threads.html
+の結果によると。また、
+http://anonscm.debian.org/cgit/pkg-openoffice/libreoffice.git/log/?h=debian-experimental-4.4
+http://anonscm.debian.org/cgit/pkg-openoffice/libreoffice.git/refs/
+を見るとつい最近のアップデートか？）
+
+Debianでは、チームメンテが行われており、
+Debian LibreOffice Maintainersという名前。
+連絡先：debian-openoffice@lists.debian.org
+
+https://lists.debian.org/debian-openoffice/
+でやりとりが確認可能。
+また、
+https://lists.debian.org/debian-openoffice/2014/10/threads.html
+
+sidのbuglistは、
+
+https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libreoffice;dist=unstable
+で閲覧可能。もちろん、Debianであっても、libreOfficeは大量のパッケージに
+分かれているため、こちらのリンクで、関連パッケージとして出ているパッケージが
+全てのBUG情報。
+
+debian側のパッケージ管理は
+http://anonscm.debian.org/cgit/pkg-openoffice/libreoffice.git
+
+$(SRC)/debian
+の中身を見ると面白いのだが、
+ 
+debian/controlファイルを数々のcontrol.XXX.inファイルから一気に生成
+できるようにしている。なお、%BUILD_DEPS_INDEP%#などの数々のマクロを
+一気に変換してcontrolファイルをメンテ。
+
+ビルド時のconfigureは、
+CONFIGURE_FLAGS= \
+                --with-vendor='$(OOO_VENDOR)' \
+                --prefix=/usr --mandir=/usr/share/man \
+                --docdir=/usr/share/doc/libreoffice \
+                --enable-lockdown \
+                --libdir=/usr/lib \
+                --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+                --disable-online-update \
+                --disable-fetch-external \
+                --without-fonts \
+                --without-myspell-dicts \
+                --disable-dependency-tracking \
+                --enable-hardlink-deliver \
+                --with-branding=$(CURDIR)/debian/branding
+
+まずこれをベースにして、
+dpkg-devで梱包されている
+/usr/share/dpkg/*.mk
+で定義される様々な変数に基づき、configureオプションが追加されていく。
+
+これに、rulesで判定されてビルドがどんどん行われる。
+rulesは最近のdhな書き方ではない。
+debian/compatだと5(compat level 5)だそうな。
+
+debian/README.Debian-source
+ごは、すげえカスタムっぷりだ。
+tar-ballモードというのと、
+vcsモード（gitだけどね）というのがあり、
+それぞれ、controlファイル生成からやるというすごい内容。
+
+ひやああ、さすがDFSG Freeにこだわるのう。openoffice由来のソースからは
+DFSG Freeでないものを根こそぎ抜いてる...
+
+dpkg-reconfigure locales
+
+とかはあんまし馴染みないかもな。
+
+debian/patches/以下の内容サマリ
+
+aarch64.diff ---> aarch64用パッチ。中身はunoオブジェクトの取り扱いを行うコードがプログラムに追加。
+(unoについては、Universal Network Objectとのこと。まあ、昔のCORBAとかCOM(DCOM?)とかの
+ アーキテクチャを搭載するために定義されたObjectモデル）
+　https://wiki.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Introduction　
+要はLibreofficeの内部のオブジェクトの形式。
+
+　--> 驚きなのはaarch64対応を自力実装してる...orz
+
+aotcompile-256M-default.diff
+--->わざわざビルドマシンのメインメモリが2GB/1GBでJavaのコンパイルのオプションを変更している
+のを取り除き、
+MAX_CLASSES_PER_JAR = 256
+MAX_BYTES_PER_JAR = 262144
+固定にするパッチ。
+
+config-sub-guess-update.diff 
+--->
+システムがglibc/ulibc/dietlibcであるかを検出して適切なLIBC変数を設定
+古いシステム（Nextとか、hp300とか、386BSD等...)の判定コードをまるごと削除。
+#様々な他システム向けの改造もあるが、debianシステムに関わりありそうなものだけ記載
+
+ebian-hardened-buildflags-CPPFLAGS.diff
+-->Hardenningを行う。
+https://wiki.debian.org/Hardening
+※実際には、dpkg-buildflags --get CPPFLAGSで得られるCPPFLAGSを設定
+
+debian-opt.diff
+--> -O[0-3]がCFLAGSに含まれる行のみCDEFAULTOPTに設定。
+※何やってるかわからん。
+
+sensible-lomua.diff
+---> デスクトップ環境に合わせるためのパッチ。MUAを適切に設定。
+sensible-browser.diff
+--->デスクトップ環境に合わせるためのパッチ。ブラウザを適切に設定。
+
+
+split-evoab.diff
+----> gnomeのMUAであるevolutionのアドレス帳連携のドライバで
+　　　EVOAB2を有効にするパッチ。
+
+earch-usr-share-for-images.diff
+---> 画像のサーチパスの検索順番をdebianにあわせるべく変更。
+
+help-msg-add-package-info.diff
+---> ヘルプファイルがインストールされていない場合に出るエラーメッセージに、
+　　　libreoffice-help-en-usパッケージ、あるいは、
+　　　libreoffice-help-<language-code>を入れてねと促すメッセージを追加
+
+debian-debug.diff
+----> -g1をgccのデバッグオプションとして利用し、デバッグシンボルのサイズを減らす。
+
+gcj-safe-jni-h-include.diff
+----> gcjで、jni.hがシステムにあわせてincludeされるように変更。
+
+
+mention-java-common-package.diff
+---> Javaに関する問題があった場合、libreoffice-java-commonパッケージを入れるように
+　　　促すメッセージを追加。
+
+jurt-soffice-location.diff
+---> sofficeを指定された場合に、debianでのインストール位置を正確に返却
+
+reportdesign-mention-package.diff
+---> Oracle Report Builder の機能が必要な場合、libreoffice-report-builderを入れてくれと促す。
+
+system-coinmp.diff
+---> coinmp(COmputational Infrastructire for Operations Research CON-OR https://projects.coin-or.org/)
+のライブラリに対応する。
+
+
+libreoffice 4.4.0-alpha1の入れ方
+
+https://wiki.debian.org/DebianExperimental
+を参考に、
+deb http://ftp.jp.debian.org/debian/ experimental main contrib non-free
+deb-src http://ftp.jp.debian.org/debian/ experimental main contrib non-free
+を/etc/apt/source.listにつけ加え、
+
+sudo aptitude -t experimental install libreoffice
+を２度実行（１度めは既存のlibreoffice一式が削除され、２度めでlibreoffice 4.4.0が導入される）
+
+まあ、動いているようには見える。メニューは日本語ではない模様。
+
+
+
+
 

@@ -1,0 +1,145 @@
+---centos 6.5
+
+debuginfoに関する記述が、redhat公式ドキュメントにあった。
+https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Developer_Guide/debugging.html
+
+まあ、buildidとかdebug-installとかの話。
+
+あと、debuginfoインストールには、専用コマンドがあり、usageは次のとおり。
+sudo debuginfo-install --nogpgcheck --enablerepo debug apr-1.3.9-5.el6_2.x86_64 apr-util-1.3.9-3.el6_0.1.x86_64 zlib-1.2.3-29.el6.x86_64
+
+笑うのは、gdb ./prefork/httpdとかして、b ap_get_brigade ,run -X -d /etc/httpd
+とかすると、
+Missing separate debuginfos, use: debuginfo-install apr-1.3.9-5.el6_2.x86_64 apr-util-1.3.9-3.el6_0.1.x86_64 bzip2-libs-1.0.5-7.el6_0.x86_64 cyrus-sasl-lib-2.1.23-13.el6_3.1.x86_64 db4-4.7.25-18.el6_4.x86_64 expat-2.0.1-11.el6_2.x86_64 glibc-2.12-1.132.el6_5.4.x86_64 gmp-4.3.1-7.el6_2.2.x86_64 httpd-2.2.15-31.el6.centos.x86_64 keyutils-libs-1.4-4.el6.x86_64 krb5-libs-1.10.3-15.el6_5.1.x86_64 libcom_err-1.41.12-18.el6_5.1.x86_64 libselinux-2.0.94-5.3.el6_4.1.x86_64 libuuid-2.17.2-12.14.el6_5.x86_64 libxml2-2.7.6-14.el6_5.2.x86_64 mod_ssl-2.2.15-31.el6.centos.x86_64 nspr-4.10.6-1.el6_5.x86_64 nss-3.16.1-7.el6_5.x86_64 nss-softokn-freebl-3.14.3-12.el6_5.x86_64 nss-util-3.16.1-2.el6_5.x86_64 openldap-2.4.23-34.el6_5.1.x86_64 openssl-1.0.1e-30.el6_5.2.x86_64 pcre-7.8-6.el6.x86_64 php-5.3.3-27.el6_5.2.x86_64 zlib-1.2.3-29.el6.x86_64
+とかかなり親切丁寧なエラーメッセージが出る。
+
+あと、debug-infoって、依存関係があるので、注意。
+================================================================================
+ Package                            Arch    Version              Repository
+                                                                           Size
+================================================================================
+Installing:
+ apr-debuginfo                      x86_64  1.3.9-5.el6_2        debug    374 k
+ apr-util-debuginfo                 x86_64  1.3.9-3.el6_0.1      debug    343 k
+ db4-debuginfo                      x86_64  4.7.25-18.el6_4      debug    6.8 M
+ expat-debuginfo                    x86_64  2.0.1-11.el6_2       debug    171 k
+ glibc-debuginfo                    x86_64  2.12-1.132.el6_5.4   debug    8.7 M
+ util-linux-ng-debuginfo            x86_64  2.17.2-12.14.el6_5   debug    1.6 M
+ yum-plugin-auto-update-debug-info  noarch  1.1.30-17.el6_5      updates   22 k
+ zlib-debuginfo                     x86_64  1.2.3-29.el6         debug    196 k
+Installing for dependencies:
+ glibc-debuginfo-common             x86_64  2.12-1.132.el6_5.4   debug    8.3 M
+
+Transaction Summary
+================================================================================
+な感じででてくる。
+
+-------------やってるさなか----------------------
+(gdb) source .gdbinit 
+(gdb) b ap_get_brigade
+Breakpoint 1 at 0x36940: file /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/util_filter.c, line 488.
+(gdb) run -X -d /etc/httpd
+Starting program: /home/nojima/rpmbuild/BUILD/httpd-2.2.15/prefork/httpd -X -d /etc/httpd
+[Thread debugging using libthread_db enabled]
+httpd: Could not reliably determine the server's fully qualified domain name, using centos65-01.local for ServerName
+
+Breakpoint 1, ap_get_brigade (next=0x7ffff851ff40, bb=0x7ffff852cbc0, 
+    mode=AP_MODE_GETLINE, block=APR_BLOCK_READ, readbytes=0)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/util_filter.c:488
+488	    if (next) {
+Missing separate debuginfos, use: debuginfo-install bzip2-libs-1.0.5-7.el6_0.x86_64 cyrus-sasl-lib-2.1.23-13.el6_3.1.x86_64 gmp-4.3.1-7.el6_2.2.x86_64 httpd-2.2.15-31.el6.centos.x86_64 keyutils-libs-1.4-4.el6.x86_64 krb5-libs-1.10.3-15.el6_5.1.x86_64 libcom_err-1.41.12-18.el6_5.1.x86_64 libcurl-7.19.7-37.el6_5.3.x86_64 libidn-1.18-2.el6.x86_64 libselinux-2.0.94-5.3.el6_4.1.x86_64 libssh2-1.4.2-1.el6.x86_64 libxml2-2.7.6-14.el6_5.2.x86_64 mod_ssl-2.2.15-31.el6.centos.x86_64 nspr-4.10.6-1.el6_5.x86_64 nss-3.16.1-7.el6_5.x86_64 nss-softokn-freebl-3.14.3-12.el6_5.x86_64 nss-util-3.16.1-2.el6_5.x86_64 openldap-2.4.23-34.el6_5.1.x86_64 openssl-1.0.1e-30.el6_5.2.x86_64 pcre-7.8-6.el6.x86_64 php-5.3.3-27.el6_5.2.x86_64 php-common-5.3.3-27.el6_5.2.x86_64
+(gdb) dump_filters next
+log_input_output(0x7ffff851ff40): ctx=0x0, r=0x0, c=0x7ffff851f6f8
+core_in(0x7ffff851ffb0): ctx=0x7ffff851ff90, r=0x0, c=0x7ffff851f6f8
+(gdb) bt
+#0  ap_get_brigade (next=0x7ffff851ff40, bb=0x7ffff852cbc0, 
+    mode=AP_MODE_GETLINE, block=APR_BLOCK_READ, readbytes=0)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/util_filter.c:488
+#1  0x00007ffff7fc9df6 in ap_rgetline_core (s=0x7ffff852b598, n=8192, 
+    read=0x7fffffffe1b8, r=0x7ffff852b568, fold=0, bb=0x7ffff852cbc0)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/protocol.c:231
+#2  0x00007ffff7fca85e in read_request_line (conn=0x7ffff851f6f8)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/protocol.c:596
+#3  ap_read_request (conn=0x7ffff851f6f8)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/protocol.c:913
+#4  0x00007ffff7fe2a00 in ap_process_http_connection (c=0x7ffff851f6f8)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/modules/http/http_core.c:183
+#5  0x00007ffff7fde7a8 in ap_run_process_connection (c=0x7ffff851f6f8)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/connection.c:43
+#6  0x00007ffff7feaa67 in child_main (child_num_arg=<value optimized out>)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/mpm/prefork/prefork.c:667
+#7  0x00007ffff7fead36 in make_child (s=0x7ffff8212860, slot=0)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/mpm/prefork/prefork.c:707
+#8  0x00007ffff7feb383 in ap_mpm_run (_pconf=<value optimized out>, 
+    plog=<value optimized out>, s=<value optimized out>)
+    at /home/nojima/rpmbuild/BUILD/httpd-2.2.15/server/mpm/prefork/prefork.c:983---Type <return> to continue, or q <return> to quit---q
+Quit
+(gdb) 
+-------------やってるさなか----------------------
+
+なんと、ap_get_brigadeは--> logio --> core_in
+と上から順番に起動された。
+ap_rgetline_coreが大本。こちらから、ap_get_brigadeがinput-filterチェーンで
+呼びだされていく。
+
+server/connection.cのAP_IMPLEMENT_HOOK_RUN_FIRST(int,process_connection,(conn_rec *c),(c),DECLINED)
+-->
+ap_process_http_connection
+-->
+ap_read_request
+-->
+ap_get_mime_headers_core
+-->
+ap_rgetline_core
+--> input-filtersへ処理が移る。
+
+
+---------->
+fedoraやってみるかー。
+
+他を知ることも必要だしなー。
+
+むほ。Live/ARM/spinというのがあるなぁ。
+
+spin:
+ http://spins.fedoraproject.org
+  ---> Debianでいうところのblendsか。
+
+もちろん、netinsallイメージもあるみたいだ。
+
+クラウド版はqcow2と、rawイメージ配ってるなぁ。
+
+うは。secondary architechureとして、PPC64/s390がある。
+
+さすが、企業！WEBページの日本語化度合いが半端ないぜ。
+
+情報源：
+wiki
+http://fedoraproject.org/wiki/Fedora_Project_Wiki
+日本語：
+https://fedoraproject.org/wiki/Fedora_Project_Wiki/ja
+
+フォーラムがあるらしい：
+http://fedoraforum.org/
+
+https://fedoraproject.org/wiki/Fedora_Release_Life_Cycle?rd=Releases/Schedule
+まぢか。6ヶ月ごとにアップグレードだそうな。で、13ヶ月ごとにパッケージのupdate。
+
+現在利用可能なのは：Release 20/絶賛開発中ということで、Release 21。
+そろそろリリース間近？のようだ。
+
+詳しくは。
+https://fedoraproject.org/wiki/Releases/21/Schedule
+http://fedoraproject.org/ja/get-prerelease
+
+なんてこった。docker版もあるのか...
+
+むー、Fedora21はServer版/Workstation版/CLOUD版があるのかー。
+spin/arm/dockerがある。
+
+バグは：
+https://bugzilla.redhat.com/
+でほうこくしろとのこと。
+
+なんかしらんが、debian-sidのwgetにて、ファイル名が長い場合
+の表示が、1文字ごとスクロールしてて面白い。
