@@ -93,6 +93,13 @@ ap_get_mime_headers_core
 ap_rgetline_core
 --> input-filtersへ処理が移る。
 
+うーん、input_filterの実装例でとてもわかり易い気がするのは、
+~/rpmbuild/BUILD/httpd-2.2.15/modules/experimental/mod_case_filter_in.c
+である気がする。
+※ memory-pool使ってない部分がある（しかもbuf=mallocしながらfreeしてない）、
+FLUSH backetハンドリングしてない、などツッコミどころは結構あるが。
+
+
 
 ---------->
 fedoraやってみるかー。
@@ -143,3 +150,106 @@ https://bugzilla.redhat.com/
 
 なんかしらんが、debian-sidのwgetにて、ファイル名が長い場合
 の表示が、1文字ごとスクロールしてて面白い。
+
+----------------------------
+
+tak形式のファイルはlibav-toolsでサポート済。
+また、CDとかをtak化されたファイルは、.cueファイルが付与されている場合、
+shnsplitとかで分割可能。
+http://www.commandlinefu.com/commands/view/2042/split-lossless-audio-ape-flac-wav-wv-by-cue-file
+
+apt-file search shnsplitすると、
+パッケージ shntool:                                      
+p   3.0.7-1.1                                                   testing,unstable                         500 
+
+パッケージ shntool:i386:
+p   3.0.7-1.1                                                   testing,unstable                         500
+とのことで、testing/unstableで入ったらしい。
+
+しかし、
+shnsplit -t '%n-%t' -f lovers.cue lovers.tak
+shnsplit: warning: failed to read data from input file using format: [tak]
+shnsplit:          + you may not have permission to read file: [Lovers.tak]
+shnsplit:          + arguments may be incorrect for decoder: [takc]
+shnsplit:          + verify that the decoder is installed and in your PATH
+shnsplit:          + this file may be unsupported, truncated or corrupt
+shnsplit: error: cannot continue due to error(s) shown above
+
+とのことで、takフォーマットを正しく認識できないっぽいぞ。
+
+http://etree.org/shnutils/shntool/
+
+みると、takはwin32バイナリのみのサポートだ。ああ残念。
+
+代わりに
+
+avconv -i lovers.tak -c:a libmp3lime -b 128k lovers.mp3
+で一旦全部mp3にコンバートして、
+mp3splt -a -c ./lovers.cue lovers.mp3
+とやったら、lovers.cueに格納されているトラック情報で、きちんと
+分割されて出てきた。
+
+---------------
+
+iOS8.0.Xになってさらに状況が悪化。
+
+まず、ideviceinstallerが動かなくなった件は、libimobiledevice4パッケージがgnutlsでsslを搭載されている為。libimobiledeviceのソースのdebian/rulesから、--disable-opensslを除くだけ（--enable-opensslとかやると、何故か、config.acが勘違いしてdisable-opensslとしてしまうようなので、削除が必要。）
+
+※注意：experimentalでもlibimobiledeviceが提供されており、ライブラリ名がlibimobiledevice5となっているので、こちらを落とさないように注意。
+
+ldd /usr/lib/x86_64-linux-gnu/libimobiledevice.so.4.0.1
+
+にて、無事libsslが利用され、libgnutlsとかが利用されてなければOK。
+
+で、無事にideviceinstaller -lは動作。
+
+ここで、ifuse version 1.1.2だと、--documentsに指定したidのマウントポイントが見つからず、
+ifuse version 1.1.3だとマウントできるが、マウントポイントの中身がからっぽ。
+さらに頭いたいことにidevicesyslogでつないでも何もエラーらしきものが表示されない。
+
+結局iproxy 8000 80でつないで、cadavor http://localhost:8000/で制御。
+
+知らんかったが、遂にupstream側がリリースタグ打ち込んだ。
+
+--------------------------
+fedora行ってみよう！とオモタが、他発表者と丸かぶりなので、archにしてみた。
+
+DVDイメージDLは
+https://www.archlinux.org/download/
+もちろん、ローリング・リリースといわれるだけあって、
+過去の経緯は↓
+https://www.archlinux.org/releng/releases/
+
+さすがにmaginetとか、torrentとか要らぬ心配しなきゃならんので、
+httpのミラーを使う。
+
+http://ftp.jaist.ac.jp/pub/Linux/ArchLinux/iso/2014.11.01/archlinux-2014.11.01-dual.iso
+まあ、こちらの環境でDL速度が10Mbpsぐらいだった。
+
+arch way
+というのが経典。
+https://wiki.archlinux.org/index.php/The_Arch_Way
+
+archはAURを使うことで現在Debianを上回る量のパッケージが使える。
+
+他のディストリとの比較の公式見解：
+https://wiki.archlinux.org/index.php/Arch_compared_to_other_distributions
+
+------------------------
+apacheの件やってたら、
+http://www.fmc-modeling.org/projects/apache
+が秀逸で、ここでFMCという概念を見つける。
+
+こいつの能力は以下の比較資料で一発でわかる感じ。
+--->
+http://www.fmc-modeling.org/fmc-and-uml
+
+自分のようなreverse-engineeringな人には、fmc記述がにあってるかも。
+なお、文献はドイツ語?
+See. http://www.fmc-modeling.org/books
+嘘だ：
+http://fmc-modeling.org/fmcbook/
+があった。wileyだけどな。
+
+
+

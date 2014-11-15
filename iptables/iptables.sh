@@ -54,6 +54,8 @@ iptables -A OUTPUT -p tcp --dst 93.94.83.52 --dport 19800 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dst 8.25.37.138 --dport 9000 --syn -j ACCEPT
 # for radio GFM
 iptables -A OUTPUT -p tcp --dst 195.138.247.90 --dport 8000 --syn -j ACCEPT
+# for absolute transe EURO
+iptables -A OUTPUT -p tcp --dst 205.164.62.15 --dport 7014 --syn -j ACCEPT
 # for irc
 iptables -A OUTPUT -p tcp --dport 6667 --syn -j ACCEPT
 # for git 
