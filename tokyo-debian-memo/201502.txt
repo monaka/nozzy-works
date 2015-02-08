@@ -395,3 +395,49 @@ env ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make clean
 
 131kbytes vs 20kbなので、何かうまくビルドできなかった？
 
+なんでこんなに大きさ違うのか？について考察。
+
+/prog/nooter/nook-hd/nook-hd-hdplus/distro-build/x-loader/ file x-load
+x-load: ELF 32-bit LSB executable, ARM, version 1, statically linked, not stripped
+
+で、
+
+-rwxr-xr-x 1 nojima nojima 141820  1月 25 16:09 x-load*
+
+ということなので、x-load本体で141kもある。つまり、build-logをみると、
+arm-linux-gnueabi-objcopy --gap-fill=0xff -O binary x-load x-load.bin
+がx-load.binの実行結果なので、こちらのcopyが行われたときにざっくり消えた。
+
+ちなみにx-load.iftというのが、MLOそのもので、signGPコマンドで、
+特別なバイナリヘッダをつけたbinファイルを作ってる。
+特別なバイナリヘッダはsignGP.cのconfig変数が該当。
+
+MLOの内容がcyanogenmod由来のものとまるで違うので、ショック。
+最初のヘッダすらまるで違う...
+
+--->そもそもB&N側のソースのx-loaderに梱包のsignGPは、
+CHSETTINGSなものを頑張るが、CWM梱包のMLOはまったく別物。
+これってどうやって持ってきたんだ?そもそもB&N側のx-loaderは
+正しい内容なのか？
+
+
+
+こりゃ、cyanogenmodから全部ひっぱってくるのが正解か?
+
+cyanogenmodのメイク方法
+http://wiki.cyanogenmod.org/w/Development
+
+で、nook hd plus用は、
+http://wiki.cyanogenmod.org/w/Build_for_ovation
+
+
+ Using these, you can build both CyangenMod and ClockworkMod recovery image from source code, and then install them both to your device.
+だとさ。なので、CWMもコンパイルできるらしい。ヤター！
+
+が、
+
+ repo init -u https://github.com/CyanogenMod/android.git -b cm-11.0
+ repo sync
+
+したらすげえ量DLだ...orz
+
