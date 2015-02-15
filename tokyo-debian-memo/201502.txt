@@ -441,3 +441,10 @@ http://wiki.cyanogenmod.org/w/Build_for_ovation
 
 したらすげえ量DLだ...orz
 
+----
+debian-develつらつらみてて、
+gnss-sdrのITPを見つけたので、しらべたら、
+http://gnss-sdr.org/documentation/general-overview
+ってことで、なんと！gnu-radioつかってGPS電波直接うけてGPSなことしちゃおう！
+というすさまじいプロジェクトだった...まぢか。
+
