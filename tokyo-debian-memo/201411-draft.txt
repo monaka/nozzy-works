@@ -231,6 +231,8 @@ arch way
 https://wiki.archlinux.org/index.php/The_Arch_Way
 
 archはAURを使うことで現在Debianを上回る量のパッケージが使える。
+参考：https://aur.archlinux.org/
+のStatistics。現在：52628パッケージある。
 
 他のディストリとの比較の公式見解：
 https://wiki.archlinux.org/index.php/Arch_compared_to_other_distributions
@@ -293,6 +295,287 @@ systemctl xxxx netctl@XXXX.service
 
  apt-get update/upgradeの操作に相当 ---> pacman -Syu
 
+ arch linuxの継承ディストリビューションとして、antergos（http://antergos.com/）
+というのがあるらしい。2chでも試すならこちらを試せという話が出てる。Aboutによれば、
+Desktop Environmentサポート、インストーラ付き arch linuxとのこと。
+---> げええ、
+http://antergosjp.github.io/
+というantergosJPという団体があった...
+
+
+Manjaro Linuxも派生品として存在。ArchBangやら、Cinnarchもあるらしい。
+archbangは2chの情報だと先日から落ちてるらしい。
+
+ バグトラッカは、
+ https://bugs.archlinux.org/
+　使い方は、
+https://wiki.archlinux.org/index.php/Reporting_Bug_Guidelines
+
+　pacmanのラッパーで、pacmanでシステムupgradeするときにNewsをチェックしたりするのが、
+pacmatic。
+https://wiki.archlinux.org/index.php/Enhance_system_stability#Consider_using_pacmatic
+
+　嘘かほんとかわからんが、使われてるパッケージの統計：
+https://www.archlinux.de/?page=FunStatistics
+
+ ubuntuからarchへ乗り換えた人の感想
+ http://divide-et-impera.org/archives/1388
+　これが魅力なのかー。うーん夢見過ぎじゃ？
+
+Arch Compared to Other Distributions (日本語)
+https://wiki.archlinux.org/index.php/Arch_Compared_to_Other_Distributions_(%E6%97%A5%E6%9C%AC%E8%AA%9E)
+
+まあ、おちついてるな。一つ言えることは、debianの最小限インスコ以上に、arch linuxの最小限インスコはコンフィグ等の透明性が高い（ようは、なんもしとらん）
+
+UbuntuからArch Linuxへ宗旨替えしてからしたことまとめ
+http://sheephead.homelinux.org/2012/03/20/6985/
+んー、なるほどな。ポイントは設定の透明性と軽さ。
+あと、システムの構成にこだわりがある場合、
+
+ 邪魔してくる、システムの考えを押し付けてくるのは--> debian/ubuntu
+ なにもしてこない、どこまでも俺様流が可能 --> arch linux
+
+ということがあるようだ。まあ、keep it simple!だしな。個別の
+インストールか依存でインストールしかないからな。Debianはユーザフレンドリー
+を採ったので、こういったことはポリシー的に実現できない。
+Arch LinuxのUser Centerizeというのはこういうこと。
+
+　やたらヨーグルトという言葉が2chで出てくるのでなにかと思ったら、
+
+Yaourt (日本語)
+https://wiki.archlinux.org/index.php/Yaourt_%28%E6%97%A5%E6%9C%AC%E8%AA%9E%29
+
+ということだった。要はAURも使えるようにしたpacmanへのスクリプト。
+
+＞Yaourt は非公式の、サードパーティ製スクリプトです。Arch Linux の開発者によるサポートはありません。
+
+という注意書きみて状況わかれ。
+
+ Redditのスレも面白い。
+ http://www.reddit.com/r/linux/comments/28rflf/arch_linux_or_ubuntu/
+
+あと、Debianは、DFSG Freeに超こだわるので、archに比べてどうしてもパッケージに見劣りがするか、遅くなる。また、Debianはunstableであっても、archよりもパッケージの取り込みが遅い。
+
+ arch linuxはそのシンプルさから、開発物がDebianよりも小さく、単純ですむ。そのため、開発者らの調整コストが少ない。つまり、Arch Linux側からみると、ディストリ維持についてムダなコストをかけてるのがDebian側に見える。ユーザの嗜好なんてわからんから、ユーザで勝手に構成しろよ！というのが、Arch Linuxの考え方。なので、このあたりの調整コストが高く付く件は全部カットできる。
+
+ポートフォリオとしては、
+  - とっつきやすさで軸をつくり、
+  - パッケージが古い、新しいで軸を作るとよいかなぁ。
+　- 調整コストの高さでも面白いかも。
+　- ユーザの自由度とか、設定の透明性と、ちょっと使えるまでの複雑さを軸にするのもあり？
+
+民主的に進むとはいえ、Debianがユーザ構成にまでポリシーを持つのでこの部分に無駄が多く、
+技術者のコミュニケーション量が多いのはDebian。インストーラがある/ないでこれだけ
+無駄が出てしまう。このためDebianはよくイベントとか開く必要が逆にでてくる。
+Arch Linuxはディストリ本体の調整項目が非常に少ないので、upstreamとの対話が重要になる。
+
+planet debian的な存在は：http://archlinux.me/
+
+開発者になるプロセス：
+https://wiki.archlinux.org/index.php/Getting_involved
+
+TUというのが、Aurのリポジトリにアップロードできる権限あり。
+スポンサーがいるらしい。で、議論＋選挙でOKとなれば、付け加えられる。
+https://wiki.archlinux.org/index.php/Trusted_Users
+
+Google-Fuというのは、検索に長けた人。
+
+Aurの実態については、
+http://note.kurodigi.com/post-0-13/
+が参考に。
+
+yaourtの導入は、
+http://note.kurodigi.com/archlinux-yaourt/
+要はAURからもってくる。
+
+が、package-queryパッケージが依存関係にあるので、
+こちらもAURからひっぱってくる必要あり。
+
+AURの面白いところは、パッケージに投票システムが有り、
+投票上位だと公式リポジトリ側へアピールになる。
+
+pacmanのチュートリ：
+https://wiki.archlinux.org/index.php/Pacman_%28%E6%97%A5%E6%9C%AC%E8%AA%9E%29
+
+AURで必要なmakepkgはpacmanパッケージに含まれる。
+[nojima@arch-01 ~]$ pacman -Qo /usr/bin/makepkg 
+/usr/bin/makepkg is owned by pacman 4.1.2-7
+
+-->pkgfileというコマンドがある。debianでいうところの、apt-fileコマンドか？
+入れたらsudo pkgfile -uでまずファイルのリストを取ってくる必要あり。
+
+パッケージグループというのがあり、まとめて複数パッケージ導入される。
+[nojima@arch-01 ~]$ pacman -Sg gnome | less
+でどんなパッケージが含まれるかわかる。
+
+AUR面白くて、tarボールでひっぱてきても、中身はPKGBUILDファイルのみ。
+でも、makepkg -sすると、勝手にソースのtarボールおとしてきて
+コンパイルが始まり、最後はパッケージが出来上がる。
+
+試しに、yaourtのために、package-queryを作成して、
+パッケージファイルみたら、
+[nojima@arch-01 package-query]$ tar tf package-query-1.4-1-x86_64.pkg.tar.xz
+.PKGINFO
+.MTREE
+usr/
+usr/bin/
+usr/share/
+usr/share/man/
+usr/share/man/man8/
+usr/share/man/man8/package-query.8.gz
+usr/bin/package-query
+だった。
+
+yaourtは
+https://wiki.archlinux.org/index.php/Yaourt_%28%E6%97%A5%E6%9C%AC%E8%AA%9E%29
+
+yaourtを入れたら、AURのリポジトリ情報を得るため、
+yaourt -Syuaしておく。
+
+検索とインストールは一緒。なので、ttf-sawarabiを探したかったら、
+yaourt sawarabi
+とかすると、
+
+[nojima@arch-01 yaourt]$ yaourt sawarabi
+1 aur/ttf-sawarabi-gothic 20140915-1 (1)
+    A gothic font for Japanese
+2 aur/ttf-sawarabi-mincho 20140915-1 (1)
+    A mincho font for Japanese
+==> Enter n° of packages to be installed (ex: 1 2 3 or 1-3)
+==> -------------------------------------------------------
+==> q
+
+こんな感じでインタラクティブモードになる。
+
+--->検索できた。
+[nojima@arch-01 yaourt]$ yaourt -Ss sawarabi
+aur/ttf-sawarabi-gothic 20140915-1 (1)
+    A gothic font for Japanese
+aur/ttf-sawarabi-mincho 20140915-1 (1)
+    A mincho font for Japanese
+
+
+[nojima@arch-01 yaourt]$ file /usr/bin/yaourt 
+/usr/bin/yaourt: Bourne-Again shell script, UTF-8 Unicode text executable
+
+らしいので、シェルスクリプト。
+
+ちなみにlvはAURの提供。入れてみる。
+おおー、AURから、PKGBUILDがおちて、makepkg-> pacmanまで走る。
+
+あれ？yaourtはroot権限不要みたいで、でもどういうわけか、pacmanOKだった。
+yaourt -S nkf
+したら入った。rootなしなのに、/usr/bin/nkfがある。
+
+pacmanで入るシステムも、yaourtで入るしすてむも一緒であつかえる。
+
+systemdのパッケージをみると、フルフルでパッチとか入ったソースをみれる。
+
+yaourt -G systemd
+cd systemd
+ls -a
+[nojima@arch-01 systemd]$ ls -a
+.
+..
+0001-nspawn-ignore-EEXIST-when-creating-mount-point.patch
+0001-sd-bus-properly-handle-removals-of-non-existing-matc.patch
+0001-sd-dhcp-client-clean-up-raw-socket-sd_event_source-w.patch
+0001-shared-install-avoid-prematurely-rejecting-missing-u.patch
+0001-shutdown-fix-arguments-to-run-initramfs-shutdown.patch
+0001-udev-hwdb-Change-error-message-regarding-missing-hwd.patch
+0001-units-don-t-order-journal-flushing-afte-remote-fs.ta.patch
+0001-units-make-systemd-journald.service-Type-notify.patch
+0001-units-order-sd-journal-flush-after-sd-remount-fs.patch
+initcpio-hook-udev
+initcpio-install-systemd
+initcpio-install-udev
+PKGBUILD
+systemd.install
+
+PKGBUILDみると、prepare()という関数で、パッチあてまくり、
+
+[nojima@arch-01 systemd]$ file /usr/bin/makepkg
+/usr/bin/makepkg: Bourne-Again shell script, ASCII text executable
+
+なんてこった、makepkgはシェルスクだ。
+
+yaourtは、
+/tmp/yaourt-tmp-<user>/aur-<pkgname>
+以下をビルドディレクトリにしてPKGBUILDファイル群を取ってきてmakepkg -sする。
+
+bash -x /usr/bin/yaourt -S nkf
+
+とかするとyaourtの動きがよくわかるが、
+
++ makepkg -s -f -p ./PKGBUILD
+とかでビルドが行われ
+
++ sudo pacman --color auto -U /tmp/yaourt-tmp-nojima/PKGDEST.v9P/nkf-2.1.3-1-x86_64.pkg.tar.xz
+とかしてるので、root権限なしでインストールができる。
++ rm -rf /tmp/yaourt-tmp-nojima/aur-nkf
+とかあるので、ビルドディレクトリを全部きれいにする。
+
+arch linuxのパッケージは-devと、-binにわけたりしない。
+基本的に１パッケージ入ると、debianでいうところの-devと-binの両方
+が入る。なので、buildにあたってのdependencyと、バイナリ
+インストールのdependencyは同一。
+
+わらえる：
+[nojima@arch-01 work]$ yaourt -Ss usbmuxd
+extra/libusbmuxd 1.0.9-1
+    USB Multiplex Daemon
+extra/usbmuxd 1.1.0-1
+    USB Multiplex Daemon
+aur/lib32-usbmuxd 1.0.8-2 (1)
+    USB Multiplex Daemon (32 bit)
+aur/libimobiledevice-ios7fix 1.1.6-2 (2)
+    Is a software library that talks the protocols to support iPhone and iPod 
+    Touch devices on Linux. Includes usbmuxd and libplist.
+aur/libusbmuxd-git 1.0.9.r0.g7823348-1 (3)
+    The usbmuxd communication interface library
+aur/usbmuxd-git 1:1.0.8.114.g50cb347-2 (29)
+    USB Multiplex Daemon
+aur/usbmuxd-unstable 1.0.9-1 (0)
+    Is a software library that talks the protocols to support iPhone and iPod 
+    Touch devices on Linux.
+
+パッケージの命名ルールがめちゃくちゃだ。
+
+pacman -Ssだけすると、リストが取れる。
+core
+extra
+community
+
+の３リポジトリがある？
+
+packageグループは
+https://www.archlinux.org/groups/
+で一覧みれる。
+
+試しに、gnome-shellを入れてみた。
+https://wiki.archlinux.org/index.php/GNOME_%28%E6%97%A5%E6%9C%AC%E8%AA%9E%29
+
+[nojima@arch-01 ~]$ sudo pacman -S gnome-shell
+resolving dependencies...
+:: There are 4 providers available for libgl:
+:: Repository extra
+   1) mesa-libgl  2) nvidia-304xx-libgl  3) nvidia-340xx-libgl  4) nvidia-libgl
+
+Enter a number (default=1): 
+
+ってな感じで「割と親切やん」ってかんじか？
+
+おお、waylandもひきずられて入るぞ。あれ？xorg-serverは？
+うーん、wpasupplicantとかも入った...
+
+その一方で、Xorgはいったので、動くかなーと思ったら、なんと、
+Xのドライバ全く入っていないでやんの。つまり、
+
+  Debian ---> 将来使う可能性のあるパッケージはとにかくなんでも入れる。
+  Arch Linux ---> ユーザが自分でえらんで必要なものだけ入れるんじゃボケ！
+　　　　　　　　　　（軽さというより、絶妙な依存関係の無さと言ったほうがよいかも。
+　　　　　　　　　　　Arch Linux Developerのセンスという感じ）
+まあ、x86fb-mode-setドライバ入れたら、いきなり、gdm動いた。
 
 
 ------------------------
@@ -329,3 +612,10 @@ wajig
 
 というツールもある。
 
+---------------------------------
+manpages-ja
+にて、sidの内容を突っ込んでいるが、
+　　- ps
+   - pstree
+
+の訳が古い。

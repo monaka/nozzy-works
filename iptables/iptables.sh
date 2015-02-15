@@ -56,6 +56,8 @@ iptables -A OUTPUT -p tcp --dst 8.25.37.138 --dport 9000 --syn -j ACCEPT
 iptables -A OUTPUT -p tcp --dst 195.138.247.90 --dport 8000 --syn -j ACCEPT
 # for absolute transe EURO
 iptables -A OUTPUT -p tcp --dst 205.164.62.15 --dport 7014 --syn -j ACCEPT
+# for trance.fm
+iptables -A OUTPUT -p tcp --dst 5.63.150.167 --dport 8002 --syn -j ACCEPT
 # for irc
 iptables -A OUTPUT -p tcp --dport 6667 --syn -j ACCEPT
 # for git 
@@ -98,8 +100,8 @@ iptables -A OUTPUT -p tcp --dport 43 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
 # for lan
 iptables -A OUTPUT -p tcp -d 172.16.52.10/32 --dport 8000 -j ACCEPT
-iptables -A INPUT  -s 10.22.95.25/32 -j ACCEPT
-iptables -A OUTPUT -d 10.22.95.25/32 -j ACCEPT
+iptables -A INPUT  -s 10.22.117.25/32 -j ACCEPT
+iptables -A OUTPUT -d 10.22.117.25/32 -j ACCEPT
 ## for ftp
 iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
 # another service
