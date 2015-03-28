@@ -448,3 +448,12 @@ http://gnss-sdr.org/documentation/general-overview
 ってことで、なんと！gnu-radioつかってGPS電波直接うけてGPSなことしちゃおう！
 というすさまじいプロジェクトだった...まぢか。
 
+--------------
+evolutionがthnikpadのtrackpointで超使いにくいので悩んでいたが、
+※スクロールが吹っ飛ぶなど
+gpointing-device-settingsで、ホイールエミュレーション
+を活用したら超良かった。中ボタンにホイールモード割り当てで
+問題なし。ホイールモードであれば、大量のメールのスクロール
+とかまったく問題がなかった。
+
+
