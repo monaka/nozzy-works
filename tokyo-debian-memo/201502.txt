@@ -455,5 +455,14 @@ gpointing-device-settingsで、ホイールエミュレーション
 を活用したら超良かった。中ボタンにホイールモード割り当てで
 問題なし。ホイールモードであれば、大量のメールのスクロール
 とかまったく問題がなかった。
+--->嘘
+
+1043  xinput --list 
+ 1044  xinput --list-props 11
+ 1045  xinput --set-prop 11 "Evdev Wheel Emulation" 1
+ 1047  xinput --set-prop 11 "Evdev Wheel Emulation Button" 2
+ 1048  xinput --list-props 11
+
+が正解。
 
 

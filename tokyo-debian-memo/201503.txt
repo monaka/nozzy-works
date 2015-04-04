@@ -1,0 +1,125 @@
+なんかもー、いろいろ動かんのう＞ linux-image-3.17-1~exp1
+--->あー、これ、linuxのせいじゃない。systemdまわりで、いろいろ
+　　デバイスファイルが作られなくてハマる。
+
+--> pppdは
+~/ pon l-05a                
+Couldn't open the /dev/ppp device: No such file or directory
+/usr/sbin/pppd: You need to create the /dev/ppp device node by
+executing the following command as root:
+	mknod /dev/ppp c 108 0
+とかいうし。
+
+sudo mknod /dev/ppp c 108 0
+
+で、動作。
+
+---> softetherはv4.14で、vpnclientがハング。
+
+どうでもよいが、vpnclientがハングする理由は、/dev/net/tunが居ないため、
+異常動作に入って、pthread_mutex_lockでこける（何故かハング）が原因。
+
+cd /dev/net
+mknod tun c 10 100
+してvpnclient動かすとさっくり動く。
+
+バグレポしちゃるぜ。くそ。
+とおもったら、debian-usersで聞いたら瞬速で答えが帰ってきて、
+すでにバグレポされてたことが、わかった。
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=780263
+kmodのせいらしい。おまけに、modprobe tunでよかったらしい。
+
+
+あと、softether v4.14は、勝手に
+/var/lib/dpkg/info/softether-vpnserver.postinst
+にて、
+------------------ここから------------------
+#!/bin/sh
+set -e
+# Automatically added by dh_installinit
+if [ -x "/etc/init.d/softether-vpnserver" ]; then
+        update-rc.d softether-vpnserver defaults >/dev/null
+        invoke-rc.d softether-vpnserver start || exit $?
+fi
+# End automatically added section
+------------------ここから------------------
+
+なことして、いきなり、
+
+[  717.827473] [Drop output]IN= OUT=ppp0 SRC=49.101.255.27 DST=130.158.6.56 LEN=65 TOS=0x00 PREC=0x00 TTL=64 ID=40655 DF PROTO=UDP SPT=55770 DPT=80 LEN=45
+※DESTは、
+
+/var/lib/dpkg/info/ dig -x 130.158.6.56
+
+; <<>> DiG 9.9.5-9-Debian <<>> -x 130.158.6.56
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 2498
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;56.6.158.130.in-addr.arpa.	IN	PTR
+
+;; ANSWER SECTION:
+56.6.158.130.in-addr.arpa. 27720 IN	PTR	keepalive.softether.com.
+
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Sat Mar 21 07:49:13 JST 2015
+;; MSG SIZE  rcvd: 91
+
+
+な通信を開始するので、注意。（まぢかー）
+
+~/prog/centos-image/ sudo virt-install --connect=qemu:///system -n centos65-01 --ram 512 --cdrom `pwd`/CentOS-6.5-x86_64-minimal.iso --disk /var/lib/libvirt/images/centos65-01,bus=virtio,size=3,format=raw,cache=writeback --vnc --hvm --accelerate
+
+Starting install...
+ERROR    Requested operation is not valid: network 'default' is not active
+Domain installation does not appear to have been successful.
+If it was, you can restart your domain by running:
+  virsh --connect qemu:///system start centos65-01
+otherwise, please restart your installation.
+
+って出るときは、dnsmasqが邪魔ぶっこいてる事が多いらしい。ーー＞嘘でした。
+
+https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Virtualization_Host_Configuration_and_Guest_Installation_Guide/App_Virt_Net_Not_Starting.html
+
+なので、sudo virsh net-start default で、defaultネットワークを起動してから、
+virt-installだそうな。（実際動いた）
+
+cenots65-minimalの入れ方。
+
+Language SelectionはEnglish
+virt-ioでぶうぶう言われるが、Re-initializeですすむ。
+Time zoneはAsia/Tokyo。
+パッケージも選ばずに終了！
+うわあああ、kernelパニックして死んだ。
+２回めやってみたが、やっぱりパニクって死んだ。
+
+---> DVD1.isoイメージ落としてきて、Memry 2Gにすると、Graphical install
+になるので、こちらで。minimumでいける。
+lang=us,keyboad=us,timzone=Asia/Tokyo
+なお、custom disk を選んで、
+LVMは全部消去して、
+vda1 /boot 500M
+vda2 /    2G
+vda3 swap 残り
+とかやる事。こうしないと、LVMとかにされてしまい超面倒。
+さらに面倒勃発。
+dumpイメージを使うしかないが、restoreコマンドガー。
+
+ぐっは、めんどくせー。
+/etc/grub.cfgみると、root=UUIDだ。
+LANG=とかの環境変数がいじられまくり。
+mkdir /etc/.backupして、grub.cfg変更。
+
+grub-install /dev/vdaして終了。
+
+
+
+
+
+
+
