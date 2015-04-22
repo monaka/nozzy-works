@@ -1,0 +1,67 @@
+Cyanogen mod環境作った。
+
+Vultrでdisk typeを作る。
+
+ここで、snapshotとか使いたかったが、
+なんとひどいことにsnapshot１発取るのに60分だってさ。
+60分もあれば、sidぐらい一発用意なので、以下の方法で作る。
+
+ Step 1. vultrに公開鍵登録。（名前つけて、公開鍵カット＆ペースト）
+ Step 2. debian 7でぶっこむ。
+ Step 3. 出来上がると、rootで先に登録した公開鍵でrootログインが可能になる。
+ Step 4. /etc/apt/source.listぶっこむ
+  deb http://http.debian.net/debian/ sid main contrib non-free
+  deb-src http://http.debian.net/debian/ sid main contrib non-free
+ Step 5. apt-get update -o Acquire::PDiffs=false
+ Step 6. aptitude full-upgrade
+ Step 7. aptitude install sudo iptables-persistent
+ Step 8. vi /etc/hostname
+         ----修正---
+	 cyanogen0001
+	 ----修正---
+ Step 9. vi /etc/hosts (sudoでエラーでるので、抑止)
+        127.0.0.1	localhost cyanogen0001
+
+ Step 10. vi /etc/sudoers.d/xxxxx
+ Step 11. groupadd -g 1000 yourname
+          useradd -g yourname -s /bin/bash -m -u 1000 yourname
+
+ Step 12. mkdir /home/yourname/.ssh;chmod 600 /home/yourname/.ssh;cp /root/.ssh/authorized_keys /home/yourname/.ssh/;chown yourname:yourname /home/yourname/.ssh/authorized_keys
+ Step 13. vi /etc/ssh/sshd_config
+     ----最終行に追加---
+     UseDNS no
+     ----最終行に追加---
+
+ Step 14. exit;
+
+ Step 15. mkdir work; cat > work/iptables.sh
+--------ここから--------- 
+#!/bin/sh
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+iptables -P INPUT DROP
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+iptables -F INPUT
+iptables -F FORWARD
+iptables -F OUTPUT
+iptables -F -t nat
+
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
+service iptables-persistent save
+service iptables-persistent restart
+exit 0
+--------ここから--------- 
+Step 16. sh. work/iptables.sh
+Step 17. sync;sync;rebootする。
+Step 18. ssh yournameしてuname -aすると、linux-3.16.0がぶっこまれているはず。
+         ※注意：rootでsshのログインはできなくなるようにfull-upgradeの際調整されちゃう。
+Step 19. andoroid sdkの入手：
+wget http://dl.google.com/android/android-sdk_r24.1.2-linux.tgz
+Step 20. 展開して、toolsディレクトリへ移動。
+Step 21. sudo aptitude install openjdk-8
+Step 22. ./android sdkでGUIが開き...
