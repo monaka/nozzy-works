@@ -100,8 +100,8 @@ iptables -A OUTPUT -p tcp --dport 43 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 10080 -j ACCEPT
 # for lan
 iptables -A OUTPUT -p tcp -d 172.16.52.10/32 --dport 8000 -j ACCEPT
-iptables -A INPUT  -s 10.22.117.25/32 -j ACCEPT
-iptables -A OUTPUT -d 10.22.117.25/32 -j ACCEPT
+iptables -A INPUT  -s 10.22.117.33/32 -j ACCEPT
+iptables -A OUTPUT -d 10.22.117.33/32 -j ACCEPT
 ## for ftp
 iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
 # another service
