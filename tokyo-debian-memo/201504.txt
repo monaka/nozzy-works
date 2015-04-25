@@ -14,7 +14,7 @@ Vultrでdisk typeを作る。
   deb-src http://http.debian.net/debian/ sid main contrib non-free
  Step 5. apt-get update -o Acquire::PDiffs=false
  Step 6. aptitude full-upgrade
- Step 7. aptitude install sudo iptables-persistent
+ Step 7. aptitude install sudo iptables-persistent xauth
  Step 8. vi /etc/hostname
          ----修正---
 	 cyanogen0001
@@ -58,10 +58,24 @@ exit 0
 --------ここから--------- 
 Step 16. sh. work/iptables.sh
 Step 17. sync;sync;rebootする。
-Step 18. ssh yournameしてuname -aすると、linux-3.16.0がぶっこまれているはず。
+Step 18. ssh -X yourname@remoteしてuname -aすると、linux-3.16.0がぶっこまれているはず。
          ※注意：rootでsshのログインはできなくなるようにfull-upgradeの際調整されちゃう。
 Step 19. andoroid sdkの入手：
 wget http://dl.google.com/android/android-sdk_r24.1.2-linux.tgz
 Step 20. 展開して、toolsディレクトリへ移動。
 Step 21. sudo aptitude install openjdk-8
-Step 22. ./android sdkでGUIが開き...
+Step 22. ./android sdkでGUIが開く。
+
+
+ちー、ssh -X でx11 forwardしようとしたら全然できないので、
+はまった。
+理由：xauthがリモート側に入ってない。
+---> bugじゃね？
+
+あー、./android sdkでGUIが開かず。
+oraclejavaか？
+
+あー、どうも何がわるさしてるかわからんので、
+./android update sdk --no-ui
+したら、いろいろ自動的にはいるようだ。
+
