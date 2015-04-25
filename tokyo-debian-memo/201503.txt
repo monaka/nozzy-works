@@ -29,6 +29,7 @@ mknod tun c 10 100
 https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=780263
 kmodのせいらしい。おまけに、modprobe tunでよかったらしい。
 
+--->最近治ったようだ。
 
 あと、softether v4.14は、勝手に
 /var/lib/dpkg/info/softether-vpnserver.postinst
@@ -116,6 +117,40 @@ LANG=とかの環境変数がいじられまくり。
 mkdir /etc/.backupして、grub.cfg変更。
 
 grub-install /dev/vdaして終了。
+
+--------------------
+
+ kindleをdebianで読む方法
+
+Step1. kindle for PCでwindows用kindle appを手に入れる
+http://www.amazon.co.jp/gp/feature.html?ie=UTF8&docId=3078592246
+
+Step2. aptitude install wine wine32 winetricks
+
+Step3. winecfgすると文字化けすることを確かめる
+　　　(/home/xxxx/.wineディレクトリが新規に作られる）
+
+Step4. winetricks wenquanyi
+を実行してMS CJKフォント突っ込む
+※これしないととにかく文字化け
+
+Step 5. wine32 KindleForPC-installer.exe
+
+Step 6. あとは、促されるままにamazon.co.jpへログイン。
+
+Step 7. Gnome3ならアプリとしてkindleが登録。あとは普通のkindleあぷり
+　　　　　として利用可能。
+
+------------------------------------
+JDの使い方
+
+ 2ch.netのAPI化により、linux 2chリーダ全滅
+なので、
+
+ jd4linuxの場合は、
+http://next2ch.net/linux/1425616458
+みて設定を変更。こちらにより、2ch.scと2ch.nextの両方が見れる。
+
 
 
 
