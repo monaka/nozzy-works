@@ -14,7 +14,8 @@ Vultrでdisk typeを作る。
   deb-src http://http.debian.net/debian/ sid main contrib non-free
  Step 5. apt-get update -o Acquire::PDiffs=false
  Step 6. aptitude full-upgrade
- Step 7. aptitude install sudo iptables-persistent xauth
+# Step 7. aptitude install sudo iptables-persistent xauth
+ Step 7. aptitude install sudo iptables-persistent
  Step 8. vi /etc/hostname
          ----修正---
 	 cyanogen0001
@@ -78,4 +79,105 @@ oraclejavaか？
 あー、どうも何がわるさしてるかわからんので、
 ./android update sdk --no-ui
 したら、いろいろ自動的にはいるようだ。
+--->とにかくいらないものがガンガン入るので、やめた方が良い。
+※実際、あとで、tools/androidでみるとわかるが、
+ sdk全部にチェック入れてインストールしたのと等価。
+
+
+あー、結局いろいろ試行錯誤したが、
+
+　-　遠距離の遅い回線だと、ssh -X 越しのXはうまく動作できない。
+　　xtermすらもまともに画面が出ない。
+
+なので、
+
+sudo aptitude install task-lxde-desktop
+
+して、vultrのconsoleにlxdeを立ち上げたら、
+tools/android が一発動作。Xのリンクよりきびきび動くので
+こちらでOKじゃん？
+
+※javaアプリケーションのせいで、consleメニューが無いのが罠。
+
+まあ、とにかく、Xがないとandoroidのsdkすらまともに入れられないのが涙...
+
+vultrのリモートコンソールに必要なフィルタが良くわからず。
+なので、取り急ぎOutput方向に42653/tcpを開けてみたが、とりあえずうまく
+いくが完全かは不明。googってもわからず。
+
+リモートコンソールつきvultr様々。
+
+あー、だめだー。512Megaだとメモリが足りん。
+swapはONにしないとダメだー。
+参考：
+https://www.vultr.com/docs/setup-swap-file-on-linux
+--->実際topで確認してるが、バリバリswapが使われるぞ?
+
+ぐっは、supportから連絡来たが意味解らん。
+instanceにより、portがかわる模様。
+
+がああ、android sdkの最小限ですら遅い...
+google遅いなぁ...
+
+ぐっは、tuiだったら、
+http://qiita.com/takakiku/items/69eb89f9af57d4138b7f
+を見ながらtuiで出来るらしい。ぐっは。
+くそがぁぁ！マニュアルに書いとけよ！
+
+さらに、android sdkは32bitライブラリ。
+なので、
+http://superuser.com/questions/700800/debian-multi-arch-android-sdk
+を参照して、32bit環境を手に入れるとなもし。
+
+dpkg --add-architecture i386
+aptitude update
+
+aptitude install libc6-i386
+
+してみた。
+---> i386パッケージの導入はなさげなので、
+　　　dpkg --remove-architecture i386
+     した。
+
+$ android update sdk -u -a -t tools,platform-tools
+
+してみた。
+
+すげーはええぜ。
+
+adbについては、
+sudo aptitude install libc-i386 lib32stdc++6
+
+うおお、adbがうごいたぜー。
+
+http://wiki.cyanogenmod.org/w/Build_for_ovation
+を見ながら、残りを用意。
+
+sudo aptitude installbison build-essential curl flex git gnupg gperf libesd0-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop openjdk-8-jdk pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev 
+
+sudo aptitude install g++-multilib gcc-multilib lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev
+
+------ここから
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+----ここまで
+は、デフォルトですでに.profileに投入済み。
+
+repo init -u https://github.com/CyanogenMod/android.git -b cm-12.1
+
+なお、
+git config --global user.email "your@email.com'
+git config --global user.name 'your'
+しとかないと、repoにて、gitが失敗に終わる。
+
+repo sync
+
+これでダウンロードがガンガン行われる。
+
+あー、ダウンロード長すぎて、途中でモバイル切れる....screenひっすだわー。
+
+
+
 

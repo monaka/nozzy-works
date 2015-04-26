@@ -104,6 +104,9 @@ iptables -A INPUT  -s 10.22.117.33/32 -j ACCEPT
 iptables -A OUTPUT -d 10.22.117.33/32 -j ACCEPT
 ## for ftp
 iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
+# vultr
+iptables -A OUTPUT -p tcp --dport 42653 -j ACCEPT
+# iptables -A OUTPUT -p tcp -d cyanogen0001 --dport 12653 -j ACCEPT
 # another service
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
 iptables -A INPUT -m limit --limit 5/min -p udp -j LOG --log-prefix '[Drop input]'
