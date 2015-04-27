@@ -53,8 +53,8 @@ iptables -A INPUT -p icmp -j ACCEPT
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
-service iptables-persistent save
-service iptables-persistent restart
+service netfilter-persistent save
+service netfilter-persistent restart
 exit 0
 --------ここから--------- 
 Step 16. sh. work/iptables.sh
@@ -172,12 +172,65 @@ git config --global user.email "your@email.com'
 git config --global user.name 'your'
 しとかないと、repoにて、gitが失敗に終わる。
 
+cd ~/android/system
 repo sync
 
 これでダウンロードがガンガン行われる。
 
 あー、ダウンロード長すぎて、途中でモバイル切れる....screenひっすだわー。
 
+うげげげえ、disk instanceで負荷かけると悲惨：
+%Cpu(s):  1.4 us,  3.1 sy,  0.0 ni,  0.0 id, 94.2 wa,  0.0 hi,  0.0 si,  1.4 st
+
+って、94.2waってなんじゃそりゃー。どうりで、aptitude full-upgradeが
+パッケージの割にクッソ遅いわーと思った。
+
+とりあえず、リモート環境なので、なんだかんだ不安定な接続になるので、
+aptitude install mosh tmux
+して、
+
+vultr側
+iptables -A INPUT -m state --state NEW -m udp -p udp --dport 60001:60010 -j ACCEPT
+
+note-pc側
+iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 60001:60010 -j ACCEPT
+
+しておき、
+
+mosh nojima@cyanogen0001
+
+すると、mosh経由でつながる。まあ、体感ではそんな便利なようには感じなかったなぁ。
+
+とりあえず、moshしといて、念のため、tmux new-sessionしといた。
+
+repo sync完了後、df したら、
+~/android/system$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       124G   35G   83G  30% /
+
+だってさ。35Gbytesもあるぜ。
+
+tmuxでは、ctr-bがbindkeyと言われるもの。ctr-b ]で、バックスクロールとなるので、
+矢印上下、あるいはPgUP/PgDNで上げ下げ。抜けるには、qをたたけばOK.
+$ cd ~/android/system
+$ source build/envsetup.sh
+$ breakfast ovation 2>&1 | tee ../build.log
+
+して、ビルド開始
+
+しかし、ショックを受けるぐらい、DISKが遅せー。
+
+moshは、まるで、screenのような扱いで紹介されるが、実際は、
+ローカルエコー付きsshぐらいの機能しか無い。
+
+なので、一度クライアントが死んじゃうと、２度とは接続できないので、
+mosh serverして何か言われたら、すでに稼働しているmosh-serverを
+killするのが正解。なので、screenなり、tmuxなりを併用するのが
+通常の使い方。
+
+※参考：
+reattach to detached mosh sessions 
+https://github.com/keithw/mosh/issues/394
 
 
 

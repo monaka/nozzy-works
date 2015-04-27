@@ -106,6 +106,8 @@ iptables -A OUTPUT -d 10.22.117.33/32 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
 # vultr
 iptables -A OUTPUT -p tcp --dport 42653 -j ACCEPT
+# mosh to vultr
+iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 60001:60010 -j ACCEPT
 # iptables -A OUTPUT -p tcp -d cyanogen0001 --dport 12653 -j ACCEPT
 # another service
 iptables -A INPUT -m limit --limit 5/min -p tcp -j LOG --log-prefix '[Drop input]'
